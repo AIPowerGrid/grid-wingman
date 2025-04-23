@@ -1,0 +1,72 @@
+{
+  "name": "cognito",
+  "version": "0.8.5",
+  "description": "Cognito is a Chrome extension that allows you to communicate with your browser.",
+  "main": "index.js",
+  "scripts": {
+    "start": "npm run clear && webpack -w --config config/webpack.config.js",
+    "clear": "rimraf dist && rimraf node_modules/.cache"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/3-ark/Cognito"
+  },
+  "keywords": [
+    "sidepanel",
+    "side",
+    "panel",
+    "chrome",
+    "extension"
+  ],
+  "author": "3-ark",
+  "license": "MIT",
+  "bugs": {
+  "url": "https://github.com/3-ark/Cognito"
+  },
+  "homepage": "",
+  "dependencies": {
+    "@chakra-ui/icons": "^2.1.1",
+    "@chakra-ui/react": "^2.7.1",
+    "@emotion/react": "^11.11.4",
+    "@reduxjs/toolkit": "^1.9.5",
+    "@types/react": "^18.2.14",
+    "@types/react-dom": "^18.2.6",
+    "@types/redux-logger": "^3.0.9",
+    "copy-webpack-plugin": "^11.0.0",
+    "dotenv": "^16.3.1",
+    "fetch-event-stream": "^0.1.5",
+    "framer-motion": "^11.1.7",
+    "generate-json-from-js-webpack-plugin": "^0.1.1",
+    "html-to-image": "^1.11.11",
+    "html-webpack-plugin": "^5.5.3",
+    "localforage": "^1.10.0",
+    "mini-css-extract-plugin": "^2.7.6",
+    "prop-types": "^15.8.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-hot-toast": "^2.4.1",
+    "react-markdown": "^10.1.0",
+    "react-redux": "^8.1.1",
+    "react-textarea-autosize": "^8.5.3",
+    "redux-thunk": "^2.4.2",
+    "remark-gfm": "^4.0.1",
+    "webext-redux": "^2.1.9"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.24.0",
+    "@stylistic/eslint-plugin-ts": "^4.2.0",
+    "@types/chrome": "^0.0.315",
+    "@typescript-eslint/eslint-plugin": "^8.29.1",
+    "eslint": "^9.24.0",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-simple-import-sort": "^12.1.1",
+    "eslint-plugin-unused-imports": "^4.1.4",
+    "globals": "^16.0.0",
+    "redux-logger": "^3.0.6",
+    "ts-loader": "^9.5.2",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.29.1",
+    "webpack": "^5.99.6",
+    "webpack-cli": "^6.0.1"
+  }
+}
