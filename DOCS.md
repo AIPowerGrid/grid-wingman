@@ -332,46 +332,36 @@ Collecting workspace informationCertainly! Here’s a detailed explanation and a
 ### sidePanel Structure and Responsibilities
 
 
-```mermaid
-flowchart TD
-  A[Cognito.tsx<br>Main Panel] --> B[Header.tsx]
-  A --> C[Messages.tsx]
-  A --> D[Settings.tsx]
-  A --> E[Input.tsx]
-  A --> F[AddToChat.tsx]
-  A --> G[Send.tsx]
-  A --> H[ChatHistory.tsx]
-  A --> I[Docs.tsx]
-  A --> J[Background.tsx]
-
-  C --> K[Message.tsx]
-  D --> L[Themes.tsx]
-  D --> M[Connect.tsx]
-  D --> N[Persona.tsx]
-  D --> O[PageContext.tsx]
-  D --> P[WebSearch.tsx]
-  D --> Q[Params.tsx]
-  D --> R[Automation.tsx]
-
-  M --> M1[ConnectOllama.tsx]
-  M --> M2[ConnectLmStudio.tsx]
-  M --> M3[ConnectGroq.tsx]
-  M --> M4[ConnectGemini.tsx]
-  M --> M5[ConnectOpenAI.tsx]
-  M --> M6[ConnectOpenRouter.tsx]
-  M --> M7[ConnectCustom.tsx]
-
-  subgraph Context & Utils
-    S[ConfigContext.tsx]
-    T[messageUtils.ts]
-    U[network.tsx]
-    V[hooks/]
-  end
-
-  A -.-> S
-  A -.-> T
-  A -.-> U
-  A -.-> V
+```
+src/
+  sidePanel/
+    Cognito.tsx         # Main entry point for the side panel UI; manages chat state, message flow, and renders all major UI sections
+    Header.tsx          # Top bar with chat title, persona/model selectors, export/import, and navigation to settings/history
+    Settings.tsx        # Accordion-based settings panel; hosts configuration sections for themes, connections, personas, etc.
+    Themes.tsx          # Theme selection and customization UI (preset/custom color schemes, font sizes)
+    Connect.tsx         # Connection forms for various AI model providers (Ollama, LM Studio, Groq, OpenAI, etc.)
+    ConnectOllama.tsx   # Ollama-specific connection form
+    ConnectLmStudio.tsx # LM Studio-specific connection form
+    ConnectGroq.tsx     # Groq-specific connection form
+    ConnectGemini.tsx   # Gemini-specific connection form
+    ConnectOpenAI.tsx   # OpenAI-specific connection form
+    ConnectOpenRouter.tsx # OpenRouter-specific connection form
+    ConnectCustom.tsx   # Custom endpoint connection form
+    Persona.tsx         # Persona management: create, edit, select, and delete custom assistant personas
+    PageContext.tsx     # Controls how much and what type of page content is shared with the AI (text/html, char limit)
+    WebSearch.tsx       # Web search configuration (source, char limit, etc.)
+    Messages.tsx        # Renders the chat message list, handles auto-scroll, and message actions (copy, repeat)
+    Message.tsx         # Renders individual chat bubbles, including markdown, code blocks, and special formatting
+    Input.tsx           # User input box for sending messages
+    Send.tsx            # Send button with loading spinner
+    AddToChat.tsx       # Button/menu to switch chat modes (web, page, etc.)
+    ChatHistory.tsx     # Displays and manages saved chat histories
+    Docs.tsx            # Info box linking to documentation
+    Background.tsx      # Optional background image for the panel
+    ConfigContext.tsx   # React context for global config (theme, persona, model, etc.)
+    messageUtils.ts     # Helpers for exporting/downloading chat content
+    network.tsx         # Web search and result parsing logic
+    hooks/              # Custom React hooks (e.g., useSendMessage, useChatTitle)
 ```
 
 - **Cognito.tsx**  
