@@ -294,6 +294,146 @@ Development instructions:
 - `config/webpack.config.js`: Modify build outputs and entry points
 - `config/manifest/`: Update extension permissions and metadata
 
+---
+
+### src Directory Structure Overview
+
+The src folder contains all the source code for the Cognito extension. Here’s what each part does:
+
+- **`Globals.d.ts`**  
+  TypeScript global type declarations used throughout the project for type safety and IntelliSense.
+
+- **`background/`**  
+  Contains the background service worker scripts. These manage extension lifecycle events, handle communication between different extension parts, and coordinate actions like content script injection and side panel behavior.  
+  - Example: `index.ts` initializes the store, sets up panel behavior, and manages connections.
+
+- **`content/`**  
+  Content scripts injected into web pages. These scripts interact with the DOM of visited sites, extract information, and relay it back to the extension for context-aware features.
+
+- **`sidePanel/`**  
+  All UI components and logic for the extension’s side panel chat interface.  
+  - Includes React components, context providers, network utilities, and helpers for rendering the chat, handling user input, displaying documentation, and managing configuration.
+  - Example:  
+    - `ConfigContext.tsx`: Provides configuration and theme context to the UI.  
+    - `Docs.tsx`: Renders the documentation/info box in the panel.  
+    - `network.tsx`: Handles web search and result parsing logic.
+
+- **`state/`**  
+  Application state management, typically using Redux or similar. Contains store setup, reducers, and actions for managing chat history, user settings, and other persistent state.
+
+- **`types/`**  
+  Shared TypeScript type definitions and enums used across the extension for consistent data structures and API contracts.
+
+- **`util/`**  
+  Utility functions and helpers used throughout the codebase. This may include storage utilities, formatting helpers, and other reusable logic.
+
+Collecting workspace informationCertainly! Here’s a detailed explanation and a Mermaid diagram for the sidePanel folder, which is the core of your extension’s UI and chat logic.
+
+### sidePanel Structure and Responsibilities
+
+
+```mermaid
+flowchart TD
+  A[Cognito.tsx<br>Main Panel] --> B[Header.tsx]
+  A --> C[Messages.tsx]
+  A --> D[Settings.tsx]
+  A --> E[Input.tsx]
+  A --> F[AddToChat.tsx]
+  A --> G[Send.tsx]
+  A --> H[ChatHistory.tsx]
+  A --> I[Docs.tsx]
+  A --> J[Background.tsx]
+
+  C --> K[Message.tsx]
+  D --> L[Themes.tsx]
+  D --> M[Connect.tsx]
+  D --> N[Persona.tsx]
+  D --> O[PageContext.tsx]
+  D --> P[WebSearch.tsx]
+  D --> Q[Params.tsx]
+  D --> R[Automation.tsx]
+
+  M --> M1[ConnectOllama.tsx]
+  M --> M2[ConnectLmStudio.tsx]
+  M --> M3[ConnectGroq.tsx]
+  M --> M4[ConnectGemini.tsx]
+  M --> M5[ConnectOpenAI.tsx]
+  M --> M6[ConnectOpenRouter.tsx]
+  M --> M7[ConnectCustom.tsx]
+
+  subgraph Context & Utils
+    S[ConfigContext.tsx]
+    T[messageUtils.ts]
+    U[network.tsx]
+    V[hooks/]
+  end
+
+  A -.-> S
+  A -.-> T
+  A -.-> U
+  A -.-> V
+```
+
+- **Cognito.tsx**  
+  Main entry point for the side panel UI. Manages chat state, message flow, and renders all major UI sections (header, messages, settings, etc.).
+
+- **Header.tsx**  
+  Top bar with chat title, persona/model selectors, export/import, and navigation to settings/history.
+
+- **Settings.tsx**  
+  Accordion-based settings panel. Hosts configuration sections for themes, connections, personas, page context, web search, and more.
+
+- **Themes.tsx**  
+  Theme selection and customization UI. Lets users pick preset or custom color schemes and font sizes.
+
+- **Connect.tsx** (+ ConnectOllama.tsx, ConnectLmStudio.tsx, etc.)  
+  Connection forms for various AI model providers (Ollama, LM Studio, Groq, OpenAI, etc.).
+
+- **Persona.tsx**  
+  Persona management: create, edit, select, and delete custom assistant personas.
+
+- **PageContext.tsx**  
+  Controls how much and what type of page content is shared with the AI (text/html, char limit).
+
+- **WebSearch.tsx**  
+  Web search configuration (source, char limit, etc.).
+
+- **Messages.tsx**  
+  Renders the chat message list, handles auto-scroll, and message actions (copy, repeat).
+
+- **Message.tsx**  
+  Renders individual chat bubbles, including markdown, code blocks, and special formatting.
+
+- **Input.tsx**  
+  User input box for sending messages.
+
+- **Send.tsx**  
+  Send button with loading spinner.
+
+- **AddToChat.tsx**  
+  Button/menu to switch chat modes (web, page, etc.).
+
+- **ChatHistory.tsx**  
+  Displays and manages saved chat histories.
+
+- **Docs.tsx**  
+  Info box linking to documentation.
+
+- **ConfigContext.tsx**  
+  React context for global config (theme, persona, model, etc.).
+
+- **messageUtils.ts**  
+  Helpers for exporting/downloading chat content.
+
+- **network.tsx**  
+  Web search and result parsing logic.
+
+- **hooks/**  
+  Custom React hooks (e.g., useSendMessage, useChatTitle).
+
+
+---
+
 Build with:
 ```sh
 npm start      # Development watch mode
