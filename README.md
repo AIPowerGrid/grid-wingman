@@ -6,6 +6,8 @@ All-around tiny browser-augmented chat client for open-source language models. D
 
 ## Plan
 
+- repair the custom openai endpoint
+
 Notes: 
 1. I will mainly fix bugs (and pull requests if any). ~At least for now, adding new functions is too hard for me. Comparison mode, I will try, but...let's see. Now I am trying to migrate to a strict CSP to prevent potential XSS. After a little research, I realized it's just too much work to do because of the UI again. Anyway. Forget it.~ 
 2. The markdown this project is using is react-markdown & redux-GFM. React‑Markdown uses **remark‑parse**, which follows the CommonMark rules strictly: The content of a code fence is treated as literal text, not parsed as inlines.  The first word of the info string is typically used to specify the language…:contentReference[oaicite:1]{index=1}. So, because the fences collide for nested code blocks, remark‑parse never sees inner lines as *inside* a code fence. I tried CSS, and it conflicts with my current style. Meanwhile, I have not seen it perfectly rendered either; besides, nested code is not very common to use for this scenario. So I just leave it there. You are welcome to solve it!
