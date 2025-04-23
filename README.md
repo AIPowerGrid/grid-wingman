@@ -6,22 +6,9 @@ All-around tiny browser-augmented chat client for open-source language models. D
 
 ## Plan
 
-- [X] Add https://www.google.com/search?q= as searching engine
-- [ ] Inject code from chat <br>
-- [X] Picture
-- [X] Better web search
-- [X] Better web parsing
-- [X] Refine the Web Search, no query shows in the first search message, even with a connection. The prompt should include the messages as contexts.
-- [X] Fix bugs (~searching title display~, ~border gets too wide sometimes~, ~web search UI crash with developer tools~)
-- [X] Better parsing for Brave and DuckDuckGo
-- [ ] Add some extra buttons for page mode
-- [X] Rewrite the API connection in openai compatible endpoint that allows custom API to be added freely
-- [ ] Comparison mode
-
-
 Notes: 
-1. I will mainly fix bugs. ~At least for now, adding new functions is too hard for me. Comparison mode, I will try, but...let's see. Now I am trying to migrate to a strict CSP to prevent potential XSS. And after a little research, it's just too much work to do, because of the UI again. Anyway. Forget it.~
-2. The markdown this project is using is react-markdown & redux-GFM. React‑Markdown uses **remark‑parse**, which follows the CommonMark rules strictly: The content of a code fence is treated as literal text, not parsed as inlines.  The first word of the info string is typically used to specify the language…:contentReference[oaicite:1]{index=1}. So, because the fences collide for nested code blocks, remark‑parse never sees inner lines as *inside* a code fence. I tried CSS, and it conflicts with my current style. Meanwhile, I have not seen it perfectly rendered either; besides, nested code is not very common to see. So I just leave it there. You are welcome to solve it!
+1. I will mainly fix bugs (and pull requests if any). ~At least for now, adding new functions is too hard for me. Comparison mode, I will try, but...let's see. Now I am trying to migrate to a strict CSP to prevent potential XSS. After a little research, I realized it's just too much work to do because of the UI again. Anyway. Forget it.~ 
+2. The markdown this project is using is react-markdown & redux-GFM. React‑Markdown uses **remark‑parse**, which follows the CommonMark rules strictly: The content of a code fence is treated as literal text, not parsed as inlines.  The first word of the info string is typically used to specify the language…:contentReference[oaicite:1]{index=1}. So, because the fences collide for nested code blocks, remark‑parse never sees inner lines as *inside* a code fence. I tried CSS, and it conflicts with my current style. Meanwhile, I have not seen it perfectly rendered either; besides, nested code is not very common to use for this scenario. So I just leave it there. You are welcome to solve it!
 
 
 ## installation
