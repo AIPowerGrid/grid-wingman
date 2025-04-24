@@ -60,10 +60,10 @@ const defaultConfig: Config = {
   personas,
   generateTitle: true,
   backgroundImage: true,
-  persona: 'Bruce',
+  persona: 'Ein',
   webMode: 'brave', // Now checked against Config['webMode']
-  webLimit: 48,
-  contextLimit: 48,
+  webLimit: 60,
+  contextLimit: 60,
   params: { temperature: 0.5 },
   models: [], // Initialize as an empty array matching Config['models'] type
   // Initialize other potentially missing properties from Config if necessary

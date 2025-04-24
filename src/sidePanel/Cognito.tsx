@@ -290,6 +290,8 @@ useEffect(() => {
     reset(); // Reset state on component unmount
   };
 }, []);
+// Inside your component:
+const [isHovering, setIsHovering] = useState(false);
 
   return (
     <Container
@@ -357,6 +359,11 @@ useEffect(() => {
             maxWidth="100%"
             height="2.5rem"
             zIndex={2}
+            opacity={isHovering ? 1 : 0} // Fade in/out
+            transform={isHovering ? "translateY(0)" : "translateY(10px)"} // Slide up/down
+            transition="all 0.2s ease-in-out" // Smooth animation
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
             sx={{
               background: 'var(--bg)',
               padding: '0.1rem',
