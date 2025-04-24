@@ -106,10 +106,3 @@ export const Messages: React.FC<MessagesProps> = ({
   );
 };
 
-// Using TypeScript interface is preferred over PropTypes in TS projects
-// Messages.propTypes = {
-//   messages: PropTypes.arrayOf(PropTypes.string),
-//   isLoading: PropTypes.bool,
-//   onReload: PropTypes.func,
-//   settingsMode: PropTypes.bool
-// };

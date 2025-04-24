@@ -179,9 +179,12 @@ const Cognito = () => {
     checkAndInject();
 
     // Set up tab change listeners
-    const handleTabActivated = (activeInfo) => {
-      checkAndInject();
-    };
+    const handleTabActivated = ({ tabId }) => {  
+      // Use tabId from activeInfo instead of querying again  
+      chrome.tabs.get(tabId, (tab) => {  
+        if (tab?.url) checkAndInject();  
+      });  
+    };  
 
     const handleTabUpdated = (tabId, changeInfo, tab) => {
       if (changeInfo.status === 'complete' || changeInfo.url) {
@@ -218,17 +221,19 @@ const Cognito = () => {
   };
 
   const onReload = () => {
-    // Keep only the second-to-last turn (the last user message)
-    const lastUserTurn = turns.length >= 2 ? turns[turns.length - 2] : null;
-    if (lastUserTurn?.role === 'user') {
-        setTurns([lastUserTurn]); // Keep only that user turn
-        setMessage(lastUserTurn.rawContent || ''); // Set input field
-    } else {
-        // If history is too short or last user message not found, just reset turns
-        setTurns([]);
-        setMessage('');
-    }
-    setLoading(false); // Ensure loading is reset
+    setTurns(prevTurns => {
+      if (prevTurns.length < 2) return prevTurns;
+      const last = prevTurns[prevTurns.length - 1];
+      const secondLast = prevTurns[prevTurns.length - 2];
+      // Only proceed if last is assistant and second last is user
+      if (last.role === 'assistant' && secondLast.role === 'user') {
+        // Remove both last assistant and user turn
+        setMessage(secondLast.rawContent); // Move user message back to input
+        return prevTurns.slice(0, -2);
+      }
+      return prevTurns;
+    });
+    setLoading(false);
   };
 
   const loadChat = (chat: ChatMessage) => {
@@ -332,7 +337,7 @@ const [isHovering, setIsHovering] = useState(false);
           />
         )}
         {!settingsMode && !historyMode && turns.length === 0 && !config?.chatMode && (
-          <Box bottom="4rem" left="0.5rem" position="absolute">
+          <Box bottom="3.4rem" left="0.5rem" position="absolute">
             <MessageTemplate onClick={() => {
               updateConfig({ chatMode: 'web' });
             }}
@@ -349,7 +354,7 @@ const [isHovering, setIsHovering] = useState(false);
         )}
         {!settingsMode && !historyMode && config?.chatMode === "page" && (
           <Box 
-            bottom="3.5rem"
+            bottom="3.4rem"
             left="0"
             right="0"
             position="fixed" 
@@ -357,7 +362,7 @@ const [isHovering, setIsHovering] = useState(false);
             flexDirection="row"
             justifyContent="center"
             maxWidth="100%"
-            height="2.5rem"
+            height="2.4rem"
             zIndex={2}
             opacity={isHovering ? 1 : 0} // Fade in/out
             transform={isHovering ? "translateY(0)" : "translateY(10px)"} // Slide up/down
@@ -365,23 +370,22 @@ const [isHovering, setIsHovering] = useState(false);
             onMouseEnter={() => setIsHovering(true)}
             onMouseLeave={() => setIsHovering(false)}
             sx={{
-              background: 'var(--bg)',
-              padding: '0.1rem',
-              borderTop: '2px solid var(--text)',
+              background: 'transparent',
+              padding: '0rem',
               backdropFilter: 'blur(10px)',
             }}
           >
-            <MessageTemplate onClick={() => onSend('Find Data')}>
-              Data
+            <MessageTemplate onClick={() => onSend('Provide a concise overview of this page.')}>
+              TLDR
             </MessageTemplate>
-            <MessageTemplate onClick={() => onSend('Get Summary')}>
-              Info
+            <MessageTemplate onClick={() => onSend('Extract all key figures, names, locations, and dates mentioned on this page and list them.')}>
+              Facts
             </MessageTemplate>
-            <MessageTemplate onClick={() => onSend('Find positive and good news from this page')}>
-              Goodies
+            <MessageTemplate onClick={() => onSend('Find positive developments, achievements, or opportunities mentioned on this page.')}>
+              Yay!
             </MessageTemplate>
-            <MessageTemplate onClick={() => onSend('Find concerning or negative news from this page')}>
-              Downers
+            <MessageTemplate onClick={() => onSend('Find concerning issues, risks, or criticisms mentioned on this page.')}>
+              Oops
             </MessageTemplate>
           </Box>
         )}
