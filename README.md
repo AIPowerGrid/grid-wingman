@@ -2,7 +2,7 @@
 
 # Cognito
 
-All-around tiny browser-augmented chat client for open-source language models. Develop based on [sidellama](https://github.com/gyopak/sidellama)
+All-around tiny chrome extension for both local and cloud LLMs. Enjoy AI in your browser. Build on [sidellama](https://github.com/gyopak/sidellama)
 
 ## Plan
 
