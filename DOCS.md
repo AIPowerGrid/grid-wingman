@@ -888,4 +888,34 @@ export const useChatTitle = (isLoading: boolean, messages: string[], message: st
    newModelApiKey: '',  // Add this
    ```
 
-update: I put a custom endpoint and connectCustom.tsx, for v3.js permission, I have added Perplexity, Mistral, TogetherAI, Cohere, Deepseek. For local, LM Studio should be able to change to other openai compatible clients, or those suit ollama's, just confirm it in the 'connectxxx.tsx'. You can just use it or add your own by yourself. I don't want to add too much to mess the UI.
+update: I put a custom endpoint and connectCustom.tsx, for v3.js permission, I have added Perplexity, Mistral, TogetherAI, Cohere, Deepseek. For local, LM Studio should be able to change to other openai compatible clients, or those suit ollama's, just confirm it in the 'connectxxx.tsx'. You can just use it or add your own by yourself. I don't want to add too much to mess the UI. Let me clarify my previous answer with better formatting and more precise details.
+
+**Custom Endpoint Configuration**
+
+The code has two main parts handling the custom endpoint:
+
+1. **Model Fetching**:
+````typescript
+// ...existing code...
+if (config?.customEndpoint && config?.customApiKey) {
+  const customModels = await fetchDataSilently(
+    `${config.customEndpoint.replace(/\/v1\/chat\/completions$/, '')}/v1/models`,
+    { headers: { Authorization: `Bearer ${config.customApiKey}` } }
+  );
+}
+// ...existing code...
+````
+
+2. **Chat Completions**:
+````typescript
+// The endpoint is used here for sending messages
+${config.customEndpoint}
+````
+
+You should enter your custom endpoint URL in one of these formats:
+- Base URL only: `https://api.example.com/v1`
+- Full URL: `https://api.example.com/v1/chat/completions`
+
+Both will work because:
+1. For model fetching: The code strips `/chat/completions` if present
+2. For chat completions: The code ensures the correct endpoint
