@@ -6,7 +6,7 @@ All-around tiny browser-augmented chat client for open-source language models. D
 
 ## Plan
 
-- repair the custom openai endpoint
+~- repair the custom openai endpoint~
 
 Notes: 
 1. I will mainly fix bugs (and pull requests if any). ~At least for now, adding new functions is too hard for me. Comparison mode, I will try, but...let's see. Now I am trying to migrate to a strict CSP to prevent potential XSS. After a little research, I realized it's just too much work to do because of the UI again. Anyway. Forget it.~ 

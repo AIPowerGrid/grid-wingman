@@ -133,8 +133,15 @@ export const useUpdateModels = () => {
         `${config.customEndpoint.replace(/\/v1\/chat\/completions$/, '')}/v1/models`,
         { headers: { Authorization: `Bearer ${config.customApiKey}` } }
       );
-      if (customModels?.data) {
-        const parsedModels = (customModels.data as Model[] ?? []).map(m => ({
+      console.log('Custom endpoint models response:', customModels); // Debug log
+
+      // Support both array and { data: array } formats
+      const modelsArray = Array.isArray(customModels)
+        ? customModels
+        : customModels?.data;
+
+      if (modelsArray && Array.isArray(modelsArray)) {
+        const parsedModels = (modelsArray as Model[]).map(m => ({
           ...m,
           id: m.id,
           host: 'custom'

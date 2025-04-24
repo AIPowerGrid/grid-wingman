@@ -205,8 +205,10 @@ const useSendMessage = (
       gemini: 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions',
       lmStudio: `${config?.lmStudioUrl || ''}/v1/chat/completions`,
       openai: 'https://api.openai.com/v1/chat/completions',
-      openrouter: 'https://openrouter.ai/api/v1/chat/completions',    // <-- Add this
-      custom: '${customEndpoint}/v1/chat/completions',
+      openrouter: 'https://openrouter.ai/api/v1/chat/completions',
+      custom: config?.customEndpoint
+        ? `${config.customEndpoint.replace(/\/v1\/chat\/completions$/, '')}/v1/chat/completions`
+        : '',
     };
     const host = currentModel.host || '';
     const url = urlMap[host];

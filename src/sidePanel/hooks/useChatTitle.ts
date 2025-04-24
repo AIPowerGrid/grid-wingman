@@ -108,7 +108,9 @@ export const useChatTitle = (isLoading: boolean, turns: MessageTurn[], message: 
           case 'custom':
             return {
               ...baseConfig,
-              url: '${customEndpoint}/v1/chat/completions',
+              url: config?.customEndpoint
+              ? `${config.customEndpoint.replace(/\/v1\/chat\/completions$/, '')}/v1/chat/completions`
+              : '',
               headers: { Authorization: `Bearer ${config.customApiKey}` }
             };
 
