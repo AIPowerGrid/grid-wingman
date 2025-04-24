@@ -345,36 +345,6 @@ useEffect(() => {
             </MessageTemplate>
           </Box>
         )}
-        {!settingsMode && !historyMode && turns.length === 0 && config?.chatMode === "page" && (
-          <Box bottom="4rem" left="0.5rem" position="absolute">
-            <MessageTemplate onClick={async () => {
-              const [tab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
-
-              if (!tab?.url || tab.url.startsWith('chrome')) {
-                toast.error('Cannot access chrome-related pages');
-
-                return;
-              }
-
-              await onSend('Find Data');
-            }}>
-              Data
-            </MessageTemplate>
-            <MessageTemplate onClick={async () => {
-              const [tab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
-
-              if (!tab?.url || tab.url.startsWith('chrome')) {
-                toast.error('Cannot access chrome-related pages');
-
-                return;
-              }
-
-              await onSend('Get Summary');
-            }}>
-              Info
-            </MessageTemplate>
-          </Box>
-        )}
         {!settingsMode && !historyMode && config?.chatMode === "page" && (
           <Box 
             bottom="3.5rem"
