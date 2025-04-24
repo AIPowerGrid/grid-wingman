@@ -267,25 +267,29 @@ const Cognito = () => {
     updateConfig({ chatMode: undefined }); // Add this line to reset chat mode
   };
 
-  // Add this useEffect
-  useEffect(() => {
-    const handlePanelOpen = async () => {
-      const [tab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
-      
-      if (tab?.id) {
-        await injectBridge();
-        chrome.tabs.sendMessage(tab.id, { type: 'GET_PAGE_CONTENT' });
-      }
-    };
-
-    handlePanelOpen();
+// Add reset() call inside handlePanelOpen when component mounts
+useEffect(() => {
+  const handlePanelOpen = async () => {
+    reset(); // Reset state every time the panel opens
+    const [tab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
     
-    return () => {
-      // Clear cached content when panel closes
-      storage.deleteItem('pagestring');
-      storage.deleteItem('pagehtml');
-    };
-  }, []);
+    if (tab?.id) {
+      await injectBridge();
+      chrome.tabs.sendMessage(tab.id, { type: 'GET_PAGE_CONTENT' });
+    }
+  };
+
+  handlePanelOpen();
+  
+  return () => {
+    // Clear cached content and reset states when panel closes
+    storage.deleteItem('pagestring');
+    storage.deleteItem('pagehtml');
+    storage.deleteItem('alttexts');
+    storage.deleteItem('tabledata');
+    reset(); // Reset state on component unmount
+  };
+}, []);
 
   return (
     <Container
@@ -368,6 +372,39 @@ const Cognito = () => {
               await onSend('Get Summary');
             }}>
               Info
+            </MessageTemplate>
+          </Box>
+        )}
+        {!settingsMode && !historyMode && config?.chatMode === "page" && (
+          <Box 
+            bottom="3.5rem"
+            left="0"
+            right="0"
+            position="fixed" 
+            display="flex" 
+            flexDirection="row"
+            justifyContent="center"
+            maxWidth="100%"
+            height="2.5rem"
+            zIndex={2}
+            sx={{
+              background: 'var(--bg)',
+              padding: '0.1rem',
+              borderTop: '2px solid var(--text)',
+              backdropFilter: 'blur(10px)',
+            }}
+          >
+            <MessageTemplate onClick={() => onSend('Find Data')}>
+              Data
+            </MessageTemplate>
+            <MessageTemplate onClick={() => onSend('Get Summary')}>
+              Info
+            </MessageTemplate>
+            <MessageTemplate onClick={() => onSend('Find positive and good news from this page')}>
+              Goodies
+            </MessageTemplate>
+            <MessageTemplate onClick={() => onSend('Find concerning or negative news from this page')}>
+              Downers
             </MessageTemplate>
           </Box>
         )}
