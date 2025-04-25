@@ -27,6 +27,7 @@
         * [Development Tips](#development-tips)
       - [Advanced Customization](#advanced-customization)
     + [Others](#others)
+      - [Markdown Rendering](#markdown-renderding)
       - [Parsing HTML](#parsing-html)
       - [Google Search Results](#google-search-results)
       - [useChatTitle.ts](#usechattitlets)
@@ -624,6 +625,14 @@ For further tweaks:
 Remember that most visual styling should be done through the theme system and CSS variables rather than direct component overrides for maintainability.
 
 ### Others
+
+#### Markdown Rendering
+
+**Codeblock Rendering**
+
+The markdown this project is using is react-markdown & redux-GFM. React‑Markdown uses **remark‑parse**, which follows the CommonMark rules strictly: The content of a code fence is treated as literal text, not parsed as inlines.  The first word of the info string is typically used to specify the language…:contentReference[oaicite:1]{index=1}. So, because the fences collide for nested code blocks, remark‑parse never sees inner lines as *inside* a code fence.
+
+**This rendering engine handles nested fenced code blocks correctly *only* when the outer fence uses different fences from the inner fences. It fails when both fences use different count fences.**
 
 #### Parsing HTML
 
