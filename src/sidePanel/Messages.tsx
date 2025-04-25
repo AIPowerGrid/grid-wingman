@@ -29,17 +29,17 @@ export const Messages: React.FC<MessagesProps> = ({
       .then(() => toast.success('Copied to clipboard'))
       .catch(() => toast.error('Failed to copy'));
   };
-  // --- Auto-scroll to bottom ---
+
   useLayoutEffect(() => {
-      // Scroll to bottom when turns change, but only if not already scrolled up significantly
-      const container = containerRef.current;
-      if (container) {
-          const isScrolledUp = container.scrollHeight - container.scrollTop > container.clientHeight + 200; // Add buffer
-          if (!isScrolledUp && messagesEndRef.current) {
-              messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
-          }
+    const container = containerRef.current;
+    if (container) {
+      // Only scroll if user is near the bottom (not scrolled up)
+      const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 200;
+      if (isNearBottom) {
+        container.scrollTop = container.scrollHeight;
       }
-  }, [turns]); // Dependency on turns
+    }
+  }, [turns]);
 
   return (
     <Box

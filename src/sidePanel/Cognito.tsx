@@ -315,88 +315,90 @@ const [isHovering, setIsHovering] = useState(false);
           settingsMode={settingsMode}
         />
         {settingsMode && <Settings />}
-        {!settingsMode && !historyMode && turns.length > 0 && (
-          <Messages
-            isLoading={isLoading}
-            turns={turns}
-            settingsMode={settingsMode}
-            onReload={onReload}
-          />
-        )}
-        {!settingsMode && !historyMode && turns.length === 0 && !config?.chatMode && (
-          // Adjust positioning and layout if needed for icons
-          <Box bottom="3rem" left="1rem" position="absolute" display="flex" flexDirection="column" gap={2}>
-            <Tooltip label="Add Web Search Results to LLM Context" placement="right" hasArrow>
-              {/* Use IconButton */}
-              <IconButton
-                aria-label="Add Web Search Results to LLM Context" // Important for accessibility
-                icon={<TbWorldSearch size="24px" />} // Pass icon component to 'icon' prop
-                onClick={() => {
-                  updateConfig({ chatMode: 'web' });
-                }}
-                variant="ghost" // Use 'ghost' for minimal styling, or 'unstyled'
-                size="md"      // Adjust size: 'sm', 'md', 'lg'
-                color="var(--text)" // Ensure icon color matches
-                // isRound // Optional: makes the button circular
-                _hover={{ bg: 'rgba(128, 128, 128, 0.2)' }} // Optional: subtle hover effect
-              />
-            </Tooltip>
-            <Tooltip label="Add Current Web Page to LLM Context" placement="right" hasArrow>
-              {/* Use IconButton */}
-              <IconButton
-                aria-label="Add Current Web Page to LLM Context"
-                icon={<TbBrowserPlus size="24px" />}
-                onClick={() => {
-                  updateConfig({ chatMode: 'page' });
-                }}
-                variant="ghost"
-                size="md"
-                color="var(--text)"
-                // isRound
-                _hover={{ bg: 'rgba(128, 128, 128, 0.2)' }}
-              />
-            </Tooltip>
-          </Box>
-        )}
-        {!settingsMode && !historyMode && config?.chatMode === "page" && (
-          <Box 
-            bottom="3rem"
-            left="1rem"
-            right="1rem"
-            position="fixed" 
-            display="flex" 
-            flexDirection="row"
-            justifyContent="center"
-            maxWidth="100%"
-            height="2.4rem"
-            zIndex={2}
-            opacity={isHovering ? 1 : 0} // Fade in/out
-            transform={isHovering ? "translateY(0)" : "translateY(10px)"} // Slide up/down
-            transition="all 0.2s ease-in-out" // Smooth animation
-            onMouseEnter={() => setIsHovering(true)}
-            onMouseLeave={() => setIsHovering(false)}
-            sx={{
-              background: 'transparent',
-              padding: '0rem',
-              backdropFilter: 'blur(10px)',
-            }}
-          >
-           <HStack spacing={4} maxW="100%" overflowX="auto" px={2}> {/* Added padding */}
-            <MessageTemplate onClick={() => onSend('Provide a concise overview of this page.')}>
-              TLDR
-            </MessageTemplate>
-            <MessageTemplate onClick={() => onSend('Extract all key figures, names, locations, and dates mentioned on this page and list them.')}>
-              Facts
-            </MessageTemplate>
-            <MessageTemplate onClick={() => onSend('Find positive developments, achievements, or opportunities mentioned on this page.')}>
-              Yay!
-            </MessageTemplate>
-            <MessageTemplate onClick={() => onSend('Find concerning issues, risks, or criticisms mentioned on this page.')}>
-              Oops
-            </MessageTemplate>
-           </HStack>
-          </Box>
-        )}
+        <Box display="flex" flexDir="column" flex="1 1 0%" minHeight={0}>
+          {!settingsMode && !historyMode && turns.length > 0 && (
+            <Messages
+              isLoading={isLoading}
+              turns={turns}
+              settingsMode={settingsMode}
+              onReload={onReload}
+            />
+          )}
+          {!settingsMode && !historyMode && turns.length === 0 && !config?.chatMode && (
+            // Adjust positioning and layout if needed for icons
+            <Box bottom="3rem" left="1rem" position="absolute" display="flex" flexDirection="column" gap={2}>
+              <Tooltip label="Add Web Search Results to LLM Context" placement="right" hasArrow>
+                {/* Use IconButton */}
+                <IconButton
+                  aria-label="Add Web Search Results to LLM Context" // Important for accessibility
+                  icon={<TbWorldSearch size="24px" />} // Pass icon component to 'icon' prop
+                  onClick={() => {
+                    updateConfig({ chatMode: 'web' });
+                  }}
+                  variant="ghost" // Use 'ghost' for minimal styling, or 'unstyled'
+                  size="md"      // Adjust size: 'sm', 'md', 'lg'
+                  color="var(--text)" // Ensure icon color matches
+                  // isRound // Optional: makes the button circular
+                  _hover={{ bg: 'rgba(128, 128, 128, 0.2)' }} // Optional: subtle hover effect
+                />
+              </Tooltip>
+              <Tooltip label="Add Current Web Page to LLM Context" placement="right" hasArrow>
+                {/* Use IconButton */}
+                <IconButton
+                  aria-label="Add Current Web Page to LLM Context"
+                  icon={<TbBrowserPlus size="24px" />}
+                  onClick={() => {
+                    updateConfig({ chatMode: 'page' });
+                  }}
+                  variant="ghost"
+                  size="md"
+                  color="var(--text)"
+                  // isRound
+                  _hover={{ bg: 'rgba(128, 128, 128, 0.2)' }}
+                />
+              </Tooltip>
+            </Box>
+          )}
+          {!settingsMode && !historyMode && config?.chatMode === "page" && (
+            <Box 
+              bottom="3rem"
+              left="1rem"
+              right="1rem"
+              position="fixed" 
+              display="flex" 
+              flexDirection="row"
+              justifyContent="center"
+              maxWidth="100%"
+              height="2.4rem"
+              zIndex={2}
+              opacity={isHovering ? 1 : 0} // Fade in/out
+              transform={isHovering ? "translateY(0)" : "translateY(10px)"} // Slide up/down
+              transition="all 0.2s ease-in-out" // Smooth animation
+              onMouseEnter={() => setIsHovering(true)}
+              onMouseLeave={() => setIsHovering(false)}
+              sx={{
+                background: 'transparent',
+                padding: '0rem',
+                backdropFilter: 'blur(10px)',
+              }}
+            >
+             <HStack spacing={4} maxW="100%" overflowX="auto" px={2}> {/* Added padding */}
+              <MessageTemplate onClick={() => onSend('Provide a concise overview of this page.')}>
+                TLDR
+              </MessageTemplate>
+              <MessageTemplate onClick={() => onSend('Extract all key figures, names, locations, and dates mentioned on this page and list them.')}>
+                Facts
+              </MessageTemplate>
+              <MessageTemplate onClick={() => onSend('Find positive developments, achievements, or opportunities mentioned on this page.')}>
+                Yay!
+              </MessageTemplate>
+              <MessageTemplate onClick={() => onSend('Find concerning issues, risks, or criticisms mentioned on this page.')}>
+                Oops
+              </MessageTemplate>
+             </HStack>
+            </Box>
+          )}
+        </Box>
         {!settingsMode && !historyMode && (
           <Box
             background="var(--active)"
