@@ -338,7 +338,7 @@ export const Header = ({ ...props }) => {
         borderBottom="2px solid var(--text)"
         display="flex"
         justifyContent="space-between"
-        pb={2}
+        pb={0}
       >
         {(!config?.models || config?.models.length === 0) && !props.settingsMode && (
           <WelcomeModal isOpen={!props.settingsMode} setSettingsMode={props.setSettingsMode} onClose={() => {}} />
