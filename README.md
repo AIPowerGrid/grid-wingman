@@ -40,13 +40,13 @@ See the [documentation](DOCS.md) for a complete overview of each persona's capab
 
 ### Download the Latest Release
 
-1.  Download the latest release from [here](link to releases).
+1.  Download the latest release from [here].
 2.  Enable Chrome Extensions > Developer mode.
 3.  Load the content of the extracted zip with the "Load unpacked" button.
 
 ### Install from Source
 
-1.  Clone the repository: `git clone [repository URL]`
+1.  Clone the repository: `git clone https://github.com/3-ark/Cognito.git`
 2.  Run `npm i && npm start` to generate your bundle, located in `dist/chrome`.
 3.  Enable Chrome Extensions > Developer mode.
 4.  Load the content of the `dist/chrome` folder with the "Load unpacked" button.
