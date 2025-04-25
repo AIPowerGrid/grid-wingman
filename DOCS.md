@@ -27,6 +27,7 @@
         * [Development Tips](#development-tips)
       - [Advanced Customization](#advanced-customization)
     + [Others](#others)
+      - [Markdown Rendering](#markdown-renderding)
       - [Parsing HTML](#parsing-html)
       - [Google Search Results](#google-search-results)
       - [useChatTitle.ts](#usechattitlets)
