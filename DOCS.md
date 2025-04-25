@@ -629,6 +629,8 @@ Remember that most visual styling should be done through the theme system and CS
 
 **Codeblock Rendering**
 
+The markdown this project is using is react-markdown & redux-GFM. React‑Markdown uses **remark‑parse**, which follows the CommonMark rules strictly: The content of a code fence is treated as literal text, not parsed as inlines.  The first word of the info string is typically used to specify the language…:contentReference[oaicite:1]{index=1}. So, because the fences collide for nested code blocks, remark‑parse never sees inner lines as *inside* a code fence.
+
 **This rendering engine handles nested fenced code blocks correctly *only* when the outer fence uses different fences from the inner fences. It fails when both fences use different count fences.**
 
 #### Parsing HTML
