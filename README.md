@@ -6,6 +6,10 @@ Cognito is a tiny, yet powerful Chrome extension that brings the power of Large 
 
 **Enjoy AI in your browser.** Built on sidellama.
 
+## Screenshot
+
+![](docs/screenshot.png)
+
 ## Key Features
 
 *   **Versatile LLM Support:**
