@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import toast from 'react-hot-toast';
-import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
+import { ViewIcon, ViewOffIcon, SmallCloseIcon } from '@chakra-ui/icons';
 import {
   Box, Button, IconButton, Input
 } from '@chakra-ui/react';
@@ -14,42 +14,18 @@ export const ConnectCustom = () => {
   const [visibleApiKeys, setVisibleApiKeys] = useState(false);
 
   const onConnect = async () => {
-    try {
-      // Fetch models from the custom endpoint
-      const modelsRes = await fetch(
-        endpoint.replace(/\/v1\/chat\/completions$/, '') + '/v1/models',
-        {
-          headers: {
-            Authorization: `Bearer ${apiKey}`,
-          },
-        }
-      );
-      const modelsJson = await modelsRes.json();
-      const models = (modelsJson.data || []).map((m: any) => ({
-        id: m.id,
-        host: 'custom',
-        active: false,
-      }));
-
-      updateConfig({
-        customApiKey: apiKey,
-        customEndpoint: endpoint,
-        customConnected: true,
-        customError: undefined,
-        models: [
-          ...(config?.models || []),
-          ...models,
-        ],
-        selectedModel: models[0]?.id || '',
-      });
-      toast.success('Custom endpoint connected');
-    } catch (e) {
-      toast.error('Failed to fetch models from custom endpoint');
-      updateConfig({
-        customError: 'Failed to fetch models',
-        customConnected: false,
-      });
-    }
+    toast.success('Custom endpoint connected');
+    updateConfig({
+      customApiKey: apiKey,
+      customEndpoint: endpoint,
+      customConnected: true,
+      customError: undefined,
+      models: [
+        ...(config?.models || []),
+        { id: 'custom', host: 'custom', active: true },
+      ],
+      selectedModel: 'custom',
+    });
   };
 
   const disabled = config?.customApiKey === apiKey && config?.customEndpoint === endpoint;
@@ -116,22 +92,44 @@ export const ConnectCustom = () => {
           </Button>
         )}
         {isConnected && (
-          <IconButton
-            _hover={{
-              background: 'var(--active)',
-              border: '2px solid var(--text)'
-            }}
-            aria-label="Done"
-            background="var(--active)"
-            border="2px solid var(--text)"
-            color="var(--text)"
-            fontSize="19px"
-            icon={visibleApiKeys ? <ViewOffIcon /> : <ViewIcon />}
-            size="sm"
-            variant="solid"
-            isRound
-            onClick={() => setVisibleApiKeys(!visibleApiKeys)}
-          />
+          <>
+            <IconButton
+              _hover={{
+                background: 'var(--active)',
+                border: '2px solid var(--text)'
+              }}
+              aria-label="Done"
+              background="var(--active)"
+              border="2px solid var(--text)"
+              color="var(--text)"
+              fontSize="19px"
+              icon={visibleApiKeys ? <ViewOffIcon /> : <ViewIcon />}
+              size="sm"
+              variant="solid"
+              isRound
+              onClick={() => setVisibleApiKeys(!visibleApiKeys)}
+            />
+            <IconButton
+              aria-label="Reset Custom Endpoint"
+              icon={<SmallCloseIcon />}
+              ml={2}
+              borderRadius={16}
+              background="var(--active)"
+              border="2px solid var(--text)"
+              color="var(--text)"
+              size="sm"
+              onClick={() => {
+                setApiKey('');
+                setEndpoint('');
+                updateConfig({
+                  customApiKey: '',
+                  customEndpoint: '',
+                  customConnected: false,
+                  customError: undefined,
+                });
+              }}
+            />
+          </>
         )}
       </Box>
     </Box>
