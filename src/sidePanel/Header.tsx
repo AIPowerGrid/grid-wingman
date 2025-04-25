@@ -78,7 +78,7 @@ const Badge = ({ children }) => (
     pb={0.5}
     pl={3}
     pr={3}
-    pt={0.5}
+    pt={0}
     textOverflow="ellipsis"
     whiteSpace="nowrap"
   >
@@ -87,7 +87,7 @@ const Badge = ({ children }) => (
 );
  
 const DrawerHeader = ({ onClose }) => (
-  <Box alignItems="center" background="var(--active)" borderBottom="2px solid var(--text)" display="flex" paddingBottom={2} paddingTop={2}>
+  <Box alignItems="center" background="var(--active)" borderBottom="2px solid var(--text)" display="flex" paddingBottom={0} paddingTop={0}>
     <IconButton
       aria-label="Close Drawer"
       as={motion.div}
@@ -159,7 +159,7 @@ const SettingsDrawer = ({
       <DrawerOverlay />
       <DrawerContent 
         background="var(--bg)" 
-        borderRadius={8} 
+        borderRadius={16} 
         borderRight="2px solid var(--text)"
         sx={{
           '&::before': {
@@ -313,8 +313,7 @@ export const Header = ({ ...props }) => {
   return (
     <Box
       background="var(--active)"
-      pb={0}
-      pt={2}
+      p={0}
       sx={{
         position: 'relative',
         '&::before': {

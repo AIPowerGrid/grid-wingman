@@ -24,7 +24,7 @@ export const Settings = () => {
       id="settings"
       overflowX="hidden"
       overflowY="scroll"
-      padding={2}
+      padding={1}
       position="absolute"
       pt="4rem"
       top={0}
@@ -32,7 +32,7 @@ export const Settings = () => {
     >
       <Accordion
         defaultIndex={defaultIndex}
-        marginTop={4}
+        marginTop={2}
         maxWidth="512px"
         ml={2}
         mr={2}

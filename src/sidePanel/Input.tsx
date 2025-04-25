@@ -17,6 +17,7 @@ export const AutoResizeTextarea = React.forwardRef((props, ref) => (
     resize="none"
     w="100%"
     {...props}
+    p={1}
   />
 ));
 AutoResizeTextarea.displayName = 'AutoResizeTextarea';
@@ -35,21 +36,7 @@ export const Input = ({ ...props }) => {
   return (
     <Box ml={2} position="relative" width="100%">
       <Box
-        bottom={0}
-        left={0}
         position="absolute"
-        right={0}
-        sx={{
-          backgroundImage: 'url(assets/images/paper-texture.png)',
-          backgroundSize: 'auto',
-          opacity: 0.3,
-          pointerEvents: 'none',
-          borderRadius: '14px',
-          mixBlendMode: 'multiply',
-          zIndex: 100,
-          margin: '0 auto'
-        }}
-        top={0}
       />
       <AutoResizeTextarea
         {...props}
@@ -74,12 +61,14 @@ export const Input = ({ ...props }) => {
         id="user-input"
         placeholder={placeholder}
         position="relative"
+        pl={4}
         pr={12}
         size="sm"
         value={props.message}
         width="100%"
         zIndex={1}
         autoFocus
+        p={1}
         onChange={event => props.setMessage(event.target.value)}
         onKeyDown={event => {
           if (props.isLoading) return;

@@ -8,7 +8,7 @@ interface SettingTitleProps {
 }
 
 export const SettingTitle = ({
- text = '', widget = <></>, padding = 4, icon = '' 
+ text = '', widget = <></>, padding = 1, icon = '' 
 }: SettingTitleProps) => (
   <Text
     color="var(--text)"

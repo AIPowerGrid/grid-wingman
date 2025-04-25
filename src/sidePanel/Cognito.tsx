@@ -3,15 +3,19 @@ import { toast, Toaster } from 'react-hot-toast';
 import {
   Box,
   Container,
+  Tooltip,
+  IconButton,
+  HStack,
 } from '@chakra-ui/react';
 import localforage from 'localforage';
+import { TbWorldSearch, TbBrowserPlus } from "react-icons/tb"; // <-- Import icons
 
 import { useChatTitle } from './hooks/useChatTitle';
 import useSendMessage from './hooks/useSendMessage';
 import { useUpdateModels } from './hooks/useUpdateModels';
 import { AddToChat } from './AddToChat';
 import { Background } from './Background';
-import { ChatHistory, ChatMessage, MessageTurn } from './ChatHistory';  // Remove deleteAll from import
+import { ChatHistory, ChatMessage, MessageTurn } from './ChatHistory'; 
 import { useConfig } from './ConfigContext';
 import { Header } from './Header';
 import { Input } from './Input';
@@ -90,38 +94,21 @@ const MessageTemplate = ({ children, onClick }) => (
   <Box
     background="var(--active)"
     border="2px solid var(--text)"
-    borderRadius={14}
+    borderRadius={16}
     color="var(--text)"
     cursor="pointer"
-    display="grid"
+    display="flex"
+    alignItems="center"
+    justifyContent="center"
     fontSize="md"
     fontWeight={800}
-    mb={2}
-    p={0}
-    pl={1}
+    p={1}
     placeItems="center"
     position="relative"
-    pr={1}
-    sx={{
-      '&::before': {
-        content: '""',
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundImage: 'url(assets/images/paper-texture.png)',
-        backgroundSize: '512px',
-        opacity: 0.3,
-        pointerEvents: 'none',
-        borderRadius: '14px',
-        mixBlendMode: 'multiply',
-        zIndex: 0
-      }
-    }}
     textAlign={'center'}
-    width="10ch"
+    width="4rem"
     onClick={onClick}
+    flexShrink={0}
   >
     {children}
   </Box>
@@ -337,26 +324,45 @@ const [isHovering, setIsHovering] = useState(false);
           />
         )}
         {!settingsMode && !historyMode && turns.length === 0 && !config?.chatMode && (
-          <Box bottom="3.4rem" left="0.5rem" position="absolute">
-            <MessageTemplate onClick={() => {
-              updateConfig({ chatMode: 'web' });
-            }}
-            >
-              Web  {/* Shorter, cleaner */}
-            </MessageTemplate>
-            <MessageTemplate onClick={() => {
-              updateConfig({ chatMode: 'page' });
-            }}
-            >
-              Page  {/* Shorter, cleaner */}
-            </MessageTemplate>
+          // Adjust positioning and layout if needed for icons
+          <Box bottom="3rem" left="1rem" position="absolute" display="flex" flexDirection="column" gap={2}>
+            <Tooltip label="Add Web Search Results to LLM Context" placement="right" hasArrow>
+              {/* Use IconButton */}
+              <IconButton
+                aria-label="Add Web Search Results to LLM Context" // Important for accessibility
+                icon={<TbWorldSearch size="24px" />} // Pass icon component to 'icon' prop
+                onClick={() => {
+                  updateConfig({ chatMode: 'web' });
+                }}
+                variant="ghost" // Use 'ghost' for minimal styling, or 'unstyled'
+                size="md"      // Adjust size: 'sm', 'md', 'lg'
+                color="var(--text)" // Ensure icon color matches
+                // isRound // Optional: makes the button circular
+                _hover={{ bg: 'rgba(128, 128, 128, 0.2)' }} // Optional: subtle hover effect
+              />
+            </Tooltip>
+            <Tooltip label="Add Current Web Page to LLM Context" placement="right" hasArrow>
+              {/* Use IconButton */}
+              <IconButton
+                aria-label="Add Current Web Page to LLM Context"
+                icon={<TbBrowserPlus size="24px" />}
+                onClick={() => {
+                  updateConfig({ chatMode: 'page' });
+                }}
+                variant="ghost"
+                size="md"
+                color="var(--text)"
+                // isRound
+                _hover={{ bg: 'rgba(128, 128, 128, 0.2)' }}
+              />
+            </Tooltip>
           </Box>
         )}
         {!settingsMode && !historyMode && config?.chatMode === "page" && (
           <Box 
-            bottom="3.4rem"
-            left="0"
-            right="0"
+            bottom="3rem"
+            left="1rem"
+            right="1rem"
             position="fixed" 
             display="flex" 
             flexDirection="row"
@@ -375,6 +381,7 @@ const [isHovering, setIsHovering] = useState(false);
               backdropFilter: 'blur(10px)',
             }}
           >
+           <HStack spacing={4} maxW="100%" overflowX="auto" px={2}> {/* Added padding */}
             <MessageTemplate onClick={() => onSend('Provide a concise overview of this page.')}>
               TLDR
             </MessageTemplate>
@@ -387,6 +394,7 @@ const [isHovering, setIsHovering] = useState(false);
             <MessageTemplate onClick={() => onSend('Find concerning issues, risks, or criticisms mentioned on this page.')}>
               Oops
             </MessageTemplate>
+           </HStack>
           </Box>
         )}
         {!settingsMode && !historyMode && (
@@ -395,13 +403,13 @@ const [isHovering, setIsHovering] = useState(false);
             borderTop="2px solid var(--text)"
             display="flex"
             justifyContent="space-between"
-            pb={2}
+            pb={1}
             position="relative"  // Add this
-            pt={2}
+            pt={1}
             style={{ opacity: settingsMode ? 0 : 1 }}
             zIndex={2}
           >
-            <Input isLoading={isLoading} message={message} setMessage={setMessage} onSend={onSend} />
+            <Input p={0} isLoading={isLoading} message={message} setMessage={setMessage} onSend={onSend} />
             <AddToChat />
             <Send isLoading={isLoading} onSend={() => onSend(message)} />
           </Box>

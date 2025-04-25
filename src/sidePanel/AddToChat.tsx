@@ -26,57 +26,64 @@ export const AddToChat = () => {
         zIndex={2}
         p={0}
         height="2rem"
+        minWidth="auto" // Allow button to shrink if needed
       >
-        <Center>
+        <Center px={2}> {/* Added padding here for better spacing */}
           {!config?.chatMode && (
-            <FiPaperclip color="var(--text)" fontSize="1.25rem" style={{ marginRight: 0 }} />
+            <FiPaperclip color="var(--text)" fontSize="1.25rem" style={{ marginRight: config?.chatMode ? '0.5rem' : 0 }} />
           )}
-          {config?.chatMode}
+          {/* Conditionally render chatMode text */}
+          {config?.chatMode && config.chatMode.charAt(0).toUpperCase() + config.chatMode.slice(1)}
         </Center>
       </MenuButton>
       <MenuList
         background="var(--active)"
-        borderBottom="2px solid var(--text)"
-        borderLeft="2px solid var(--text)"
-        borderRight="2px solid var(--text)"
-        borderTop="2px solid var(--text)"
+        border="2px solid var(--text)" // Apply border once here
+        borderRadius="md" // Optional: add some rounding
         marginTop="1px"
-        minWidth="110px"
-        p={0}
-        style={{
-          right: '-5.1rem', bottom: '0rem', position: 'absolute' 
-        }}
+        minWidth="80px" // Adjusted minWidth
+        p={0} // Remove padding from MenuList itself
+        overflow="hidden" // Ensure border radius clips children
         zIndex={4}
       >
         <MenuItem
           _hover={{ background: 'var(--bg)' }}
-          background={!config?.chatMode ? 'var(--bg)' : 'var(--bg)'}
-          borderBottom="2px solid var(--text)"
+          background={!config?.chatMode ? 'var(--bg)' : 'transparent'} // Use transparent for non-active
+          borderBottom="2px solid var(--text)" // Remove individual borders
           color="var(--text)"
           fontSize="md"
           fontWeight={800}
           onClick={() => updateConfig({ chatMode: undefined })}
+          display="flex" // Add display flex
+          justifyContent="center" // Add justify content center
+          py={2} // Add vertical padding
         >
           Chat
         </MenuItem>
         <MenuItem
           _hover={{ background: 'var(--bg)' }}
-          background={config?.chatMode === 'page' ? 'var(--bg)' : 'var(--bg)'}
+          background={config?.chatMode === 'page' ? 'var(--bg)' : 'transparent'}
           borderBottom="2px solid var(--text)"
           color="var(--text)"
           fontSize="md"
           fontWeight={800}
           onClick={() => updateConfig({ chatMode: 'page' })}
+          display="flex" // Add display flex
+          justifyContent="center" // Add justify content center
+          py={2} // Add vertical padding
         >
           Page
         </MenuItem>
         <MenuItem
           _hover={{ background: 'var(--bg)' }}
-          background={config?.chatMode === 'web' ? 'var(--bg)' : 'var(--bg)'}
+          background={config?.chatMode === 'web' ? 'var(--bg)' : 'transparent'}
           color="var(--text)"
           fontSize="md"
           fontWeight={800}
           onClick={() => updateConfig({ chatMode: 'web' })}
+          display="flex" // Add display flex
+          justifyContent="center" // Add justify content center
+          py={2} // Add vertical padding
         >
           Web
         </MenuItem>
