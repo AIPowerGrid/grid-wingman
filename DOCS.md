@@ -625,6 +625,12 @@ Remember that most visual styling should be done through the theme system and CS
 
 ### Others
 
+#### Markdown Rendering
+
+**Codeblock Rendering**
+
+**This rendering engine handles nested fenced code blocks correctly *only* when the outer fence uses different fences from the inner fences. It fails when both fences use different count fences.**
+
 #### Parsing HTML
 
 I purge the results from DuckDuckGo too much, it returns 0. It took me a while to find it. A few pro tips to keep it robust:
