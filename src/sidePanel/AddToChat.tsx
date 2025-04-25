@@ -1,6 +1,6 @@
-import { AttachmentIcon } from '@chakra-ui/icons';
+import { FiPaperclip } from 'react-icons/fi';
 import {
- Button, Menu, MenuButton, MenuItem, MenuList 
+  Button, Menu, MenuButton, MenuItem, MenuList, Center
 } from '@chakra-ui/react';
 
 import { useConfig } from './ConfigContext';
@@ -11,25 +11,28 @@ export const AddToChat = () => {
   return (
     <Menu>
       <MenuButton
-        aria-label="Settings"
+        aria-label="Add to chat"
         as={Button}
         background="var(--bg)"
         border="2px solid var(--text)"
         borderRadius={16}
         color="var(--text)"
-        fontSize="md"
+        fontSize="sm"
         fontWeight={800}
         m={0}
         ml={2}
-        padding={config?.chatMode ? 2 : 0}
-        paddingLeft={config?.chatMode ? 2 : 0}
-        paddingRight={config?.chatMode ? 5 : '1px'}
-        rightIcon={!config?.chatMode ? <AttachmentIcon color="var(--text)" fontSize="xl" marginRight="5px" /> : undefined}
         size="md"
         variant="outlined"
         zIndex={2}
+        p={0}
+        height="2rem"
       >
-        {config?.chatMode}
+        <Center>
+          {!config?.chatMode && (
+            <FiPaperclip color="var(--text)" fontSize="1.25rem" style={{ marginRight: 0 }} />
+          )}
+          {config?.chatMode}
+        </Center>
       </MenuButton>
       <MenuList
         background="var(--active)"
@@ -41,8 +44,8 @@ export const AddToChat = () => {
         minWidth="110px"
         p={0}
         style={{
- right: '-5.1rem', bottom: '0.25rem', position: 'absolute' 
-}}
+          right: '-5.1rem', bottom: '0rem', position: 'absolute' 
+        }}
         zIndex={4}
       >
         <MenuItem
@@ -65,7 +68,7 @@ export const AddToChat = () => {
           fontWeight={800}
           onClick={() => updateConfig({ chatMode: 'page' })}
         >
-          Page  {/* Changed from "Page Chat" */}
+          Page
         </MenuItem>
         <MenuItem
           _hover={{ background: 'var(--bg)' }}
@@ -75,7 +78,7 @@ export const AddToChat = () => {
           fontWeight={800}
           onClick={() => updateConfig({ chatMode: 'web' })}
         >
-          Web  {/* Changed from "web chat" */}
+          Web
         </MenuItem>
       </MenuList>
     </Menu>

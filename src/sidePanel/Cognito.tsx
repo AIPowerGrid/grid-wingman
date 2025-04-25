@@ -403,7 +403,7 @@ const [isHovering, setIsHovering] = useState(false);
           >
             <Input isLoading={isLoading} message={message} setMessage={setMessage} onSend={onSend} />
             <AddToChat />
-            <Send isLoading={isLoading} onSend={onSend} />
+            <Send isLoading={isLoading} onSend={() => onSend(message)} />
           </Box>
         )}
         {historyMode && (
