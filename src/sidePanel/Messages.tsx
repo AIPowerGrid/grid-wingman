@@ -57,47 +57,61 @@ export const Messages: React.FC<MessagesProps> = ({
     >
       {turns.map(
         (turn, i) => turn && (
-          // but if messages are stable or always appended, it might be acceptable.
-          // Consider a more stable key if possible (e.g., a unique ID per message).
           <Box
-            key={turn.timestamp || `turn_${i}`} // Use timestamp if available, fallback to index
+            key={turn.timestamp || `turn_${i}`}
             alignItems="flex-end"
             display="flex"
-            justifyContent={turn.role === 'user' ? 'flex-start' : 'flex-end'} // Align user right, assistant left
+            justifyContent={turn.role === 'user' ? 'flex-start' : 'flex-end'}
             mb={0}
             mt={3}
             width="100%"
             onMouseEnter={() => setHoveredIndex(i)}
             onMouseLeave={() => setHoveredIndex(-1)}
           >
-            <Message turn={turn} index={i} />
-            <Box display="flex" flexDirection="column" gap={1} ml={1}>
-              {/* Sorted props for Copy IconButton */}
-              <IconButton
-                aria-label="Copy"
-                as={motion.div}
-                borderRadius={16}
-                icon={<CopyIcon color="var(--text)" fontSize="xl" />}
-                opacity={hoveredIndex === i ? 1 : 0}
-                transition="opacity 0.2s"
-                variant="outlined"
-                whileHover={{ scale: 1.1, cursor: 'pointer' }}
-                onClick={() => copyMessage(turn.rawContent)}
-              />
-              {i === turns.length - 1 && turn.role === 'assistant' && ( // Check if it's the last turn AND assistant
+            {turn.role === 'assistant' && (
+              <Box display="flex" flexDirection="column" gap={0} mr={0}>
                 <IconButton
-                  aria-label="Repeat"
+                  aria-label="Copy"
                   as={motion.div}
                   borderRadius={16}
-                  icon={<RepeatIcon color="var(--text)" fontSize="2xl" />}
+                  icon={<CopyIcon color="var(--text)" fontSize="xl" />}
                   opacity={hoveredIndex === i ? 1 : 0}
                   transition="opacity 0.2s"
                   variant="outlined"
-                  whileHover={{ rotate: '90deg', cursor: 'pointer' }}
-                  onClick={onReload}
+                  whileHover={{ scale: 1.1, cursor: 'pointer' }}
+                  onClick={() => copyMessage(turn.rawContent)}
                 />
-              )}
-            </Box>
+                {i === turns.length - 1 && (
+                  <IconButton
+                    aria-label="Repeat"
+                    as={motion.div}
+                    borderRadius={16}
+                    icon={<RepeatIcon color="var(--text)" fontSize="xl" />}
+                    opacity={hoveredIndex === i ? 1 : 0}
+                    transition="opacity 0.2s"
+                    variant="outlined"
+                    whileHover={{ rotate: '90deg', cursor: 'pointer' }}
+                    onClick={onReload}
+                  />
+                )}
+              </Box>
+            )}
+            <Message turn={turn} index={i} />
+            {turn.role === 'user' && (
+              <Box display="flex" flexDirection="column" gap={0} ml={0}>
+                <IconButton
+                  aria-label="Copy"
+                  as={motion.div}
+                  borderRadius={16}
+                  icon={<CopyIcon color="var(--text)" fontSize="xl" />}
+                  opacity={hoveredIndex === i ? 1 : 0}
+                  transition="opacity 0.2s"
+                  variant="outlined"
+                  whileHover={{ scale: 1.1, cursor: 'pointer' }}
+                  onClick={() => copyMessage(turn.rawContent)}
+                />
+              </Box>
+            )}
           </Box>
         )
       )}

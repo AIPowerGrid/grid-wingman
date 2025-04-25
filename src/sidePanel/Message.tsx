@@ -347,7 +347,8 @@ export const Message: React.FC<MessageProps> = ({ turn, index }) => {
        maxWidth="calc(100% - 3rem)" // Maybe adjust for user vs assistant?
        // ml={turn.role === 'assistant' ? 2 : 'auto'} // Example alignment adjustment
        // mr={turn.role === 'user' ? 2 : 'auto'} // Example alignment adjustment
-       ml={2} // Keep original for now
+       ml={2} 
+       mr={2}
        pb={1}
        pl={4}
        pr={4}
