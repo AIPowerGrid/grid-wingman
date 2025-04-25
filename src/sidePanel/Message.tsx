@@ -2,7 +2,7 @@ import {
    ClassAttributes, HTMLAttributes, ReactNode, useState 
   } from 'react'; // Added HTMLAttributes, ClassAttributes
 import Markdown from 'react-markdown';
-import { CopyIcon } from '@chakra-ui/icons';
+import { FiCopy } from 'react-icons/fi';
 import {
  Box, Button, Collapse, IconButton, useDisclosure
 } from '@chakra-ui/react';
@@ -70,31 +70,37 @@ const Code = ({
    children, className, inline, ...rest 
   }: CodeProps) => {
   const [copied, setCopied] = useState(false);
+  const [hovered, setHovered] = useState(false); // Add hover state
+
   const copyToClipboard = () => {
     if (typeof children === 'string') {
       setCopied(true);
       navigator.clipboard.writeText(children);
-      setTimeout(() => setCopied(false), 1500); // Reset copied state after 1.5s
+      setTimeout(() => setCopied(false), 1500);
     }
   };
 
-  // Determine if it's a block or inline code based on className (react-markdown convention)
   const match = /language-(\w+)/.exec(className || '');
-  const isBlock = !!match; // True if className contains language-*, indicating a block
+  const isBlock = !!match;
 
   if (isBlock) {
     return (
-      <Box position="relative" my={4}>
+      <Box
+        position="relative"
+        my={4}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+      >
         <pre style={{
-          overflow: 'auto', // Changed from scroll to auto
-          padding: '1rem', // Consistent padding
-          margin: 0, // Reset margin if Box handles it
+          overflow: 'auto',
+          padding: '1rem',
+          margin: 0,
           background: 'var(--text)',
           color: 'var(--bg)',
-          borderRadius: '8px', // Slightly smaller radius for blocks
-          maxWidth: '100%' // Allow full width within container
+          borderRadius: '8px',
+          maxWidth: '100%'
         }}
-{...rest}>
+        {...rest}>
           <code className={className}>{children}</code>
         </pre>
         <IconButton
@@ -102,13 +108,16 @@ const Code = ({
           aria-label={copied ? "Copied!" : "Copy code"}
           background="var(--bg)"
           color="var(--text)"
-          icon={<CopyIcon />}
+          icon={<FiCopy />}
           position="absolute"
           right="0.5rem"
           size="sm"
-          title={copied ? "Copied!" : "Copy code"} // Tooltip for better UX
+          title={copied ? "Copied!" : "Copy code"}
           top="0.5rem"
           onClick={copyToClipboard}
+          opacity={hovered ? 1 : 0} // Show only on hover
+          transition="opacity 0.2s"
+          pointerEvents={hovered ? 'auto' : 'none'} // Prevent accidental click when hidden
         />
       </Box>
     );
@@ -119,8 +128,8 @@ const Code = ({
     <code style={{
       color: 'var(--bg)',
       background: 'var(--text)',
-      padding: '0.2rem 0.4rem', // Adjusted padding for inline
-      borderRadius: '4px' // Smaller radius for inline
+      padding: '0.2rem 0.4rem',
+      borderRadius: '4px'
     }}
     className={className}
     {...rest}

@@ -1,6 +1,7 @@
 import { useState, useLayoutEffect, useRef } from 'react';
 import toast from 'react-hot-toast';
-import { CopyIcon, RepeatIcon } from '@chakra-ui/icons';
+import { FiCopy } from 'react-icons/fi';
+import { FiRepeat } from 'react-icons/fi';
 import { Box, IconButton } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
 
@@ -74,7 +75,7 @@ export const Messages: React.FC<MessagesProps> = ({
                   aria-label="Copy"
                   as={motion.div}
                   borderRadius={16}
-                  icon={<CopyIcon color="var(--text)" fontSize="xl" />}
+                  icon={<FiCopy color="var(--text)" fontSize="1.5rem" />}
                   opacity={hoveredIndex === i ? 1 : 0}
                   transition="opacity 0.2s"
                   variant="outlined"
@@ -86,7 +87,7 @@ export const Messages: React.FC<MessagesProps> = ({
                     aria-label="Repeat"
                     as={motion.div}
                     borderRadius={16}
-                    icon={<RepeatIcon color="var(--text)" fontSize="xl" />}
+                    icon={<FiRepeat color="var(--text)" fontSize="1.5rem" />}
                     opacity={hoveredIndex === i ? 1 : 0}
                     transition="opacity 0.2s"
                     variant="outlined"
@@ -103,7 +104,7 @@ export const Messages: React.FC<MessagesProps> = ({
                   aria-label="Copy"
                   as={motion.div}
                   borderRadius={16}
-                  icon={<CopyIcon color="var(--text)" fontSize="xl" />}
+                  icon={<FiCopy color="var(--text)" fontSize="1.5rem" />}
                   opacity={hoveredIndex === i ? 1 : 0}
                   transition="opacity 0.2s"
                   variant="outlined"
