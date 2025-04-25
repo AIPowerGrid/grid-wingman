@@ -1,47 +1,72 @@
-![](/public/images/ein.png)
+# Cognito: Your All-in-One AI Companion for Browser LLMs
 
-# Cognito
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-All-around tiny chrome extension for both local and cloud LLMs. Enjoy AI in your browser. Build on [sidellama](https://github.com/gyopak/sidellama)
+Cognito is a tiny, yet powerful Chrome extension that brings the power of Large Language Models (LLMs) directly to your browser. Whether you prefer cloud-based solutions or running models locally, Cognito seamlessly integrates with your workflow, allowing you to leverage AI for a variety of tasks.
 
-## Plan
+**Enjoy AI in your browser.** Built on sidellama.
 
-~- repair the custom openai endpoint~
+## Key Features
 
-Notes: 
-1. I will mainly fix bugs (and pull requests if any). ~At least for now, adding new functions is too hard for me. Comparison mode, I will try, but...let's see. Now I am trying to migrate to a strict CSP to prevent potential XSS. After a little research, I realized it's just too much work to do because of the UI again. Anyway. Forget it.~ 
+*   **Versatile LLM Support:**
+    *   **Cloud LLMs:** Compatible with any OpenAI API-compliant service: OpenAI, Gemini, GROQ, OPENROUTER. Plus one.
+    *   **Local LLMs:** Seamlessly integrates with:
+        *   Ollama
+        *   LM Studio
+        *   GPT4All
+        *   Jan
+        *   Open WebUI
+        *   ...and any other platform that exposes an OpenAI-compatible API!
 
+*   **Diverse Personas:** Seven pre-built personas designed to cater to specific needs (see below).
 
-## installation
+*   **Web Search Integration:** Enhanced access to information for context-aware AI interactions.
 
-- download the latest [release](https://github.com/3-ark/Cognito/releases)
-- enable Chrome `Extensions > Developer mode`
-- load the content of the extracted zip with `Load unpacked` button
+## Available Personas
 
-### install from source
+Cognito offers the following personas to tailor the AI's behavior to your specific needs:
 
-- clone the repo
-- run `npm i && npm start` to generate your bundle located in `dist/chrome`
-- enable chrome `Extensions > Developer mode`
-- load the content of `dist/chrome` folder with `Load unpacked` button
+*   **Ein:** Academic researcher
+*   **Warren:** Business analyst
+*   **Charlie:** Friendly assistant
+*   **Agatha:** Creative thinker
+*   **Jan:** Strategist
+*   **Sherlock:** Detective
+*   **Bruce:** All-around assistant
 
-## docs
+See the [documentation](DOCS.md) for a complete overview of each persona's capabilities.
 
-Check out the [documentation page](/DOCS.md)
+## Installation
 
-### Available Personas
+### Download the Latest Release
 
-Cognito comes with seven distinct personas to suit different needs:
+1.  Download the latest release from [here].
+2.  Enable Chrome Extensions > Developer mode.
+3.  Load the content of the extracted zip with the "Load unpacked" button.
 
-*   **Ein:** Academic researcher focused on analyzing research papers. Delivers core problem statements, key findings with data, takeaways with implications, and insightful questions grounded in the text.
-*   **Warren:** Business analyst providing actionable insights on business strategies and market trends. Emphasizes data-driven decision-making, risk assessment, and strategic planning.
-*   **Charlie:** Friendly assistant for answering questions, explaining concepts, and brainstorming. Prioritizes clarity, empathy, and practical support.
-*   **Agatha:** Creative thinker who excels at generating innovative ideas and solutions. Emphasizes imagination, unconventional approaches, and experimentation.
-*   **Jan:** Strategist skilled at logical problem-solving, critical thinking, and long-term planning. Emphasizes structured strategies, risk assessment, and adaptability.
-*   **Sherlock:** Detective focused on logical reasoning and deduction. Emphasizes breaking down complex problems, step-by-step strategies, and careful analysis.
-*   **Bruce:** All-around assistant proficient in a wide range of tasks, including answering questions, explaining concepts, analyzing text, writing, and brainstorming.
+### Install from Source
 
-![](/docs/Cognito_app.png)
+1.  Clone the repository: `git clone https://github.com/3-ark/Cognito.git`
+2.  Run `npm i && npm start` to generate your bundle, located in `dist/chrome`.
+3.  Enable Chrome Extensions > Developer mode.
+4.  Load the content of the `dist/chrome` folder with the "Load unpacked" button.
 
-Web Search
-![alt text](/docs/googleparsing.png)
+## Documentation
+
+For detailed usage instructions, persona guides, and troubleshooting, please refer to the [documentation page](DOCS.md).
+
+## Roadmap
+
+*   Bug fixes and improvements.
+*   Evaluate and integrate pull requests.
+*   [Future Consideration] Comparison mode (exploring feasibility).
+*   [Future Consideration] Strict CSP implementation (exploring feasibility).
+
+## Contributing
+
+Contributions are welcome!
+
+## License
+
+MIT License - see the [LICENSE](LICENSE) file for details.
+
