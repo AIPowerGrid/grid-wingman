@@ -49,7 +49,7 @@ export const useUpdateModels = () => {
 
   // Throttled fetch function
   const lastFetchRef = useRef(0);
-  const FETCH_INTERVAL = 2 * 60 * 1000; // 2 minutes
+  const FETCH_INTERVAL = 1 * 60 * 1000; // 1 minutes
 
   const fetchAllModels = useCallback(async () => {
     const now = Date.now();
