@@ -255,6 +255,23 @@ const Td = ({ children, ...rest }: TdProps) => (
   }} {...rest}>{children}</td>
 );
 
+// Blockquote
+type BlockquoteProps = { children?: ReactNode } & HTMLAttributes<HTMLElement>;
+const Blockquote = ({ children, ...rest }: BlockquoteProps) => (
+  <blockquote
+    style={{
+      borderLeft: '4px solid var(--markdown-h2, var(--text))',
+      margin: '1em 0',
+      padding: '0.5em 1em',
+      background: 'rgba(0,0,0,0.03)',
+      color: 'var(--markdown-h2, var(--text))'
+    }}
+    {...rest}
+  >
+    {children}
+  </blockquote>
+);
+
 // Thinking block
 const ThinkingBlock = ({ content }: { content: string }) => {
   const { isOpen, onToggle } = useDisclosure();
@@ -314,7 +331,8 @@ const markdownComponents = {
   tbody: TBody,
   tr: Tr,
   th: Th,
-  td: Td
+  td: Td,
+  blockquote: Blockquote // <-- Add this line
 };
 
 interface MessageProps {
