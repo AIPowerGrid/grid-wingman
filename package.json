@@ -54,6 +54,8 @@
     "remark-gfm": "^4.0.1",
     "remark-math": "^6.0.0",
     "remark-supersub": "^1.0.0",
+    "sass": "^1.87.0",
+    "sass-loader": "^16.0.5",
     "webext-redux": "^2.1.9"
   },
   "devDependencies": {
