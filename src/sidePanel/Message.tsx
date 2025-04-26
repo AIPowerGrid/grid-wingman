@@ -1,3 +1,4 @@
+import '../content/index.scss'; // Import your markdown styles
 import {
   ClassAttributes, HTMLAttributes, ReactNode, useState
 } from 'react';
@@ -7,6 +8,8 @@ import {
   Box, Button, Collapse, IconButton, useDisclosure
 } from '@chakra-ui/react';
 import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
+import remarkSupersub from 'remark-supersub';
 import { MessageTurn } from './ChatHistory';
 
 // List components
@@ -395,7 +398,11 @@ export const Message: React.FC<MessageProps> = ({ turn, index }) => {
         {turn.role === 'assistant' && turn.webDisplayContent && (
           <div className="message-prefix">
             <Markdown
-              remarkPlugins={[remarkGfm]}
+              remarkPlugins={[
+                [remarkGfm, { singleTilde: false }],
+                remarkMath,
+                remarkSupersub
+              ]}
               components={markdownComponents}
             >
               {`**From the Internet**\n${turn.webDisplayContent}\n\n---\n\n`}
@@ -410,7 +417,11 @@ export const Message: React.FC<MessageProps> = ({ turn, index }) => {
             return (
               <div key={`content_${partIndex}`} className="message-content">
                 <Markdown
-                  remarkPlugins={[remarkGfm]}
+                  remarkPlugins={[
+                    [remarkGfm, { singleTilde: false }],
+                    remarkMath,
+                    remarkSupersub
+                  ]}
                   components={markdownComponents}
                 >
                   {part}
