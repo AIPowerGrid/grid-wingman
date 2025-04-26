@@ -53,9 +53,12 @@ Offer critical feedback when needed. Assume the user can handle straight talk an
 const defaultConfig: Config = {
   theme: 'paper',
   customTheme: {
-    active: '#C2E7B5',
+    active: '#7eaa6e',
     bg: '#c2e7b5',
-    text: '#333333'
+    text: '#eadbdb',
+    bold: '#af1b1b',
+    link: '#003bb9',
+    italic: '#09993e',
   },
   personas,
   generateTitle: true,

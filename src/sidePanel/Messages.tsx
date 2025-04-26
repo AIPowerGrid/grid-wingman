@@ -116,7 +116,6 @@ export const Messages: React.FC<MessagesProps> = ({
           </Box>
         )
       )}
-      <div ref={messagesEndRef} />
     </Box>
   );
 };

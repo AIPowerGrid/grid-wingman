@@ -30,6 +30,7 @@ interface Model {
 }
 import { useConfig } from './ConfigContext';
 import { Docs } from './Docs';
+import { useUpdateModels } from './hooks/useUpdateModels';
  
 const WelcomeModal = ({
  isOpen, onClose, setSettingsMode 
@@ -148,7 +149,8 @@ const SettingsDrawer = ({
 }) => {
   const [searchQuery, setSearchQuery] = React.useState('');
   const [inputFocused, setInputFocused] = React.useState(false);
-  
+  const { fetchAllModels } = useUpdateModels(); // <-- Use the hook here
+
   const filteredModels = config?.models?.filter(model => 
     model.id.toLowerCase().includes(searchQuery.toLowerCase()) || 
     model.host?.toLowerCase()?.includes(searchQuery.toLowerCase())
@@ -234,6 +236,7 @@ const SettingsDrawer = ({
                 onFocus={() => {
                   setSearchQuery(''); // Clear search on focus to start fresh search
                   setInputFocused(true);
+                  fetchAllModels(); // <-- Fetch models on focus, throttled
                 }}
                 onBlur={() => setTimeout(() => setInputFocused(false), 150)}
               />

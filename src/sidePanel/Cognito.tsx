@@ -326,7 +326,7 @@ const [isHovering, setIsHovering] = useState(false);
           )}
           {!settingsMode && !historyMode && turns.length === 0 && !config?.chatMode && (
             // Adjust positioning and layout if needed for icons
-            <Box bottom="3rem" left="1rem" position="absolute" display="flex" flexDirection="column" gap={2}>
+            <Box bottom="3rem" left="2rem" position="absolute" display="flex" flexDirection="column" gap={2}>
               <Tooltip label="Add Web Search Results to LLM Context" placement="right" hasArrow>
                 {/* Use IconButton */}
                 <IconButton
@@ -336,7 +336,7 @@ const [isHovering, setIsHovering] = useState(false);
                     updateConfig({ chatMode: 'web' });
                   }}
                   variant="ghost" // Use 'ghost' for minimal styling, or 'unstyled'
-                  size="md"      // Adjust size: 'sm', 'md', 'lg'
+                  size="lg"      // Adjust size: 'sm', 'md', 'lg'
                   color="var(--text)" // Ensure icon color matches
                   // isRound // Optional: makes the button circular
                   _hover={{ bg: 'rgba(128, 128, 128, 0.2)' }} // Optional: subtle hover effect
@@ -351,7 +351,7 @@ const [isHovering, setIsHovering] = useState(false);
                     updateConfig({ chatMode: 'page' });
                   }}
                   variant="ghost"
-                  size="md"
+                  size="lg"
                   color="var(--text)"
                   // isRound
                   _hover={{ bg: 'rgba(128, 128, 128, 0.2)' }}

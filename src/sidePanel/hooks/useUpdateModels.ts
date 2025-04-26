@@ -1,20 +1,20 @@
-import {
- useCallback,useEffect, useState 
-} from 'react';
+import { useCallback, useRef, useState } from 'react';
 import storage from 'src/util/storageUtil';
 import { useConfig } from '../ConfigContext';
-import {
- GEMINI_URL, GROQ_URL, OPENAI_URL, OPENROUTER_URL 
-} from '../constants';
+import { GEMINI_URL, GROQ_URL, OPENAI_URL, OPENROUTER_URL } from '../constants';
 import type { Model } from 'src/types/config';
 
 const fetchDataSilently = async (url: string, params = {}) => {
   try {
     const res = await fetch(url, params);
-    const data = res.json();
-
+    if (!res.ok) {
+      console.error(`[fetchDataSilently] HTTP error! Status: ${res.status} for URL: ${url}`);
+      return undefined;
+    }
+    const data = await res.json();
     return data;
   } catch (error) {
+    console.error(`[fetchDataSilently] Fetch or JSON parse error for URL: ${url}`, error);
     return undefined;
   }
 };
@@ -23,168 +23,137 @@ export const useUpdateModels = () => {
   const [chatTitle, setChatTitle] = useState('');
   const { config, updateConfig } = useConfig();
 
-  const fetchModels = useCallback(async () => {
+  // Helper to update models in config
+  const updateModels = useCallback((newModels: Model[], host: string) => {
+    const haveModelsChanged = (newModels: Model[], existingModels: Model[] = []) => {
+      if (newModels.length !== existingModels.length) return true;
+      const sortById = (a: Model, b: Model) => a.id.localeCompare(b.id);
+      const sortedNew = [...newModels].sort(sortById);
+      const sortedExisting = [...existingModels].sort(sortById);
+      return JSON.stringify(sortedNew) !== JSON.stringify(sortedExisting);
+    };
 
-    let models: Model[] = [];
+    const existingModels = (config?.models ?? []).filter(m => m.host !== host);
+    const combinedModels = [...existingModels, ...newModels];
 
+    if (haveModelsChanged(combinedModels, config?.models)) {
+      const isSelectedAvailable = config?.selectedModel &&
+        combinedModels.some(m => m.id === config?.selectedModel);
+
+      updateConfig({
+        models: combinedModels,
+        selectedModel: isSelectedAvailable ? config?.selectedModel : combinedModels[0]?.id
+      });
+    }
+  }, [config, updateConfig]);
+
+  // Throttled fetch function
+  const lastFetchRef = useRef(0);
+  const FETCH_INTERVAL = 2 * 60 * 1000; // 2 minutes
+
+  const fetchAllModels = useCallback(async () => {
+    const now = Date.now();
+    if (now - lastFetchRef.current < FETCH_INTERVAL) {
+      console.log('[useUpdateModels] Model fetch throttled.');
+      return;
+    }
+    lastFetchRef.current = now;
+
+    // Ollama
     if (config?.ollamaUrl) {
-      const ollamaModels = await fetchDataSilently(`${config?.ollamaUrl}/api/tags`);
-
-      if (!ollamaModels) {
-        updateConfig({ ollamaConnected: false, ollamaUrl: '' });
-      } else {
+      console.log('[useUpdateModels] Fetching Ollama models...');
+      const ollamaModels = await fetchDataSilently(`${config.ollamaUrl}/api/tags`);
+      if (ollamaModels) {
         const parsedModels = (ollamaModels?.models as Model[] ?? []).map(m => ({
-          ...m,
-          id: m.id, // fallback if needed
-          host: 'ollama'
+          ...m, id: m.id, host: 'ollama'
         }));
-
-        models = [...models, ...parsedModels];
+        updateModels(parsedModels, 'ollama');
       }
     }
 
+    // LM Studio
     if (config?.lmStudioUrl) {
-      console.log('lm')
-      const lmStudioModels = await fetchDataSilently(`${config?.lmStudioUrl}/v1/models`);
-
-      console.log('lm', lmStudioModels)
-
-      if (!lmStudioModels) {
-        updateConfig({ lmStudioConnected: false, lmStudioUrl: '' });
-      } else {
+      console.log('[useUpdateModels] Fetching LM Studio models...');
+      const lmStudioModels = await fetchDataSilently(`${config.lmStudioUrl}/v1/models`);
+      if (lmStudioModels) {
         const parsedModels = (lmStudioModels?.data as Model[] ?? []).map(m => ({
-          ...m,
-          id: m.id, // fallback if needed
-          host: 'lmStudio'
+          ...m, id: m.id, host: 'lmStudio'
         }));
-
-        models = [...models, ...parsedModels];
+        updateModels(parsedModels, 'lmStudio');
       }
     }
 
+    // Gemini
     if (config?.geminiApiKey) {
-      const geminiModels = await fetchDataSilently(GEMINI_URL, { headers: { Authorization: `Bearer ${config?.geminiApiKey}` } });
-
-      if (!geminiModels) {
-        updateConfig({ geminiConnected: false });
-      } else {
+      console.log('[useUpdateModels] Fetching Gemini models...');
+      const geminiModels = await fetchDataSilently(GEMINI_URL, { headers: { Authorization: `Bearer ${config.geminiApiKey}` } });
+      if (geminiModels) {
         const parsedModels = (geminiModels?.data as Model[] ?? []).filter(m => m.id.startsWith('models/gemini')).map(m => ({
-          ...m,
-          id: m.id, // fallback if needed
-          host: 'gemini'
+          ...m, id: m.id, host: 'gemini'
         }));
-
-        models = [...models, ...parsedModels];
+        updateModels(parsedModels, 'gemini');
       }
     }
-    
+
+    // Groq
     if (config?.groqApiKey) {
-      const groqModels = await fetchDataSilently(GROQ_URL, { headers: { Authorization: `Bearer ${config?.groqApiKey}` } });
-
-      if (!groqModels) {
-        updateConfig({ groqConnected: false });
-      } else {
+      console.log('[useUpdateModels] Fetching Groq models...');
+      const groqModels = await fetchDataSilently(GROQ_URL, { headers: { Authorization: `Bearer ${config.groqApiKey}` } });
+      if (groqModels) {
         const parsedModels = (groqModels?.data as Model[] ?? []).map(m => ({
-          ...m,
-          id: m.id, // fallback if needed
-          host: 'groq'
+          ...m, id: m.id, host: 'groq'
         }));
-
-        models = [...models, ...parsedModels];
+        updateModels(parsedModels, 'groq');
       }
     }
 
+    // OpenAI
     if (config?.openAiApiKey) {
-      const openAiModels = await fetchDataSilently(OPENAI_URL, { headers: { Authorization: `Bearer ${config?.openAiApiKey}` } });
-
-      if (!openAiModels) {
-        updateConfig({ openAiConnected: false });
-      } else {
+      console.log('[useUpdateModels] Fetching OpenAI models...');
+      const openAiModels = await fetchDataSilently(OPENAI_URL, { headers: { Authorization: `Bearer ${config.openAiApiKey}` } });
+      if (openAiModels) {
         const parsedModels = (openAiModels?.data as Model[] ?? []).filter(m => m.id.startsWith('gpt-')).map(m => ({
-          ...m,
-          id: m.id, // fallback if needed
-          host: 'openai'
+          ...m, id: m.id, host: 'openai'
         }));
-
-        models = [...models, ...parsedModels];
+        updateModels(parsedModels, 'openai');
       }
     }
 
+    // OpenRouter
     if (config?.openRouterApiKey) {
-      const openRouterModels = await fetchDataSilently(OPENROUTER_URL, { headers: { Authorization: `Bearer ${config?.openRouterApiKey}` } });
-
-      if (!openRouterModels) {
-        updateConfig({ openRouterConnected: false });
-      } else {
+      console.log('[useUpdateModels] Fetching OpenRouter models...');
+      const openRouterModels = await fetchDataSilently(OPENROUTER_URL, { headers: { Authorization: `Bearer ${config.openRouterApiKey}` } });
+      if (openRouterModels) {
         const parsedModels = (openRouterModels?.data as Model[] ?? []).map(m => ({
-          ...m,
-          id: m.id, // fallback if needed
-          context_length: m.context_length,
-          host: 'openrouter'
+          ...m, id: m.id, context_length: m.context_length, host: 'openrouter'
         }));
-
-        models = [...models, ...parsedModels];
+        updateModels(parsedModels, 'openrouter');
       }
     }
 
     // Custom Endpoint
-    if (config?.customEndpoint && config?.customApiKey) {
+    if (config?.customEndpoint || config?.customApiKey) {
+      console.log('[useUpdateModels] Fetching Custom Endpoint models...');
       const customModels = await fetchDataSilently(
-        `${config.customEndpoint.replace(/\/v1\/chat\/completions$/, '')}/v1/models`,
+        `${config.customEndpoint!.replace(/\/v1\/chat\/completions$/, '')}/v1/models`,
         { headers: { Authorization: `Bearer ${config.customApiKey}` } }
       );
-      console.log('Custom endpoint models response:', customModels); // Debug log
-
-      // Support both array and { data: array } formats
       const modelsArray = Array.isArray(customModels)
         ? customModels
         : customModels?.data;
-
       if (modelsArray && Array.isArray(modelsArray)) {
         const parsedModels = (modelsArray as Model[]).map(m => ({
-          ...m,
-          id: m.id,
-          host: 'custom'
+          ...m, id: m.id, host: 'custom'
         }));
-        models = [...models, ...parsedModels];
+        updateModels(parsedModels, 'custom');
       }
     }
+  }, [config, updateModels, updateConfig]);
 
-    const haveModelsChanged = (newModels: Model[], existingModels: Model[] = []) => {
-      if (newModels.length !== existingModels.length) return true;
+  // Remove the automatic effect
+  // useEffect(() => {
+  //   fetchAllModels();
+  // }, [fetchAllModels]);
 
-      const sortById = (a: Model, b: Model) => a.id.localeCompare(b.id);
-      const sortedNew = [...newModels].sort(sortById);
-      const sortedExisting = [...existingModels].sort(sortById);
-
-      return JSON.stringify(sortedNew) !== JSON.stringify(sortedExisting);
-    };
-
-    if (models.length > 0 && haveModelsChanged(models, config?.models)) {
-      const isSelectedAvailable = config?.selectedModel && 
-        models.some(m => m.id === config?.selectedModel);
-
-      updateConfig({ 
-        models, 
-        selectedModel: isSelectedAvailable ? config?.selectedModel : models[0]?.id 
-      });
-    }
-  }, [config, updateConfig, storage.getItem]);
-
-  // Only fetch models when dependencies change
-  useEffect(() => {
-    fetchModels();
-  }, [
-    config?.ollamaUrl,
-    config?.lmStudioUrl,
-    config?.geminiApiKey,
-    config?.groqApiKey,
-    config?.openAiApiKey,      // <-- add this
-    config?.openRouterApiKey,         // <-- add this
-    config?.customEndpoint,      // <-- add this
-    config?.customApiKey,        // <-- add this
-    fetchModels
-  ]);
-
-  return { chatTitle, setChatTitle };
+  return { chatTitle, setChatTitle, fetchAllModels };
 };

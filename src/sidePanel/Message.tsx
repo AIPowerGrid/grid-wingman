@@ -1,76 +1,70 @@
 import {
-   ClassAttributes, HTMLAttributes, ReactNode, useState 
-  } from 'react'; // Added HTMLAttributes, ClassAttributes
+  ClassAttributes, HTMLAttributes, ReactNode, useState
+} from 'react';
 import Markdown from 'react-markdown';
 import { FiCopy } from 'react-icons/fi';
 import {
- Box, Button, Collapse, IconButton, useDisclosure
+  Box, Button, Collapse, IconButton, useDisclosure
 } from '@chakra-ui/react';
 import remarkGfm from 'remark-gfm';
-import { MessageTurn } from './ChatHistory'; // Adjust path if needed
+import { MessageTurn } from './ChatHistory';
 
-// Update ListProps type
-type ListProps = { 
+// List components
+type ListProps = {
   children?: ReactNode;
-  ordered?: boolean; // Add ordered prop detection
+  ordered?: boolean;
 } & HTMLAttributes<HTMLUListElement | HTMLOListElement>;
 
-// Keep existing Ul component
 const Ul = ({ children, ...rest }: ListProps) => (
   <ul style={{
-    paddingLeft: '2rem', 
-    paddingTop: '0.5rem', 
+    paddingLeft: '2rem',
+    paddingTop: '0.5rem',
     paddingBottom: '0.5rem',
-    listStyleType: 'disc' // Explicit bullet style
-  }} {...rest}>
-    {children}
-  </ul>
+    listStyleType: 'disc'
+  }} {...rest}>{children}</ul>
 );
 
-// Add new Ol component
 const Ol = ({ children, ...rest }: ListProps) => (
   <ol style={{
     paddingLeft: '2rem',
     paddingTop: '0.5rem',
     paddingBottom: '0.5rem',
-    listStyleType: 'decimal' // Explicit number style
-  }} {...rest}>
-    {children}
-  </ol>
+    listStyleType: 'decimal'
+  }} {...rest}>{children}</ol>
 );
 
-// Define a more specific type for paragraph props
+// Paragraph
 type ParagraphProps = { children?: ReactNode } & HTMLAttributes<HTMLParagraphElement>;
-
 const P = ({ children, ...rest }: ParagraphProps) => (
   <p style={{
     paddingTop: 0,
     paddingBottom: '0.2rem',
-    wordBreak: 'break-word', // Add this line
-    overflowWrap: 'break-word', // Add this line
-    whiteSpace: 'pre-wrap' // Add this line
-  }}
-  {...rest}>{children}</p>
+    wordBreak: 'break-word',
+    overflowWrap: 'break-word',
+    whiteSpace: 'pre-wrap'
+  }} {...rest}>{children}</p>
 );
 
-// Define a more specific type for pre props
+// Pre/code
 type PreProps = { children?: ReactNode } & HTMLAttributes<HTMLPreElement>;
-
 const Pre = ({ children, ...rest }: PreProps) => (
   <pre style={{
- overflow: 'scroll', paddingLeft: '1rem', paddingTop: '0.5rem', paddingBottom: '0.5rem', margin: '1rem 0', background: 'var(--text)', color: 'var(--bg)', borderRadius: '16px', maxWidth: '80vw'
-}}
-{...rest}>{children}</pre>
+    overflow: 'scroll',
+    paddingLeft: '1rem',
+    paddingTop: '0.5rem',
+    paddingBottom: '0.5rem',
+    margin: '1rem 0',
+    background: 'var(--markdown-pre-bg, var(--text))',
+    color: 'var(--markdown-pre-fg, var(--bg))',
+    borderRadius: '16px',
+    maxWidth: '80vw'
+  }} {...rest}>{children}</pre>
 );
 
-// Define a more specific type for code props
 type CodeProps = { children?: ReactNode; className?: string; inline?: boolean } & HTMLAttributes<HTMLElement>;
-
-const Code = ({
-   children, className, inline, ...rest 
-  }: CodeProps) => {
+const Code = ({ children, className, inline, ...rest }: CodeProps) => {
   const [copied, setCopied] = useState(false);
-  const [hovered, setHovered] = useState(false); // Add hover state
+  const [hovered, setHovered] = useState(false);
 
   const copyToClipboard = () => {
     if (typeof children === 'string') {
@@ -95,12 +89,11 @@ const Code = ({
           overflow: 'auto',
           padding: '1rem',
           margin: 0,
-          background: 'var(--text)',
-          color: 'var(--bg)',
+          background: 'var(--markdown-code-bg, var(--text))',
+          color: 'var(--markdown-code-fg, var(--bg))',
           borderRadius: '8px',
           maxWidth: '100%'
-        }}
-        {...rest}>
+        }} {...rest}>
           <code className={className}>{children}</code>
         </pre>
         <IconButton
@@ -115,9 +108,9 @@ const Code = ({
           title={copied ? "Copied!" : "Copy code"}
           top="0.5rem"
           onClick={copyToClipboard}
-          opacity={hovered ? 1 : 0} // Show only on hover
+          opacity={hovered ? 1 : 0}
           transition="opacity 0.2s"
-          pointerEvents={hovered ? 'auto' : 'none'} // Prevent accidental click when hidden
+          pointerEvents={hovered ? 'auto' : 'none'}
         />
       </Box>
     );
@@ -126,8 +119,8 @@ const Code = ({
   // Inline code
   return (
     <code style={{
-      color: 'var(--bg)',
-      background: 'var(--text)',
+      color: 'var(--markdown-code-fg, var(--bg))',
+      background: 'var(--markdown-code-bg, var(--text))',
       padding: '0.2rem 0.4rem',
       borderRadius: '4px'
     }}
@@ -139,37 +132,34 @@ const Code = ({
   );
 };
 
-// Define a more specific type for anchor props
+// Anchor
 type AnchorProps = { children?: ReactNode; href?: string } & HTMLAttributes<HTMLAnchorElement>;
-
-const A = ({
-   children, href, ...rest 
-  }: AnchorProps) => (
+const A = ({ children, href, ...rest }: AnchorProps) => (
   <a href={href}
     style={{
-      color: 'var(--link)', // Changed from --text to --link
-      textDecoration: 'underline', 
-      padding: '2px 7px', 
+      color: 'var(--markdown-link, var(--link))',
+      textDecoration: 'underline',
+      padding: '2px 7px',
       borderRadius: '6px'
     }}
     target="_blank"
-    rel="noopener noreferrer" // Added for security
+    rel="noopener noreferrer"
     {...rest}
   >
     {children}
   </a>
 );
 
-// Add to your component types section
+// Headings
 type HeadingProps = { children?: ReactNode } & HTMLAttributes<HTMLHeadingElement>;
-
 const H1 = ({ children, ...rest }: HeadingProps) => (
   <h1 style={{
     fontSize: '1.5rem',
     fontWeight: 800,
     margin: '1rem 0 1rem',
-    borderBottom: '2px solid var(--text)',
-    paddingBottom: '0.5rem'
+    borderBottom: '2px solid var(--markdown-h1, var(--text))',
+    paddingBottom: '0.5rem',
+    color: 'var(--markdown-h1, var(--text))'
   }} {...rest}>{children}</h1>
 );
 
@@ -178,47 +168,46 @@ const H2 = ({ children, ...rest }: HeadingProps) => (
     fontSize: '1.25rem',
     fontWeight: 700,
     margin: '1rem 0 0.75rem',
-    borderBottom: '1px solid var(--text)',
-    paddingBottom: '0.4rem'
+    borderBottom: '1px solid var(--markdown-h2, var(--text))',
+    paddingBottom: '0.4rem',
+    color: 'var(--markdown-h2, var(--text))'
   }} {...rest}>{children}</h2>
 );
 
-// Add H3 component after H2
 const H3 = ({ children, ...rest }: HeadingProps) => (
   <h3 style={{
     fontSize: '1.1rem',
     fontWeight: 600,
     margin: '0.75rem 0 0.5rem',
-    borderBottom: '1px dashed var(--text)',
-    paddingBottom: '0.3rem'
+    borderBottom: '1px dashed var(--markdown-h3, var(--text))',
+    paddingBottom: '0.3rem',
+    color: 'var(--markdown-h3, var(--text))'
   }} {...rest}>{children}</h3>
 );
 
-// Add similar components for h3-h6 as needed...
-
-// Add new components for strong/em
+// Strong/Em
 type StrongProps = { children?: ReactNode } & HTMLAttributes<HTMLElement>;
 const Strong = ({ children, ...rest }: StrongProps) => (
-  <strong style={{ 
-    color: 'var(--bold)',
-    fontWeight: 700, // Keep bold weight
-    fontFamily: 'Poppins, sans-serif' // Explicit font stack
+  <strong style={{
+    color: 'var(--markdown-strong, var(--bold))',
+    fontWeight: 700,
+    fontFamily: 'Poppins, sans-serif'
   }} {...rest}>{children}</strong>
 );
 
 type EmProps = { children?: ReactNode } & HTMLAttributes<HTMLElement>;
 const Em = ({ children, ...rest }: EmProps) => (
-  <em style={{ 
-    color: 'var(--italic)',
-    fontStyle: 'italic' // Keep italic slant
+  <em style={{
+    color: 'var(--markdown-em, var(--italic))',
+    fontStyle: 'italic'
   }} {...rest}>{children}</em>
 );
 
-// Add new table components after Em component
+// Table
 type TableProps = { children?: ReactNode } & HTMLAttributes<HTMLTableElement>;
 const Table = ({ children, ...rest }: TableProps) => (
-  <table style={{ 
-    border: `2px solid var(--text)`,
+  <table style={{
+    border: `2px solid var(--markdown-table-border, var(--text))`,
     borderCollapse: 'collapse',
     width: '100%',
     margin: '1rem 0'
@@ -227,9 +216,9 @@ const Table = ({ children, ...rest }: TableProps) => (
 
 type THeadProps = { children?: ReactNode } & HTMLAttributes<HTMLTableSectionElement>;
 const THead = ({ children, ...rest }: THeadProps) => (
-  <thead style={{ 
+  <thead style={{
     background: 'var(--active)',
-    borderBottom: `2px solid var(--text)`
+    borderBottom: `2px solid var(--markdown-table-border, var(--text))`
   }} {...rest}>{children}</thead>
 );
 
@@ -253,7 +242,7 @@ type ThProps = { children?: ReactNode } & HTMLAttributes<HTMLTableCellElement>;
 const Th = ({ children, ...rest }: ThProps) => (
   <th style={{
     padding: '0.5rem',
-    border: `1px solid var(--text)`,
+    border: `1px solid var(--markdown-table-border, var(--text))`,
     fontWeight: 700
   }} {...rest}>{children}</th>
 );
@@ -262,11 +251,11 @@ type TdProps = { children?: ReactNode } & HTMLAttributes<HTMLTableCellElement>;
 const Td = ({ children, ...rest }: TdProps) => (
   <td style={{
     padding: '0.5rem',
-    border: `1px solid var(--text)`
+    border: `1px solid var(--markdown-table-border, var(--text))`
   }} {...rest}>{children}</td>
 );
 
-// Add this new component
+// Thinking block
 const ThinkingBlock = ({ content }: { content: string }) => {
   const { isOpen, onToggle } = useDisclosure();
 
@@ -285,17 +274,17 @@ const ThinkingBlock = ({ content }: { content: string }) => {
       </Button>
       <Collapse in={isOpen} animateOpacity>
         <Box
-          bg='rgba(0,0,0,0.05)' // Slightly different background for thought block
+          bg='rgba(0,0,0,0.05)'
           border='1px dashed'
           borderColor='var(--text)'
           borderRadius='md'
           p={3}
         >
           <div className="markdown-body">
-            <Markdown 
+            <Markdown
               remarkPlugins={[remarkGfm]}
               components={{
-                ...markdownComponents, // Spread existing components
+                ...markdownComponents,
                 h1: H1,
                 h2: H2,
                 h3: H3
@@ -307,19 +296,19 @@ const ThinkingBlock = ({ content }: { content: string }) => {
   );
 };
 
-// Update markdownComponents mapping
+// Markdown components mapping
 const markdownComponents = {
   ul: Ul,
-  ol: Ol, // Changed from Ul to new Ol component
+  ol: Ol,
   p: P,
   pre: Pre,
   code: Code,
   a: A,
-  strong: Strong, // Add strong mapping
-  em: Em,        // Add em mapping
+  strong: Strong,
+  em: Em,
   h1: H1,
   h2: H2,
-  h3: H3, // Add H3 to components
+  h3: H3,
   table: Table,
   thead: THead,
   tbody: TBody,
@@ -330,38 +319,32 @@ const markdownComponents = {
 
 interface MessageProps {
   turn: MessageTurn;
-  index: number; // Keep index if needed for styling/keys further down
+  index: number;
 }
 
 export const Message: React.FC<MessageProps> = ({ turn, index }) => {
-  // Split the message by <think> tags, keeping the delimiters
   const contentToRender = turn.rawContent || '';
   const parts = contentToRender.split(/(<think>[\s\S]*?<\/think>)/g).filter(part => part && part.trim() !== '');
   const thinkRegex = /<think>([\s\S]*?)<\/think>/;
-  // Define components object once
 
   return (
     <Box
-      // --- Style based on turn.role ---
       background={turn.role === 'assistant' ? 'var(--active)' : 'var(--bg)'}
       border="2px"
-      borderColor={turn.role === 'assistant' ? 'var(--text)' : 'var(--text)'} // Or use different borders?
+      borderColor={turn.role === 'assistant' ? 'var(--text)' : 'var(--text)'}
       borderRadius={16}
-      className="chatMessage" // --- Keep this class for downloadImage ---
-      color={'var(--text)'} // Assuming text color is consistent
+      className="chatMessage"
+      color={'var(--text)'}
       fontSize="md"
       fontStyle={'normal'}
       fontWeight={600}
-       // --- Adjust maxWidth/margins based on role if needed ---
-       maxWidth="calc(100% - 3rem)" // Maybe adjust for user vs assistant?
-       // ml={turn.role === 'assistant' ? 2 : 'auto'} // Example alignment adjustment
-       // mr={turn.role === 'user' ? 2 : 'auto'} // Example alignment adjustment
-       ml={2} 
-       mr={2}
-       pb={1}
-       pl={4}
-       pr={4}
-       pt={2}
+      maxWidth="calc(100% - 3rem)"
+      ml={2}
+      mr={2}
+      pb={1}
+      pl={4}
+      pr={4}
+      pt={2}
       sx={{
         textAlign: 'left',
         position: 'relative',
@@ -375,9 +358,9 @@ export const Message: React.FC<MessageProps> = ({ turn, index }) => {
           backgroundImage: 'url(assets/images/paper-texture.png)',
           backgroundSize: '512px',
           backgroundRepeat: 'repeat',
-          opacity: 0.5, // Adjusted opacity
+          opacity: 0.5,
           pointerEvents: 'none',
-          borderRadius: '14px', // slightly less than parent to avoid edge artifacts
+          borderRadius: '14px',
           mixBlendMode: 'multiply',
           filter: 'contrast(1) brightness(1) sharpen(0)',
           boxShadow: `
@@ -391,29 +374,22 @@ export const Message: React.FC<MessageProps> = ({ turn, index }) => {
       }}
     >
       <div className="message-markdown">
-        {/* --- Conditionally Render Prefix for Assistant --- */}
         {turn.role === 'assistant' && turn.webDisplayContent && (
-          <div className="message-prefix"> {/* Optional wrapper class */}
-             <Markdown
-                remarkPlugins={[remarkGfm]}
-                components={markdownComponents}
-              >
-                {`**From the Internet**\n${turn.webDisplayContent}\n\n---\n\n`}
-              </Markdown>
+          <div className="message-prefix">
+            <Markdown
+              remarkPlugins={[remarkGfm]}
+              components={markdownComponents}
+            >
+              {`**From the Internet**\n${turn.webDisplayContent}\n\n---\n\n`}
+            </Markdown>
           </div>
         )}
-
-       {/* Render actual content parts (including thinking blocks) */}
         {parts.map((part, partIndex) => {
           const match = part.match(thinkRegex);
-
           if (match && match[1]) {
-            // Render thinking block
             return <ThinkingBlock key={`think_${partIndex}`} content={match[1]} />;
           } else {
-            // Render normal markdown content from turn.rawContent
             return (
-              // Using partIndex for key as part content might not be unique
               <div key={`content_${partIndex}`} className="message-content">
                 <Markdown
                   remarkPlugins={[remarkGfm]}

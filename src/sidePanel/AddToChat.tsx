@@ -1,4 +1,4 @@
-import { FiPaperclip } from 'react-icons/fi';
+import { GoArrowSwitch } from "react-icons/go";
 import {
   Button, Menu, MenuButton, MenuItem, MenuList, Center
 } from '@chakra-ui/react';
@@ -30,10 +30,10 @@ export const AddToChat = () => {
       >
         <Center px={2}> {/* Added padding here for better spacing */}
           {!config?.chatMode && (
-            <FiPaperclip color="var(--text)" fontSize="1.25rem" style={{ marginRight: config?.chatMode ? '0.5rem' : 0 }} />
+            < GoArrowSwitch  color="var(--text)" fontSize="1.25rem" />
           )}
           {/* Conditionally render chatMode text */}
-          {config?.chatMode && config.chatMode.charAt(0).toUpperCase() + config.chatMode.slice(1)}
+          {config?.chatMode && config.chatMode.toUpperCase()}
         </Center>
       </MenuButton>
       <MenuList
@@ -41,10 +41,12 @@ export const AddToChat = () => {
         border="2px solid var(--text)" // Apply border once here
         borderRadius="md" // Optional: add some rounding
         marginTop="1px"
-        minWidth="80px" // Adjusted minWidth
+        height="auto" // Allow height to adjust based on content
+        minWidth="auto" // Adjusted minWidth
         p={0} // Remove padding from MenuList itself
         overflow="hidden" // Ensure border radius clips children
         zIndex={4}
+        mr="1.5rem" // Adjusted margin to align with button
       >
         <MenuItem
           _hover={{ background: 'var(--bg)' }}
@@ -56,9 +58,9 @@ export const AddToChat = () => {
           onClick={() => updateConfig({ chatMode: undefined })}
           display="flex" // Add display flex
           justifyContent="center" // Add justify content center
-          py={2} // Add vertical padding
+          py={1} // Add vertical padding
         >
-          Chat
+          CHAT
         </MenuItem>
         <MenuItem
           _hover={{ background: 'var(--bg)' }}
@@ -70,9 +72,9 @@ export const AddToChat = () => {
           onClick={() => updateConfig({ chatMode: 'page' })}
           display="flex" // Add display flex
           justifyContent="center" // Add justify content center
-          py={2} // Add vertical padding
+          py={1} // Add vertical padding
         >
-          Page
+          PAGE
         </MenuItem>
         <MenuItem
           _hover={{ background: 'var(--bg)' }}
@@ -83,9 +85,9 @@ export const AddToChat = () => {
           onClick={() => updateConfig({ chatMode: 'web' })}
           display="flex" // Add display flex
           justifyContent="center" // Add justify content center
-          py={2} // Add vertical padding
+          py={1} // Add vertical padding
         >
-          Web
+          WEB
         </MenuItem>
       </MenuList>
     </Menu>

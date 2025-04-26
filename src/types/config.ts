@@ -58,6 +58,17 @@ export interface Config {
     active: string;
     bg: string;
     text: string;
+    bold: string;
+    italic: string;
+    link: string;
+    codeBg: string;
+    codeFg: string;
+    preBg: string;
+    preFg: string;
+    tableBorder: string;
+    error: string;
+    success: string;
+    warning: string;
   };
   panelOpen: boolean; // Add this property to Config interface
 }
