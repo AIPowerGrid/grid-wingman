@@ -383,7 +383,7 @@ const [isHovering, setIsHovering] = useState(false);
               }}
             >
              <HStack spacing={4} maxW="100%" overflowX="auto" px={2}> {/* Added padding */}
-              <MessageTemplate onClick={() => onSend('Provide a concise overview of this page.')}>
+              <MessageTemplate onClick={() => onSend('Provide your summary.')}>
                 TLDR
               </MessageTemplate>
               <MessageTemplate onClick={() => onSend('Extract all key figures, names, locations, and dates mentioned on this page and list them.')}>

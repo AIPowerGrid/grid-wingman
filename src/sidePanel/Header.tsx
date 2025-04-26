@@ -1,7 +1,9 @@
 import {
   DeleteIcon,
   SettingsIcon,
-  SmallCloseIcon
+  SmallCloseIcon,
+  MoonIcon,
+  SunIcon
 } from '@chakra-ui/icons';
 import {
   Box,
@@ -19,7 +21,8 @@ import {
   ModalOverlay,
   Select,
   Text,
-  useDisclosure
+  useDisclosure,
+  Image
 } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
 import React from 'react';
@@ -41,7 +44,7 @@ const WelcomeModal = ({
       <ModalHeader textAlign="center">👋 Welcome Detective 👋</ModalHeader>
       <ModalBody>
         <Text color="var(--text)" fontSize="md" fontWeight={600} textAlign="center">
-          The game is afoot!<br />
+          The Game Is Afoot!<br />
         </Text>
         <Box display="flex" justifyContent="center" mt={6}>
           <Button
@@ -56,7 +59,7 @@ const WelcomeModal = ({
             size="md"
             onClick={() => setSettingsMode(true)}
           >
-            settings
+            Settings
           </Button>
         </Box>
       </ModalBody>
@@ -87,40 +90,57 @@ const Badge = ({ children }) => (
   </Box>
 );
  
-const DrawerHeader = ({ onClose }) => (
-  <Box alignItems="center" background="var(--active)" borderBottom="2px solid var(--text)" display="flex" paddingBottom={0} paddingTop={0}>
-    <IconButton
-      aria-label="Close Drawer"
-      as={motion.div}
-      borderRadius={16}
-      icon={<SmallCloseIcon color="var(--text)" fontSize="3xl" />}
-      ml={1}
-      mr={1}
-      position="relative"
-      sx={{
-        '&::before': {
-          content: '""',
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundImage: 'url(assets/images/paper-texture.png)',
-          backgroundSize: 'cover',
-          opacity: 0.0,
-          pointerEvents: 'none',
-          borderRadius: '16px',
-          mixBlendMode: 'multiply',
-          zIndex: 0
-        }
-      }}
-      variant="outlined"
-      whileHover={{ cursor: 'pointer' }}
-      onClick={onClose}
-    />
-    <Badge>settings</Badge>
-  </Box>
-);
+const DrawerHeader = ({ onClose }) => {
+  const { config, updateConfig } = useConfig(); // Add this line
+
+  // Determine if current theme is dark
+  const isDark = config?.theme === 'dark';
+
+  return (
+    <Box alignItems="center" background="var(--active)" borderBottom="2px solid var(--text)" display="flex" paddingBottom={0} paddingTop={0}>
+      <IconButton
+        aria-label="Close Drawer"
+        as={motion.div}
+        borderRadius={16}
+        icon={<SmallCloseIcon color="var(--text)" fontSize="3xl" />}
+        ml={1}
+        mr={1}
+        position="relative"
+        sx={{
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundImage: 'url(assets/images/paper-texture.png)',
+            backgroundSize: 'cover',
+            opacity: 0.0,
+            pointerEvents: 'none',
+            borderRadius: '16px',
+            mixBlendMode: 'multiply',
+            zIndex: 0
+          }
+        }}
+        variant="outlined"
+        whileHover={{ cursor: 'pointer' }}
+        onClick={onClose}
+      />
+      <Badge>Settings</Badge>
+      <IconButton
+        aria-label={isDark ? "Switch to light theme" : "Switch to dark theme"}
+        icon={isDark ? <SunIcon color="var(--text)" /> : <MoonIcon color="var(--text)" />}
+        background="transparent"
+        border="none"
+        ml={4}
+        onClick={() => updateConfig({ theme: isDark ? 'paper' : 'dark' })}
+        _hover={{ background: 'var(--active)' }}
+        size="lg"
+      />
+    </Box>
+  );
+};
  
 const DrawerSection = ({ title, children }) => (
   <Box borderBottom="2px solid var(--text)" p={2} pb={4}>
@@ -182,7 +202,7 @@ const SettingsDrawer = ({
       >
         <DrawerBody padding={0}>
           <DrawerHeader onClose={onClose} />
-          <DrawerSection title="persona">
+          <DrawerSection title="Persona">
             <Select
                sx={{
                 '> option': {
@@ -214,7 +234,7 @@ const SettingsDrawer = ({
               {Object.keys(config.personas || {}).map(p => <option key={p} value={p}>{p}</option>)}
             </Select>
           </DrawerSection>
-          <DrawerSection title="model">
+          <DrawerSection title="Model">
             <Box position="relative">
               <Input
                 value={inputFocused ? searchQuery : config?.selectedModel || ''}
@@ -281,21 +301,21 @@ const SettingsDrawer = ({
               )}
             </Box>
           </DrawerSection>
-          <DrawerLinkSection title="configuration" onClick={() => { setSettingsMode(true); onClose(); }} />
+          <DrawerLinkSection title="Configuration" onClick={() => { setSettingsMode(true); onClose(); }} />
           <DrawerLinkSection
-            title="chat history"
+            title="Chat History"
             onClick={() => { setHistoryMode(true); onClose(); }}
           />
           <DrawerLinkSection
-            title="export chat (text)"
+            title="Export Chat (text)"
             onClick={() => { onClose(); downloadText(); }}
           />
           <DrawerLinkSection
-            title="export chat (json)"
+            title="Export Chat (json)"
             onClick={() => { onClose(); downloadJson(); }}
           />
           <DrawerLinkSection
-            title="export chat (image)"
+            title="Export Chat (image)"
             onClick={() => { downloadImage(); onClose(); }}
           />
         </DrawerBody>
@@ -395,14 +415,14 @@ export const Header = ({ ...props }) => {
                 fontSize="md"
                 fontWeight={600}
               >
-                The game is afoot!
+                The Game Is Afoot!
               </Text>
               <Docs />
             </Box>
           )}
           {props.historyMode && (
             <Box alignItems="center" display="flex" justifyContent="space-between" width="100%">
-              <Badge>chat history</Badge>
+              <Badge>Chat History</Badge>
               <IconButton
                 aria-label="Delete all"
                 as={motion.div}
