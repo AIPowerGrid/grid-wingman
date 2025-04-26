@@ -4,7 +4,7 @@
 
 Cognito is a tiny, yet powerful Chrome extension that brings the power of Large Language Models (LLMs) directly to your browser. Whether you prefer cloud-based solutions or running models locally, Cognito seamlessly integrates with your workflow, allowing you to leverage AI for a variety of tasks.
 
-**Enjoy AI in your browser.** Built on sidellama.
+**Enjoy AI in your browser.** Built on [sidellama](https://github.com/gyopak/sidellama).
 
 ## Screenshot
 
