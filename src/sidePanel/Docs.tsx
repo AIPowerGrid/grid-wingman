@@ -22,7 +22,7 @@ export const Docs = () => (
     onClick={() => window.open("https://github.com/3-ark/Cognito/blob/main/DOCS.md", "_blank")}
   >
     <Flex alignItems="center" justifyContent="space-between">
-      <Text>1.0.2</Text>
+      <Text>1.1.0</Text>
     </Flex>
   </Box>
 );
