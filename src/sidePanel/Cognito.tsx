@@ -15,26 +15,26 @@ import useSendMessage from './hooks/useSendMessage';
 import { useUpdateModels } from './hooks/useUpdateModels';
 import { AddToChat } from './AddToChat';
 import { Background } from './Background';
-import { ChatHistory, ChatMessage, MessageTurn } from './ChatHistory'; 
+import { ChatHistory, ChatMessage, MessageTurn } from './ChatHistory';
 import { useConfig } from './ConfigContext';
 import { Header } from './Header';
 import { Input } from './Input';
 import { Messages } from './Messages';
 import {
- downloadImage, downloadJson, downloadText 
+ downloadImage, downloadJson, downloadText
 } from './messageUtils';
 import { Send } from './Send';
 import { Settings } from './Settings';
 import storage from '../util/storageUtil';
 
 function bridge() {
-  // Collect image alt texts
+    // Collect image alt texts
   const altTexts = Array.from(document.images)
-    .map(img => img.alt)
+      .map(img => img.alt)
     .filter(alt => alt.trim().length > 0)
-    .join('. ');
+      .join('. ');
 
-  // Extract table contents
+    // Extract table contents
   const tableData = Array.from(document.querySelectorAll('table'))
     .map(table => table.innerText.replace(/\s\s+/g, ' '))
     .join('\n');
@@ -43,8 +43,6 @@ function bridge() {
     title: document.title,
     text: document.body.innerText.replace(/\s\s+/g, ' '),
     html: document.body.innerHTML.replace(/\s\s+/g, ' '),
-    
-    // New fields
     altTexts,
     tableData,
     meta: {
@@ -60,37 +58,94 @@ function bridge() {
 async function injectBridge() {
   const queryOptions = { active: true, lastFocusedWindow: true };
   const [tab] = await chrome.tabs.query(queryOptions);
-  
-  // Add early return for restricted URLs
-  if (!tab?.id || tab.url?.startsWith('chrome://') || tab.url?.startsWith('chrome-extension://')) {
-    console.debug('Skipping injection for restricted URL:', tab?.url);
 
+  // Add early return for restricted URLs
+  if (!tab?.id || tab.url?.startsWith('chrome://') || tab.url?.startsWith('chrome-extension://') || tab.url?.startsWith('about:')) { // Added about:
+    console.debug('[Cognito Inject - Reverted] Skipping injection for restricted URL:', tab?.url);
+    // Clear storage if activating/navigating to a restricted tab
+    storage.deleteItem('pagestring');
+    storage.deleteItem('pagehtml');
+    storage.deleteItem('alttexts');
+    storage.deleteItem('tabledata');
     return;
   }
 
+  console.debug(`[Cognito Inject - Reverted] Attempting injection into tab ${tab.id} (${tab.url})`);
+
+  // Clear storage before injection attempt
+  storage.deleteItem('pagestring');
+  storage.deleteItem('pagehtml');
+  storage.deleteItem('alttexts');
+  storage.deleteItem('tabledata');
+  console.debug('[Cognito Inject - Reverted] Cleared previous page content from storage.');
+
+
   try {
-    const result = await chrome.scripting.executeScript({
+    console.debug('[Cognito Inject - Reverted] Executing bridge function...');
+    const results = await chrome.scripting.executeScript({
       target: { tabId: tab.id },
       func: bridge
     });
-    const res = JSON.parse(result?.[0]?.result || '{}');
 
-    try {
-      storage.setItem('pagestring', res?.text || ''); // Raw string, no JSON.stringify
-      storage.setItem('pagehtml', res?.html || '');
-      storage.setItem('alttexts', res?.altTexts || '');
-      storage.setItem('tabledata', res?.tableData || '');
-    } catch (err) {
-      console.debug('storage error:', err);
+    // Basic result checking
+    if (!results || !Array.isArray(results) || results.length === 0 || !results[0] || typeof results[0].result !== 'string') {
+        console.error('[Cognito Inject - Reverted] Bridge function execution returned invalid or unexpected results structure:', results);
+        // No toast here in the reverted version, just log
+        return;
     }
-  } catch (err) {
-    console.debug('Script injection failed:', err);
+
+    const rawResult = results[0].result;
+    let res: any; // Use 'any' for simplicity in reverted version or define a simple interface
+    try {
+        res = JSON.parse(rawResult);
+    } catch (parseError) {
+        console.error('[Cognito Inject - Reverted] Failed to parse JSON result from bridge:', parseError, 'Raw result string:', rawResult);
+        return;
+    }
+
+    // Check for error field from bridge (added basic error handling)
+    if (res.error) {
+        console.error('[Cognito Inject - Reverted] Bridge function reported an error:', res.error, 'Title:', res.title);
+        return;
+    }
+
+    console.debug('[Cognito Inject - Reverted] Bridge function parsed result:', { // Log subset
+        title: res?.title,
+        textLength: res?.text?.length,
+        htmlLength: res?.html?.length
+    });
+    console.log(`[Cognito Inject - Reverted] Extracted Content: Text=${res?.text?.length}, HTML=${res?.html?.length}`);
+
+
+    // Store the extracted content (reverted version)
+    try {
+      storage.setItem('pagestring', res?.text ?? ''); // Use nullish coalescing
+      storage.setItem('pagehtml', res?.html ?? '');
+      storage.setItem('alttexts', res?.altTexts ?? '');
+      storage.setItem('tabledata', res?.tableData ?? '');
+      console.debug('[Cognito Inject - Reverted] Stored extracted content.');
+    } catch (storageError) {
+        console.error('[Cognito Inject - Reverted] Storage error after successful extraction:', storageError);
+        // Attempt to clear storage again on error
+        storage.deleteItem('pagestring');
+        storage.deleteItem('pagehtml');
+        storage.deleteItem('alttexts');
+        storage.deleteItem('tabledata');
+    }
+  } catch (execError) {
+    console.error('[Cognito Inject - Reverted] Bridge function execution failed:', execError);
+    // Log specific errors if needed, but avoid user-facing toasts in reverted version
+    if (execError instanceof Error && (execError.message.includes('Cannot access contents of url "chrome://') || execError.message.includes('Cannot access a chrome extension URL') || execError.message.includes('Cannot access contents of url "about:'))) {
+        console.warn('[Cognito Inject - Reverted] Cannot access restricted URL.');
+    }
+    // Storage should have been cleared before the try block
   }
 }
 
+
 const generateChatId = () => `chat_${Math.random().toString(16).slice(2)}`;
- 
-const MessageTemplate = ({ children, onClick }) => (
+
+const MessageTemplate = ({ children, onClick }: { children: React.ReactNode, onClick: () => void }) => ( // Keep type annotation
   <Box
     background="var(--active)"
     border="2px solid var(--text)"
@@ -109,6 +164,10 @@ const MessageTemplate = ({ children, onClick }) => (
     width="4rem"
     onClick={onClick}
     flexShrink={0}
+    _hover={{ // Keep hover effect
+        background: "rgba(var(--text-rgb), 0.1)"
+    }}
+    transition="background 0.2s ease-in-out"
   >
     {children}
   </Box>
@@ -119,7 +178,7 @@ const Cognito = () => {
   const [message, setMessage] = useState('');
   const [chatId, setChatId] = useState(generateChatId());
   const [webContent, setWebContent] = useState('');
-  const [pageContent, setPageContent] = useState('');
+  const [pageContent, setPageContent] = useState(''); // Keep state, might be used by useSendMessage
   const [isLoading, setLoading] = useState(false);
   const [settingsMode, setSettingsMode] = useState(false);
   const [historyMode, setHistoryMode] = useState(false);
@@ -127,11 +186,12 @@ const Cognito = () => {
   const [currentTabInfo, setCurrentTabInfo] = useState<{ id: number | null, url: string }>({ id: null, url: '' });
 
   const containerRef = useRef<HTMLDivElement>(null);
+  const lastInjectedRef = useRef<{ id: number | null, url: string }>({ id: null, url: '' }); // Keep ref for tab change logic
 
+  // Resize observer remains the same
   useEffect(() => {
     const resizeObserver = new ResizeObserver(() => {
       if (containerRef.current) {
-        // Force layout recalculation
         containerRef.current.style.minHeight = '100dvh';
         requestAnimationFrame(() => {
           if (containerRef.current) {
@@ -140,42 +200,70 @@ const Cognito = () => {
         });
       }
     });
-
-    if (containerRef.current) {
-      resizeObserver.observe(containerRef.current);
-    }
-
+    if (containerRef.current) resizeObserver.observe(containerRef.current);
     return () => resizeObserver.disconnect();
   }, []);
 
+  // Tab management useEffect (Reverted Logic - simpler check)
   useEffect(() => {
     if (config?.chatMode !== 'page') return;
 
-    // Function to check and inject if needed
+    // Function to check and inject if needed (Reverted - simpler logic)
     const checkAndInject = async () => {
       const [tab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
-      
-      // Only inject if tab or URL changed
-      if (tab?.id && tab.url && (tab.id !== currentTabInfo.id || tab.url !== currentTabInfo.url)) {
-        setCurrentTabInfo({ id: tab.id, url: tab.url });
-        await injectBridge();
+      if (!tab?.id || !tab.url) return;
+
+      // Skip injection for restricted URLs upfront
+      if (tab.url.startsWith('chrome://') || tab.url.startsWith('chrome-extension://') || tab.url.startsWith('about:')) {
+          console.log(`[Cognito - Reverted] Active tab is restricted (${tab.url}). Skipping injection.`);
+          // Clear storage if the active tab is restricted and changed
+          if (lastInjectedRef.current.id !== tab.id || lastInjectedRef.current.url !== tab.url) {
+              storage.deleteItem('pagestring');
+              storage.deleteItem('pagehtml');
+              storage.deleteItem('alttexts');
+              storage.deleteItem('tabledata');
+              console.log("[Cognito - Reverted] Cleared storage due to restricted tab activation/update.");
+          }
+          lastInjectedRef.current = { id: tab.id, url: tab.url };
+          setCurrentTabInfo({ id: tab.id, url: tab.url }); // Update current tab info
+          return; // Don't inject
+      }
+
+      // Inject if tab or URL changed (and not restricted)
+      // Use lastInjectedRef to track if injection already happened for this tab/url
+      if (tab.id !== lastInjectedRef.current.id || tab.url !== lastInjectedRef.current.url) {
+        console.log(`[Cognito - Reverted] Tab changed or updated. Old: ${lastInjectedRef.current.id}/${lastInjectedRef.current.url}, New: ${tab.id}/${tab.url}. Re-injecting bridge.`);
+        lastInjectedRef.current = { id: tab.id, url: tab.url }; // Update ref *before* injection
+        setCurrentTabInfo({ id: tab.id, url: tab.url }); // Update current tab info
+        await injectBridge(); // Inject using the reverted function
+      } else {
+        console.log(`[Cognito - Reverted] Tab activated/updated, but ID and URL match last injection. Skipping bridge injection.`);
       }
     };
 
-    // Initial check
+    // Initial check when mode switches to 'page'
     checkAndInject();
 
-    // Set up tab change listeners
-    const handleTabActivated = ({ tabId }) => {  
-      // Use tabId from activeInfo instead of querying again  
-      chrome.tabs.get(tabId, (tab) => {  
-        if (tab?.url) checkAndInject();  
-      });  
-    };  
-
-    const handleTabUpdated = (tabId, changeInfo, tab) => {
-      if (changeInfo.status === 'complete' || changeInfo.url) {
+    // Set up tab change listeners (Reverted - simpler logic)
+    const handleTabActivated = (activeInfo: chrome.tabs.TabActiveInfo) => {
+      console.log(`[Cognito - Reverted] Tab activated: tabId ${activeInfo.tabId}`);
+      // Get tab info to check URL and call checkAndInject
+      chrome.tabs.get(activeInfo.tabId, (tab) => {
+        if (chrome.runtime.lastError) {
+          console.warn(`[Cognito - Reverted] Error getting tab info on activation: ${chrome.runtime.lastError.message}`);
+          return;
+        }
+        // checkAndInject handles restricted URLs and injection decision
         checkAndInject();
+      });
+    };
+
+    const handleTabUpdated = (tabId: number, changeInfo: chrome.tabs.TabChangeInfo, tab: chrome.tabs.Tab) => {
+      // Inject only when the active tab finishes loading or its URL changes
+      if (tab.active && (changeInfo.status === 'complete' || (changeInfo.url && tab.status === 'complete'))) {
+         console.log(`[Cognito - Reverted] Active tab updated: tabId ${tabId}, status: ${changeInfo.status}, url changed: ${!!changeInfo.url}`);
+         // checkAndInject handles restricted URLs and injection decision
+         checkAndInject();
       }
     };
 
@@ -184,10 +272,13 @@ const Cognito = () => {
 
     // Cleanup listeners
     return () => {
+      console.log("[Cognito - Reverted] Cleaning up tab listeners for 'page' mode.");
       chrome.tabs.onActivated.removeListener(handleTabActivated);
       chrome.tabs.onUpdated.removeListener(handleTabUpdated);
+      // Clear last injected ref when mode changes away from 'page' or component unmounts
+      lastInjectedRef.current = { id: null, url: '' };
     };
-  }, [config?.chatMode]); // Only re-run if chatMode changes
+  }, [config?.chatMode]); // Re-run setup/cleanup when chatMode changes
 
   const { chatTitle, setChatTitle } = useChatTitle(isLoading, turns, message);
 
@@ -196,15 +287,17 @@ const Cognito = () => {
   useUpdateModels();
 
   const reset = () => {
+    console.log("[Cognito - Reverted] Resetting chat state.");
     setTurns([]);
-    setPageContent('');
+    setPageContent(''); // Reset this state too
     setWebContent('');
     setLoading(false);
     updateConfig({ chatMode: undefined });
     setMessage('');
     setChatTitle('');
     setChatId(generateChatId());
-    setHistoryMode(false); // Add this
+    setHistoryMode(false);
+    setSettingsMode(false); // Ensure settings mode is also reset
   };
 
   const onReload = () => {
@@ -212,78 +305,111 @@ const Cognito = () => {
       if (prevTurns.length < 2) return prevTurns;
       const last = prevTurns[prevTurns.length - 1];
       const secondLast = prevTurns[prevTurns.length - 2];
-      // Only proceed if last is assistant and second last is user
       if (last.role === 'assistant' && secondLast.role === 'user') {
-        // Remove both last assistant and user turn
-        setMessage(secondLast.rawContent); // Move user message back to input
+        console.log("[Cognito - Reverted] Reloading last user message.");
+        setMessage(secondLast.rawContent);
         return prevTurns.slice(0, -2);
       }
+      console.log("[Cognito - Reverted] Cannot reload, conditions not met.");
       return prevTurns;
     });
     setLoading(false);
   };
 
   const loadChat = (chat: ChatMessage) => {
+    console.log(`[Cognito - Reverted] Loading chat ${chat.id}`);
     setChatTitle(chat.title || '');
     setTurns(chat.turns);
     setChatId(chat.id);
-    setHistoryMode(false);
-  };
-
-  useEffect(() => {
-    if (turns.length && !isLoading) {
-      const savedChat: ChatMessage = {
-        id: chatId,
-        title: chatTitle,
-        turns, // Already contains proper role info
-        last_updated: Date.now(),
-        model: config?.selectedModel
-      };
-      console.log(`[${Date.now()}] Cognito: Saving chat ${chatId}`, savedChat); // Debug log
-
-      localforage.setItem(chatId, savedChat);
-    }
-  }, [chatId, turns, isLoading, chatTitle, config?.selectedModel]);
-
-  const deleteAll = async () => {
-    const keys = await localforage.keys();
-    await Promise.all(keys.map(key => localforage.removeItem(key)));
-    setTurns([]);
-    setPageContent('');
-    setWebContent('');
-    setLoading(false);
-    setMessage('');
-    setChatTitle('');
-    setChatId(generateChatId());
-    setHistoryMode(false); // Add this line to exit history mode
-    updateConfig({ chatMode: undefined }); // Add this line to reset chat mode
-  };
-
-// Add reset() call inside handlePanelOpen when component mounts
-useEffect(() => {
-  const handlePanelOpen = async () => {
-    reset(); // Reset state every time the panel opens
-    const [tab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
-    
-    if (tab?.id) {
-      await injectBridge();
-      chrome.tabs.sendMessage(tab.id, { type: 'GET_PAGE_CONTENT' });
-    }
-  };
-
-  handlePanelOpen();
-  
-  return () => {
-    // Clear cached content and reset states when panel closes
+    setHistoryMode(false); // Exit history mode after loading
+    setSettingsMode(false); // Ensure settings mode is off
+    updateConfig({ chatMode: undefined }); // Reset chat mode when loading history
+    // Clear any potentially stale page content from storage
     storage.deleteItem('pagestring');
     storage.deleteItem('pagehtml');
     storage.deleteItem('alttexts');
     storage.deleteItem('tabledata');
-    reset(); // Reset state on component unmount
+    lastInjectedRef.current = { id: null, url: '' }; // Reset injection ref
   };
-}, []);
-// Inside your component:
-const [isHovering, setIsHovering] = useState(false);
+
+  // Chat saving useEffect (Reverted - simpler log)
+  useEffect(() => {
+    if (turns.length > 0 && !isLoading && !historyMode && !settingsMode) { // Added history/settings check
+      const savedChat: ChatMessage = {
+        id: chatId,
+        title: chatTitle || `Chat ${new Date(Date.now()).toLocaleString()}`, // Ensure title exists
+        turns,
+        last_updated: Date.now(),
+        model: config?.selectedModel
+      };
+      console.log(`[Cognito - Reverted] Saving chat ${chatId} (Turns: ${turns.length})`); // Simpler log
+      localforage.setItem(chatId, savedChat).catch(err => {
+        console.error(`[Cognito - Reverted] Error saving chat ${chatId}:`, err);
+      });
+    }
+  }, [chatId, turns, isLoading, chatTitle, config?.selectedModel, historyMode, settingsMode]); // Keep dependencies
+
+  const deleteAll = async () => {
+    console.warn("[Cognito - Reverted] Deleting all chat history from localforage.");
+    try {
+        const keys = await localforage.keys();
+        const chatKeys = keys.filter(key => key.startsWith('chat_'));
+        await Promise.all(chatKeys.map(key => localforage.removeItem(key)));
+        toast.success("Deleted all chats"); // Keep user feedback
+        reset(); // Reset the current chat state after deleting all
+    } catch (error) {
+        console.error("[Cognito - Reverted] Error deleting all chats:", error);
+        toast.error("Failed to delete chats"); // Keep user feedback
+    }
+  };
+
+  // Panel open/close useEffect (Reverted - simpler logic, no immediate injection)
+  useEffect(() => {
+    const handlePanelOpen = async () => {
+      console.log("[Cognito - Reverted] Panel opened. Resetting state.");
+      reset(); // Reset state first
+
+      // Check current tab immediately on open to set refs and clear storage if needed
+      const [tab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
+      if (tab?.id && tab.url) {
+          if (tab.url.startsWith('chrome://') || tab.url.startsWith('chrome-extension://') || tab.url.startsWith('about:')) {
+              console.log("[Cognito - Reverted] Panel opened on restricted tab. Clearing storage.");
+              storage.deleteItem('pagestring');
+              storage.deleteItem('pagehtml');
+              storage.deleteItem('alttexts');
+              storage.deleteItem('tabledata');
+          } else {
+              console.log("[Cognito - Reverted] Panel opened on valid tab. Injection will occur if mode switched to 'page'.");
+              // Don't inject here, let the mode change effect handle it
+          }
+          // Update refs regardless
+          lastInjectedRef.current = { id: tab.id, url: tab.url };
+          setCurrentTabInfo({ id: tab.id, url: tab.url });
+      } else {
+          console.log("[Cognito - Reverted] Panel opened, but no active tab found or tab has no URL.");
+          lastInjectedRef.current = { id: null, url: '' };
+          setCurrentTabInfo({ id: null, url: '' });
+      }
+    };
+
+    handlePanelOpen(); // Run on component mount (panel open)
+
+    // Return cleanup function for component unmount (panel close)
+    return () => {
+      console.log("[Cognito - Reverted] Panel closing (component unmount). Clearing cached content and resetting state.");
+      // Clear cached content from storage
+      storage.deleteItem('pagestring');
+      storage.deleteItem('pagehtml');
+      storage.deleteItem('alttexts');
+      storage.deleteItem('tabledata');
+      // Reset component state fully on close
+      reset();
+      lastInjectedRef.current = { id: null, url: '' }; // Clear injection ref
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Empty dependency array ensures this runs only on mount and unmount
+
+  const [isHovering, setIsHovering] = useState(false);
 
   return (
     <Container
@@ -295,16 +421,18 @@ const [isHovering, setIsHovering] = useState(false);
       overflow="hidden" // Prevent layout shifts
       display="flex"
       flexDirection="column"
+      bg="var(--bg)" // Ensure background color is set
     >
       <Box
         display="flex"
         flexDir="column"
         justifyContent="space-between"
-        minHeight="100vh"
+        minHeight="100dvh" // Changed from 100vh to 100dvh
+        flexGrow={1} // Allow this box to grow
       >
         <Header
           chatTitle={chatTitle}
-          deleteAll={deleteAll}  // Pass the local deleteAll function
+          deleteAll={deleteAll}
           downloadImage={() => downloadImage(turns)}
           downloadJson={() => downloadJson(turns)}
           downloadText={() => downloadText(turns)}
@@ -314,22 +442,22 @@ const [isHovering, setIsHovering] = useState(false);
           setSettingsMode={setSettingsMode}
           settingsMode={settingsMode}
         />
-        {settingsMode && <Settings />}
+          {settingsMode && <Settings />}
         <Box display="flex" flexDir="column" flex="1 1 0%" minHeight={0}>
           {!settingsMode && !historyMode && turns.length > 0 && (
-            <Messages
-              isLoading={isLoading}
-              turns={turns}
+                <Messages
+                  isLoading={isLoading}
+                  turns={turns}
               settingsMode={settingsMode}
-              onReload={onReload}
-            />
-          )}
+                  onReload={onReload}
+                />
+              )}
           {!settingsMode && !historyMode && turns.length === 0 && !config?.chatMode && (
             // Adjust positioning and layout if needed for icons
-            <Box bottom="3rem" left="2rem" position="absolute" display="flex" flexDirection="column" gap={2}>
-              <Tooltip label="Add Web Search Results to LLM Context" placement="right" hasArrow>
+            <Box bottom="4rem" left="2rem" position="absolute" display="flex" flexDirection="column" gap={2}>
+                  <Tooltip label="Add Web Search Results to LLM Context" placement="right" hasArrow>
                 {/* Use IconButton */}
-                <IconButton
+                    <IconButton
                   aria-label="Add Web Search Results to LLM Context" // Important for accessibility
                   icon={<TbWorldSearch size="24px" />} // Pass icon component to 'icon' prop
                   onClick={() => {
@@ -340,32 +468,32 @@ const [isHovering, setIsHovering] = useState(false);
                   color="var(--text)" // Ensure icon color matches
                   // isRound // Optional: makes the button circular
                   _hover={{ bg: 'rgba(128, 128, 128, 0.2)' }} // Optional: subtle hover effect
-                />
-              </Tooltip>
-              <Tooltip label="Add Current Web Page to LLM Context" placement="right" hasArrow>
+                    />
+                  </Tooltip>
+                  <Tooltip label="Add Current Web Page to LLM Context" placement="right" hasArrow>
                 {/* Use IconButton */}
-                <IconButton
-                  aria-label="Add Current Web Page to LLM Context"
-                  icon={<TbBrowserPlus size="24px" />}
+                    <IconButton
+                      aria-label="Add Current Web Page to LLM Context"
+                      icon={<TbBrowserPlus size="24px" />}
                   onClick={() => {
                     updateConfig({ chatMode: 'page' });
                   }}
-                  variant="ghost"
-                  size="lg"
-                  color="var(--text)"
+                      variant="ghost"
+                      size="lg"
+                      color="var(--text)"
                   // isRound
-                  _hover={{ bg: 'rgba(128, 128, 128, 0.2)' }}
-                />
-              </Tooltip>
-            </Box>
-          )}
+                      _hover={{ bg: 'rgba(128, 128, 128, 0.2)' }}
+                    />
+                  </Tooltip>
+                </Box>
+              )}
           {!settingsMode && !historyMode && config?.chatMode === "page" && (
-            <Box 
-              bottom="3rem"
-              left="1rem"
-              right="1rem"
+                 <Box
+              bottom="4rem"
+              left="0rem"
+              right="0rem"
               position="fixed" 
-              display="flex" 
+                    display="flex"
               flexDirection="row"
               justifyContent="center"
               maxWidth="100%"
@@ -374,15 +502,15 @@ const [isHovering, setIsHovering] = useState(false);
               opacity={isHovering ? 1 : 0} // Fade in/out
               transform={isHovering ? "translateY(0)" : "translateY(10px)"} // Slide up/down
               transition="all 0.2s ease-in-out" // Smooth animation
-              onMouseEnter={() => setIsHovering(true)}
-              onMouseLeave={() => setIsHovering(false)}
-              sx={{
+                    onMouseEnter={() => setIsHovering(true)}
+                    onMouseLeave={() => setIsHovering(false)}
+                      sx={{
                 background: 'transparent',
                 padding: '0rem',
                 backdropFilter: 'blur(10px)',
               }}
             >
-             <HStack spacing={4} maxW="100%" overflowX="auto" px={2}> {/* Added padding */}
+             <HStack spacing={6} maxW="100%" overflowX="auto" px={3}> {/* Added padding */}
               <MessageTemplate onClick={() => onSend('Provide your summary.')}>
                 TLDR
               </MessageTemplate>
@@ -395,8 +523,8 @@ const [isHovering, setIsHovering] = useState(false);
               <MessageTemplate onClick={() => onSend('Find concerning issues, risks, or criticisms mentioned on this page.')}>
                 Oops
               </MessageTemplate>
-             </HStack>
-            </Box>
+                    </HStack>
+                  </Box>
           )}
         </Box>
         {!settingsMode && !historyMode && (
@@ -426,7 +554,8 @@ const [isHovering, setIsHovering] = useState(false);
       </Box>
       <Toaster
         containerStyle={{
-          borderRadius: 16
+          borderRadius: 16,
+          bottom: '60px', // Adjust position if needed
         }}
         toastOptions={{
           duration: 2000,
@@ -434,10 +563,10 @@ const [isHovering, setIsHovering] = useState(false);
           style: {
             background: 'var(--bg)',
             color: 'var(--text)',
-            fontSize: "1.25rem"
+            fontSize: "1rem", // Reverted font size
+            border: '1px solid var(--text)',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
           },
-
-          // Default options for specific types
           success: {
             duration: 2000,
             style: {
@@ -446,9 +575,11 @@ const [isHovering, setIsHovering] = useState(false);
               fontSize: "1.25rem"
             }
           }
-        }} />
+        }}
+      />
     </Container>
   );
 };
+
 
 export default Cognito;
