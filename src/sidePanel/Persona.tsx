@@ -346,7 +346,7 @@ const Persona = () => {
               // Use react-icons component here
               icon={<IoTrashOutline />}
               pb={2} 
-              variant="outline" // Use ghost or unstyled for better control with react-icons
+              variant="ghost" // Use ghost or unstyled for better control with react-icons
               size="lg" // Adjust size as needed
               ml={2} // Add some margin
               onClick={onDeleteOpen}
@@ -358,7 +358,7 @@ const Persona = () => {
             // Use react-icons component here
             icon={<IoAdd />}
             pb={2} // Align with other buttons
-            variant="outline" // Use ghost or unstyled
+            variant="ghost" // Use ghost or unstyled
             size="lg" // Adjust size as needed
             ml={2} // Add some margin
             onClick={() => {
