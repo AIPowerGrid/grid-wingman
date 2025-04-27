@@ -349,7 +349,7 @@ const Cognito = () => {
   }, [chatId, turns, isLoading, chatTitle, config?.selectedModel, historyMode, settingsMode]); // Keep dependencies
 
   const deleteAll = async () => {
-    console.warn("[Cognito ] Deleting all chat history from localforage.");
+    console.log("[Cognito ] Deleting all chat history from localforage.");
     try {
         const keys = await localforage.keys();
         const chatKeys = keys.filter(key => key.startsWith('chat_'));
