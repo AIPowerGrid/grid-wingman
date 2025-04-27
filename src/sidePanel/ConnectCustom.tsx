@@ -1,8 +1,11 @@
 import { useState } from 'react';
 import toast from 'react-hot-toast';
-import { ViewIcon, ViewOffIcon, SmallCloseIcon } from '@chakra-ui/icons';
+import { FaEye, FaEyeSlash, FaTimes } from 'react-icons/fa'; // Import React Icons
 import {
-  Box, Button, IconButton, Input
+  Box,
+  Button,
+  IconButton,
+  Input,
 } from '@chakra-ui/react';
 
 import { useConfig } from './ConfigContext';
@@ -103,7 +106,7 @@ export const ConnectCustom = () => {
               border="2px solid var(--text)"
               color="var(--text)"
               fontSize="19px"
-              icon={visibleApiKeys ? <ViewOffIcon /> : <ViewIcon />}
+              icon={visibleApiKeys ? <FaEyeSlash /> : <FaEye />} // Use React Icons
               size="sm"
               variant="solid"
               isRound
@@ -111,7 +114,7 @@ export const ConnectCustom = () => {
             />
             <IconButton
               aria-label="Reset Custom Endpoint"
-              icon={<SmallCloseIcon />}
+              icon={<FaTimes />}
               ml={2}
               borderRadius={16}
               background="var(--active)"

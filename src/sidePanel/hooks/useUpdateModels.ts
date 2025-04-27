@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useState } from 'react';
 import storage from 'src/util/storageUtil';
 import { useConfig } from '../ConfigContext';
 import { GEMINI_URL, GROQ_URL, OPENAI_URL, OPENROUTER_URL } from '../constants';
@@ -47,21 +47,24 @@ export const useUpdateModels = () => {
       });
     }
   }, [config, updateConfig]);
-
-  // Throttled fetch function
-  const lastFetchRef = useRef(0);
-  const FETCH_INTERVAL = 5000; // 5s
+  // // Throttled fetch function
+  // const lastFetchRef = useRef(0);
+  // const FETCH_INTERVAL = 1 * 60 * 1000; // 1 minutes
 
   const fetchAllModels = useCallback(async () => {
-    const now = Date.now();
-    if (now - lastFetchRef.current < FETCH_INTERVAL) {
-      console.log('[useUpdateModels] Model fetch throttled.');
-      return;
-    }
-    lastFetchRef.current = now;
+
+    // const now = Date.now();
+    // if (now - lastFetchRef.current < FETCH_INTERVAL) {
+    //   console.log('[useUpdateModels] Model fetch throttled.');
+    //   return;
+    // }
+    // lastFetchRef.current = now;
+
 
     // Ollama
-    if (config?.ollamaUrl) {
+    const isConnected = config?.ollamaConnected || config?.lmStudioConnected;
+
+    if (config?.ollamaUrl && isConnected) {
       console.log('[useUpdateModels] Fetching Ollama models...');
       const ollamaModels = await fetchDataSilently(`${config.ollamaUrl}/api/tags`);
       if (ollamaModels) {
@@ -69,18 +72,6 @@ export const useUpdateModels = () => {
           ...m, id: m.id, host: 'ollama'
         }));
         updateModels(parsedModels, 'ollama');
-      }
-    }
-
-    // LM Studio
-    if (config?.lmStudioUrl) {
-      console.log('[useUpdateModels] Fetching LM Studio models...');
-      const lmStudioModels = await fetchDataSilently(`${config.lmStudioUrl}/v1/models`);
-      if (lmStudioModels) {
-        const parsedModels = (lmStudioModels?.data as Model[] ?? []).map(m => ({
-          ...m, id: m.id, host: 'lmStudio'
-        }));
-        updateModels(parsedModels, 'lmStudio');
       }
     }
 
@@ -93,6 +84,19 @@ export const useUpdateModels = () => {
           ...m, id: m.id, host: 'gemini'
         }));
         updateModels(parsedModels, 'gemini');
+      }
+    }
+
+    // LM Studio
+
+    if (config?.lmStudioUrl && isConnected) {
+      console.log('[useUpdateModels] Fetching LM Studio models...');
+      const lmStudioModels = await fetchDataSilently(`${config.lmStudioUrl}/v1/models`);
+      if (lmStudioModels) {
+        const parsedModels = (lmStudioModels?.data as Model[] ?? []).map(m => ({
+          ...m, id: m.id, host: 'lmStudio'
+        }));
+        updateModels(parsedModels, 'lmStudio');
       }
     }
 
