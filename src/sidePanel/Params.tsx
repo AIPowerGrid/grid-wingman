@@ -72,9 +72,9 @@ export const Params = () => {
     >
       <AccordionButton _hover={{ backgroundColor: 'transparent' }} paddingBottom={1} paddingRight={2}>
         <SettingTitle
-          icon="🧮"
+          icon="🎚️"
           padding={0}
-          text="params"
+          text="Params"
         />
       </AccordionButton>
       <AccordionPanel p={2} pt={0}>

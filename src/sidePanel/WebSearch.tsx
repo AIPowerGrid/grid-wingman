@@ -83,7 +83,7 @@ export const WebSearch = () => {
         <SettingTitle
           icon="🌐"
           padding={0}
-          text="web search"
+          text="Web Search"
         />
       </AccordionButton>
       <AccordionPanel p={4} pt={2}>

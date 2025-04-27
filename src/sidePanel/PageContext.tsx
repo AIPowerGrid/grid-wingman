@@ -20,12 +20,12 @@ export const PageContext = () => {
     >
       <AccordionButton _hover={{ backgroundColor: 'transparent' }} paddingBottom={1} paddingRight={2}>
         <SettingTitle
-          icon="📜"
+          icon="📄"
           padding={0}
-          text="page context"
+          text="Page Context"
           widget={(
             <Grid alignItems="center" display="flex">
-              {config?.host
+              {config?.contextLimit
                 && (
                   <Button
                     _hover={{

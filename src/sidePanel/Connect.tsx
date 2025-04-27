@@ -51,7 +51,7 @@ const ConnectionSection: React.FC<ConnectionProps> = ({
 export const Connect: React.FC = () => (
   <AccordionItem border={borderStyle} borderRadius={16} mb={4} mt={2}>
     <AccordionButton _hover={{ backgroundColor: 'transparent' }} paddingBottom={1} paddingRight={2}>
-      <SettingTitle icon="🔗" padding={0} text="connections" />
+      <SettingTitle icon="🛜" padding={0} text="Connections" />
     </AccordionButton>
     <AccordionPanel p={0}>
       <ConnectionSection Component={ConnectOllama} title="ollama" />
