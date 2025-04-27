@@ -250,7 +250,7 @@ Output:
 \n\n
 Example 2:
 Context: {{user}}:today is a nice day in paris i want to have a walk and find a restaurant to have a nice meal. {{assistant}}: Bonjour, it's a nice day!
-Input from user ({{user}}): please choose me the best resturant 
+Input from user ({{user}}): please choose me the best restaurant 
 Output:
 'best restaurants Paris France'
 \n\n
