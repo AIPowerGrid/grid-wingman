@@ -3,6 +3,7 @@ import storage from 'src/util/storageUtil';
 import { useConfig } from '../ConfigContext';
 import { GEMINI_URL, GROQ_URL, OPENAI_URL, OPENROUTER_URL } from '../constants';
 import type { Model } from 'src/types/config';
+import { normalizeApiEndpoint } from 'src/background/util';
 
 const fetchDataSilently = async (url: string, params = {}) => {
   try {
@@ -49,7 +50,7 @@ export const useUpdateModels = () => {
 
   // Throttled fetch function
   const lastFetchRef = useRef(0);
-  const FETCH_INTERVAL = 1 * 60 * 1000; // 1 minutes
+  const FETCH_INTERVAL = 5000; // 5s
 
   const fetchAllModels = useCallback(async () => {
     const now = Date.now();
@@ -133,9 +134,10 @@ export const useUpdateModels = () => {
 
     // Custom Endpoint
     if (config?.customEndpoint || config?.customApiKey) {
+      const normalizedUrl = normalizeApiEndpoint(config?.customEndpoint);
       console.log('[useUpdateModels] Fetching Custom Endpoint models...');
       const customModels = await fetchDataSilently(
-        `${config.customEndpoint!.replace(/\/v1\/chat\/completions$/, '')}/v1/models`,
+        `${normalizedUrl}/v1/models`,
         { headers: { Authorization: `Bearer ${config.customApiKey}` } }
       );
       const modelsArray = Array.isArray(customModels)
@@ -149,11 +151,6 @@ export const useUpdateModels = () => {
       }
     }
   }, [config, updateModels, updateConfig]);
-
-  // Remove the automatic effect
-  // useEffect(() => {
-  //   fetchAllModels();
-  // }, [fetchAllModels]);
 
   return { chatTitle, setChatTitle, fetchAllModels };
 };

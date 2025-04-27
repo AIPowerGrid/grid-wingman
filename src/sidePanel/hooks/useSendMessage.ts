@@ -3,12 +3,11 @@ import { MessageTurn } from '../ChatHistory'; // Adjust path if needed
 import { fetchDataAsStream, webSearch, processQueryWithAI } from '../network';
 import storage from 'src/util/storageUtil';// --- Interfaces (Model, Config, ApiMessage) remain the same ---
 import type { Config, Model } from 'src/types/config';
-// ...rest of your code...
+import { normalizeApiEndpoint } from 'src/background/util';
 interface ApiMessage {
   role: 'user' | 'assistant' | 'system';
   content: string;
 }
-
 
 // getAuthHeader remains the same...
 export const getAuthHeader = (config: Config, currentModel: Model) => {
@@ -198,6 +197,7 @@ const useSendMessage = (
     console.log(`[${callId}] useSendMessage: Assistant placeholder turn added.`);
 
     // --- Step 4: Call LLM (Streaming) ---
+    const normalizedUrl = normalizeApiEndpoint(config?.customEndpoint);
     const configBody = { stream: true };
     const urlMap: Record<string, string> = {
       groq: 'https://api.groq.com/openai/v1/chat/completions',
@@ -207,7 +207,7 @@ const useSendMessage = (
       openai: 'https://api.openai.com/v1/chat/completions',
       openrouter: 'https://openrouter.ai/api/v1/chat/completions',
       custom: config?.customEndpoint
-        ? `${config.customEndpoint.replace(/\/v1\/chat\/completions$/, '')}/v1/chat/completions`
+        ? `${normalizedUrl}/v1/chat/completions`
         : '',
     };
     const host = currentModel.host || '';

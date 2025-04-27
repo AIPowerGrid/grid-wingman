@@ -137,6 +137,7 @@ const DrawerHeader = ({ onClose }) => {
         mr={2} // Add some margin
         onClick={() => updateConfig({ theme: isDark ? 'paper' : 'dark' })}
         _hover={{ background: 'var(--active)' }}
+        _focusVisible={{ boxShadow: 'none', outline: 'none' }}
         size="lg" // Keep Chakra size prop for button dimensions
       />
     </Box>
