@@ -66,10 +66,10 @@ import {
       name: 'smoke',
       active: '#939393',
       bg: '#dfdfdf',
-      text: '#333333',
-      bold: '#af1b1b',
-      italic: '#09993e',
-      link: '#7a9ce4',
+      text: '#000000',
+      bold: '#eafadb',
+      italic: '#fbe1cf',
+      link: '#c3d5fa',
       codeBg: '#333333', // text
       codeFg: '#dfdfdf', // bg
       preBg: '#333333',  // text
@@ -86,7 +86,7 @@ import {
       text: '#333333',
       bold: '#af1b1b',
       italic: '#6349b3',
-      link: '#5a84de',
+      link: '#4367b6',
       codeBg: '#333333', // text
       codeFg: '#EFD6AC', // bg
       preBg: '#333333',  // text
