@@ -506,7 +506,7 @@ const Cognito = () => {
               )}
           {!settingsMode && !historyMode && config?.chatMode === "page" && (
                  <Box
-              bottom="4rem"
+              bottom="4.5rem"
               left="0rem"
               right="0rem"
               position="fixed" 
@@ -514,7 +514,7 @@ const Cognito = () => {
               flexDirection="row"
               justifyContent="center"
               maxWidth="100%"
-              height="2.4rem"
+              height="3rem"
               zIndex={2}
               opacity={isHovering ? 1 : 0} // Fade in/out
               transform={isHovering ? "translateY(0)" : "translateY(10px)"} // Slide up/down
@@ -527,7 +527,7 @@ const Cognito = () => {
                 backdropFilter: 'blur(10px)',
               }}
             >
-             <HStack spacing={6} maxW="100%" overflowX="auto" px={3}> {/* Added padding */}
+             <HStack spacing={6} maxW="100%" overflowX="auto" px={4}> {/* Added padding */}
               <MessageTemplate onClick={() => onSend('Provide your summary.')}>
                 TLDR
               </MessageTemplate>
