@@ -4,9 +4,10 @@ import { FiCopy } from 'react-icons/fi';
 import { FiRepeat } from 'react-icons/fi';
 import { Box, IconButton } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
-
+import { SlVolume2 } from "react-icons/sl";
 import { MessageTurn } from './ChatHistory';
 import { Message } from './Message';
+import {speakMessage} from '../util/ttsUtils';
 
 // Define the props interface for better type safety
 interface MessagesProps {
@@ -81,6 +82,17 @@ export const Messages: React.FC<MessagesProps> = ({
                   variant="outlined"
                   whileHover={{ scale: 1.1, cursor: 'pointer' }}
                   onClick={() => copyMessage(turn.rawContent)}
+                />
+                <IconButton
+                  aria-label="Speak"
+                  as={motion.div}
+                  borderRadius={16}
+                  icon={<SlVolume2 color="var(--text)" fontSize="1.5rem" />}
+                  onClick={() => speakMessage(turn.rawContent)}
+                  opacity={hoveredIndex === i ? 1 : 0}
+                  transition="opacity 0.2s"
+                  variant="outlined"
+                  whileHover={{ scale: 1.1, cursor: 'pointer' }}
                 />
                 {i === turns.length - 1 && (
                   <IconButton
