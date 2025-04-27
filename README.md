@@ -23,7 +23,7 @@ Cognito is a tiny, yet powerful Chrome extension that brings the power of Large 
         *   ...and any other platform that exposes an OpenAI-compatible API!
 
 
-    *Note: use https://url/v1/chat/completions for custom openai endpoints. use localhost:xxxx as your address, don't add /v1.*
+    ~~*Note: use https://url/v1/chat/completions for custom openai endpoints. use localhost:xxxx as your address, don't add /v1.*~~
 
 *   **Diverse Personas:** Seven pre-built personas designed to cater to specific needs (see below).
 
