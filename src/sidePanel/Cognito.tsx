@@ -364,6 +364,8 @@ const Cognito = () => {
 
   // Panel open/close useEffect (Revised - Don't set lastInjectedRef on open)
   useEffect(() => {
+    let cancelled = false;
+
     const handlePanelOpen = async () => {
       console.log("[Cognito - Revised] Panel opened. Resetting state.");
       reset(); // Reset state first
@@ -371,7 +373,7 @@ const Cognito = () => {
       // Check current tab immediately on open ONLY to clear storage if needed
       try {
         const [tab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
-        if (tab?.id && tab.url) {
+        if (!cancelled && tab?.id && tab.url) {
             // Only update currentTabInfo state here, NOT lastInjectedRef
             setCurrentTabInfo({ id: tab.id, url: tab.url }); // Keep this for UI/display if needed
 
@@ -387,7 +389,7 @@ const Cognito = () => {
                 console.log("[Cognito - Revised] Panel opened on valid tab. Injection will occur if mode switched to 'page'. lastInjectedRef is currently:", lastInjectedRef.current);
                 // DO NOT set lastInjectedRef here. Let checkAndInject handle it.
             }
-        } else {
+        } else if (!cancelled) {
             console.log("[Cognito - Revised] Panel opened, but no active tab found or tab has no URL.");
             // Reset refs and state if no valid tab found
             lastInjectedRef.current = { id: null, url: '' };
@@ -398,7 +400,8 @@ const Cognito = () => {
             storage.deleteItem('tabledata');
         }
       } catch (error) {
-          console.error("[Cognito - Revised] Error during panel open tab check:", error);
+        if (!cancelled) { 
+        console.error("[Cognito - Revised] Error during panel open tab check:", error);
           // Reset refs and state on error
           lastInjectedRef.current = { id: null, url: '' };
           setCurrentTabInfo({ id: null, url: '' });
@@ -407,12 +410,14 @@ const Cognito = () => {
           storage.deleteItem('alttexts');
           storage.deleteItem('tabledata');
       }
-    };
+    }
+  }
 
     handlePanelOpen(); // Run on component mount (panel open)
 
     // Return cleanup function for component unmount (panel close) - Keep this as is
     return () => {
+      cancelled = true; // Set cancelled to true to prevent state updates
       console.log("[Cognito - Revised] Panel closing (component unmount). Clearing cached content and resetting state.");
       // Clear cached content from storage
       storage.deleteItem('pagestring');
