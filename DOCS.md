@@ -159,7 +159,7 @@ But this is from the same page just before this: [useSendMessage: Retrieved page
 
 Conclusion:
 
-**I will keep it simple.**
+**I will keep it simple.** [Update] I tried readability.js (for hours) with DOMpurify later, the result basically not better, readability itself is a mess for most of the websites, I use the clone inside the package to make a better parsing for styles which I failed by breaking the page. But the result is weird, something is off, it does decrease the text length by like 1000~2000, but I can't get a better response from the assistants, it's much worse than before. So, still considering 2000 is not a big deal if your normal injection is more than 6000, I will keep it this way.
 
 The chat history includes **all previous messages** in current conversation by default, but context limits apply for AI processing:
 
