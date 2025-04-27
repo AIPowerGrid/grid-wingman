@@ -1,11 +1,4 @@
 import {
-  DeleteIcon,
-  SettingsIcon,
-  SmallCloseIcon,
-  MoonIcon,
-  SunIcon
-} from '@chakra-ui/icons';
-import {
   Box,
   Button,
   Drawer,
@@ -26,6 +19,10 @@ import {
 } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
 import React from 'react';
+// Import react-icons
+import { FiSettings, FiX, FiTrash2 } from 'react-icons/fi';
+import { IoMoonOutline, IoSunnyOutline } from 'react-icons/io5'; // Using io5 for outline icons
+
 interface Model {
   id: string;
   active: boolean;
@@ -34,9 +31,9 @@ interface Model {
 import { useConfig } from './ConfigContext';
 import { Docs } from './Docs';
 import { useUpdateModels } from './hooks/useUpdateModels';
- 
+
 const WelcomeModal = ({
- isOpen, onClose, setSettingsMode 
+ isOpen, onClose, setSettingsMode
 }) => (
   <Modal isOpen={isOpen} scrollBehavior="inside" size="sm" isCentered onClose={onClose}>
     <ModalOverlay />
@@ -53,7 +50,8 @@ const WelcomeModal = ({
             border="2px solid var(--text)"
             borderRadius={16}
             color="var(--text)"
-            leftIcon={<SettingsIcon />}
+            // Use react-icon here
+            leftIcon={<FiSettings />}
             mr={2}
             position="relative"
             size="md"
@@ -66,7 +64,7 @@ const WelcomeModal = ({
     </ModalContent>
   </Modal>
 );
- 
+
 const Badge = ({ children }) => (
   <Box
     background="var(--bg)"
@@ -89,7 +87,7 @@ const Badge = ({ children }) => (
     {children}
   </Box>
 );
- 
+
 const DrawerHeader = ({ onClose }) => {
   const { config, updateConfig } = useConfig(); // Add this line
 
@@ -102,7 +100,8 @@ const DrawerHeader = ({ onClose }) => {
         aria-label="Close Drawer"
         as={motion.div}
         borderRadius={16}
-        icon={<SmallCloseIcon color="var(--text)" fontSize="3xl" />}
+        // Use react-icon here, adjust size as needed (e.g., '24px' or '1.5rem')
+        icon={<FiX color="var(--text)" size="28px" />}
         ml={1}
         mr={1}
         position="relative"
@@ -130,25 +129,27 @@ const DrawerHeader = ({ onClose }) => {
       <Badge>Settings</Badge>
       <IconButton
         aria-label={isDark ? "Switch to light theme" : "Switch to dark theme"}
-        icon={isDark ? <SunIcon color="var(--text)" /> : <MoonIcon color="var(--text)" />}
+        // Use react-icons here, adjust size as needed (e.g., '20px')
+        icon={isDark ? <IoSunnyOutline color="var(--text)" size="20px" /> : <IoMoonOutline color="var(--text)" size="20px" />}
         background="transparent"
         border="none"
-        ml={4}
+        ml="auto" // Push to the right
+        mr={2} // Add some margin
         onClick={() => updateConfig({ theme: isDark ? 'paper' : 'dark' })}
         _hover={{ background: 'var(--active)' }}
-        size="lg"
+        size="lg" // Keep Chakra size prop for button dimensions
       />
     </Box>
   );
 };
- 
+
 const DrawerSection = ({ title, children }) => (
   <Box borderBottom="2px solid var(--text)" p={2} pb={4}>
     <Text color="var(--text)" fontSize="xl" fontWeight={600} mb={2}>{title}</Text>
     {children}
   </Box>
 );
- 
+
 const DrawerLinkSection = ({ title, onClick }) => (
   <Box _hover={{ background: 'var(--active)' }} borderBottom="2px solid var(--text)">
     <Text
@@ -163,25 +164,25 @@ const DrawerLinkSection = ({ title, onClick }) => (
     </Text>
   </Box>
 );
- 
+
 const SettingsDrawer = ({
- isOpen, onClose, config, updateConfig, availableModelNames, setSettingsMode, downloadText, downloadJson, downloadImage, setHistoryMode 
+ isOpen, onClose, config, updateConfig, availableModelNames, setSettingsMode, downloadText, downloadJson, downloadImage, setHistoryMode
 }) => {
   const [searchQuery, setSearchQuery] = React.useState('');
   const [inputFocused, setInputFocused] = React.useState(false);
   const { fetchAllModels } = useUpdateModels(); // <-- Use the hook here
 
-  const filteredModels = config?.models?.filter(model => 
-    model.id.toLowerCase().includes(searchQuery.toLowerCase()) || 
+  const filteredModels = config?.models?.filter(model =>
+    model.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
     model.host?.toLowerCase()?.includes(searchQuery.toLowerCase())
   ) || [];
 
   return (
     <Drawer isOpen={isOpen} placement="left" size="xs" onClose={onClose}>
       <DrawerOverlay />
-      <DrawerContent 
-        background="var(--bg)" 
-        borderRadius={16} 
+      <DrawerContent
+        background="var(--bg)"
+        borderRadius={16}
         borderRight="2px solid var(--text)"
         sx={{
           '&::before': {
@@ -210,12 +211,12 @@ const SettingsDrawer = ({
                   color: 'var(--text)',
                 },
               }}
-              
+
               _focus={{
-   borderColor: 'var(--text)', boxShadow: 'none !important', background: 'transparent' 
+   borderColor: 'var(--text)', boxShadow: 'none !important', background: 'transparent'
   }}
               _hover={{
-   borderColor: 'var(--text)', boxShadow: 'none !important', background: 'var(--active)' 
+   borderColor: 'var(--text)', boxShadow: 'none !important', background: 'var(--active)'
   }}
               background="transparent"
               border="2px"
@@ -238,7 +239,7 @@ const SettingsDrawer = ({
             <Box position="relative">
               <Input
                 value={inputFocused ? searchQuery : config?.selectedModel || ''}
-                placeholder={inputFocused ? "Search models..." : config?.selectedModel || "Select model..."} 
+                placeholder={inputFocused ? "Search models..." : config?.selectedModel || "Select model..."}
                 //size="sm"
                 background="transparent"
                 border="2px"
@@ -327,7 +328,7 @@ const SettingsDrawer = ({
 export const Header = ({ ...props }) => {
   const { config, updateConfig } = useConfig();
   const {
- isOpen, onOpen, onClose 
+ isOpen, onOpen, onClose
 } = useDisclosure();
   const availableModelNames = config?.models?.map(({ id }) => id);
 
@@ -373,7 +374,8 @@ export const Header = ({ ...props }) => {
                 aria-label="Settings"
                 as={motion.div}
                 borderRadius={16}
-                icon={<SettingsIcon color="var(--text)" fontSize="xl" />}
+                // Use react-icon here, adjust size as needed (e.g., '20px')
+                icon={<FiSettings color="var(--text)" size="20px" />}
                 ml={1}
                 mr={1}
                 variant="outlined"
@@ -385,7 +387,8 @@ export const Header = ({ ...props }) => {
                 aria-label="Close"
                 as={motion.div}
                 borderRadius={16}
-                icon={<SmallCloseIcon color="var(--text)" fontSize="3xl" />}
+                // Use react-icon here, adjust size as needed (e.g., '28px')
+                icon={<FiX color="var(--text)" size="28px" />}
                 ml={1}
                 mr={1}
                 variant="outlined"
@@ -427,7 +430,8 @@ export const Header = ({ ...props }) => {
                 aria-label="Delete all"
                 as={motion.div}
                 borderRadius={16}
-                icon={<DeleteIcon color="var(--text)" fontSize="xl" />}
+                // Use react-icon here, adjust size as needed (e.g., '20px')
+                icon={<FiTrash2 color="var(--text)" size="20px" />}
                 mr={2}
                 variant="outlined"
                 whileHover={{ rotate: '15deg', cursor: 'pointer' }}
@@ -441,10 +445,12 @@ export const Header = ({ ...props }) => {
             aria-label="Reset"
             as={motion.div}
             borderRadius={16}
-            icon={<DeleteIcon color="var(--text)" fontSize="xl" />}
+            // Use react-icon here, adjust size as needed (e.g., '20px')
+            icon={<FiTrash2 color="var(--text)" size="20px" />}
             variant="outlined"
             whileHover={{ rotate: '15deg', cursor: 'pointer' }}
             onClick={props.reset}
+            mr={2} // Added margin for spacing
           />
         )}
       </Box>
