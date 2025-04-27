@@ -7,8 +7,8 @@
   --link: #003bb9;
 
   /* Markdown-specific */
-  --markdown-h1: var(--text);
-  --markdown-h2: var(--text);
+  --markdown-h1: var(--bold);
+  --markdown-h2: var(--italic);
   --markdown-h3: var(--text);
   --markdown-strong: var(--bold);
   --markdown-em: var(--italic);
@@ -110,6 +110,7 @@
   font-family: monospace;
 }
 
+/* Table styles */
 .markdown-body table {
   border: 2px solid var(--markdown-table-border);
   border-collapse: collapse;
@@ -118,8 +119,9 @@
 }
 
 .markdown-body thead {
-  background: var(--active);
+  background: var(--text); /* Example background color */
   border-bottom: 2px solid var(--markdown-table-border);
+  color: var(--bg)
 }
 
 .markdown-body th,
@@ -132,7 +134,7 @@
   background: rgba(0,0,0,0.05);
 }
 
-/* Optional: style blockquotes, hr, etc. */
+/* Blockquote */
 .markdown-body blockquote {
   border-left: 4px solid var(--markdown-h2);
   margin: 1em 0;
@@ -141,10 +143,37 @@
   color: var(--markdown-h2);
 }
 
+/* Horizontal rule */
 .markdown-body hr {
   border: none;
   border-top: 1px solid var(--markdown-h2);
   margin: 1.5em 0;
+}
+
+/* Subscript and superscript */
+.markdown-body sub,
+.markdown-body sup {
+  font-size: 0.8em;
+  line-height: 0;
+  position: relative;
+  vertical-align: baseline;
+}
+
+.markdown-body sup {
+  top: -0.5em;
+}
+
+.markdown-body sub {
+  bottom: -0.2em;
+}
+
+/* Math rendering (KaTeX) */
+.markdown-body .katex {
+  font-size: 1em;
+  color: var(--markdown-h2);
+  background: none;
+  border-radius: 0;
+  padding: 0;
 }
 
 /* Responsive tweaks */

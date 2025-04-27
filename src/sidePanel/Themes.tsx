@@ -69,7 +69,7 @@ import {
       text: '#333333',
       bold: '#af1b1b',
       italic: '#09993e',
-      link: '#003bb9',
+      link: '#7a9ce4',
       codeBg: '#333333', // text
       codeFg: '#dfdfdf', // bg
       preBg: '#333333',  // text
@@ -85,13 +85,13 @@ import {
       bg: '#EFD6AC',
       text: '#333333',
       bold: '#af1b1b',
-      italic: '#b8852f',
-      link: '#003bb9',
+      italic: '#6349b3',
+      link: '#5a84de',
       codeBg: '#333333', // text
       codeFg: '#EFD6AC', // bg
       preBg: '#333333',  // text
       preFg: '#EFD6AC',  // bg
-      tableBorder: '#333333',
+      tableBorder: '#6349b3',
       error: '#d32f2f',
       success: '#388e3c',
       warning: '#fbc02d'
@@ -142,8 +142,8 @@ import {
     document.documentElement.style.setProperty('--link', c.link);
 
     // Markdown and UI variables
-    document.documentElement.style.setProperty('--markdown-h1', c.text);
-    document.documentElement.style.setProperty('--markdown-h2', c.text);
+    document.documentElement.style.setProperty('--markdown-h1', c.bold);
+    document.documentElement.style.setProperty('--markdown-h2', c.italic);
     document.documentElement.style.setProperty('--markdown-h3', c.text);
     document.documentElement.style.setProperty('--markdown-strong', c.bold);
     document.documentElement.style.setProperty('--markdown-em', c.italic);
@@ -197,7 +197,7 @@ import {
         codeFg: '#245612', // bg
         preBg: '#efeaea',  // text
         preFg: '#245612',  // bg
-        tableBorder: '#efeaea',
+        tableBorder: '#efeaea', // text
         error: '#fbd709',   // bold
         success: '#587bc5', // link
         warning: '#fbd709'  // bold
