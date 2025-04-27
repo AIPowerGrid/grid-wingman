@@ -62,9 +62,8 @@ export const useUpdateModels = () => {
 
 
     // Ollama
-    const isConnected = config?.ollamaConnected || config?.lmStudioConnected;
 
-    if (config?.ollamaUrl && isConnected) {
+    if (config?.ollamaUrl && config?.ollamaConnected) {
       console.log('[useUpdateModels] Fetching Ollama models...');
       const ollamaModels = await fetchDataSilently(`${config.ollamaUrl}/api/tags`);
       if (ollamaModels) {
@@ -89,7 +88,7 @@ export const useUpdateModels = () => {
 
     // LM Studio
 
-    if (config?.lmStudioUrl && isConnected) {
+    if (config?.lmStudioUrl && config?.lmStudioConnected) {
       console.log('[useUpdateModels] Fetching LM Studio models...');
       const lmStudioModels = await fetchDataSilently(`${config.lmStudioUrl}/v1/models`);
       if (lmStudioModels) {
