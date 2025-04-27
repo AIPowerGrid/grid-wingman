@@ -1,6 +1,6 @@
 {
   "name": "cognito",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Cognito is a Chrome extension that allows you to communicate with your browser.",
   "main": "index.js",
   "scripts": {
