@@ -85,7 +85,7 @@ import {
       bg: '#EFD6AC',
       text: '#333333',
       bold: '#af1b1b',
-      italic: '#d79d39',
+      italic: '#b8852f',
       link: '#003bb9',
       codeBg: '#333333', // text
       codeFg: '#EFD6AC', // bg
