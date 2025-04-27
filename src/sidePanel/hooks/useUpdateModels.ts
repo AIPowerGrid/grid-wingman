@@ -66,11 +66,13 @@ export const useUpdateModels = () => {
     if (config?.ollamaUrl && config?.ollamaConnected) {
       console.log('[useUpdateModels] Fetching Ollama models...');
       const ollamaModels = await fetchDataSilently(`${config.ollamaUrl}/api/tags`);
-      if (ollamaModels) {
+      if (!ollamaModels) {
+        updateConfig({ ollamaConnected: false, ollamaUrl: '' });
+      } else {
         const parsedModels = (ollamaModels?.models as Model[] ?? []).map(m => ({
           ...m, id: m.id, host: 'ollama'
         }));
-        updateModels(parsedModels, 'ollama');
+        updateModels(parsedModels, parsedModels[3]?.host);
       }
     }
 
@@ -82,7 +84,7 @@ export const useUpdateModels = () => {
         const parsedModels = (geminiModels?.data as Model[] ?? []).filter(m => m.id.startsWith('models/gemini')).map(m => ({
           ...m, id: m.id, host: 'gemini'
         }));
-        updateModels(parsedModels, 'gemini');
+        updateModels(parsedModels, parsedModels[20]?.host);
       }
     }
 
@@ -91,11 +93,13 @@ export const useUpdateModels = () => {
     if (config?.lmStudioUrl && config?.lmStudioConnected) {
       console.log('[useUpdateModels] Fetching LM Studio models...');
       const lmStudioModels = await fetchDataSilently(`${config.lmStudioUrl}/v1/models`);
-      if (lmStudioModels) {
+      if (!lmStudioModels) {
+        updateConfig({ lmStudioConnected: false, lmStudioUrl: '' });
+      } else {
         const parsedModels = (lmStudioModels?.data as Model[] ?? []).map(m => ({
           ...m, id: m.id, host: 'lmStudio'
         }));
-        updateModels(parsedModels, 'lmStudio');
+        updateModels(parsedModels, parsedModels[3]?.host);
       }
     }
 
@@ -107,7 +111,7 @@ export const useUpdateModels = () => {
         const parsedModels = (groqModels?.data as Model[] ?? []).map(m => ({
           ...m, id: m.id, host: 'groq'
         }));
-        updateModels(parsedModels, 'groq');
+        updateModels(parsedModels, parsedModels[3]?.host);
       }
     }
 
@@ -119,7 +123,7 @@ export const useUpdateModels = () => {
         const parsedModels = (openAiModels?.data as Model[] ?? []).filter(m => m.id.startsWith('gpt-')).map(m => ({
           ...m, id: m.id, host: 'openai'
         }));
-        updateModels(parsedModels, 'openai');
+        updateModels(parsedModels, parsedModels[5]?.host);
       }
     }
 
@@ -131,7 +135,7 @@ export const useUpdateModels = () => {
         const parsedModels = (openRouterModels?.data as Model[] ?? []).map(m => ({
           ...m, id: m.id, context_length: m.context_length, host: 'openrouter'
         }));
-        updateModels(parsedModels, 'openrouter');
+        updateModels(parsedModels, parsedModels[2]?.host);
       }
     }
 
@@ -150,7 +154,7 @@ export const useUpdateModels = () => {
         const parsedModels = (modelsArray as Model[]).map(m => ({
           ...m, id: m.id, host: 'custom'
         }));
-        updateModels(parsedModels, 'custom');
+        updateModels(parsedModels, parsedModels[3]?.host);
       }
     }
   }, [config, updateModels, updateConfig]);
