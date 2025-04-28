@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Cognito is your FREE, all-in-one AI companion, now available directly from the Chrome Extension Store! This powerful extension brings the capabilities of Large Language Models (LLMs) to your browser, allowing you to summarize web pages, interact directly with page content, conduct context-aware web searches, readout the responses and more. Choose between cloud-based services like OpenAI and Gemini or run models locally with Ollama and LM Studio. **Install Cognito today and enjoy AI in your browser!**
+Cognito is your FREE, all-in-one AI companion, now available directly from the Chrome Extension Store! This powerful extension brings the capabilities of Large Language Models (LLMs) to your browser, allowing you to summarize web pages, interact directly with page content, conduct context-aware web searches, read out the responses, and more. Choose between cloud-based services like OpenAI and Gemini or run models locally with Ollama and LM Studio. **Install Cognito today and enjoy AI in your browser!**
 
 Built on [sidellama](https://github.com/gyopak/sidellama).
 
@@ -27,7 +27,7 @@ Built on [sidellama](https://github.com/gyopak/sidellama).
 *   **Web Search Integration:** Enhanced access to information for context-aware AI interactions.
 *   **Page context reading** Transcripts reading included for Bloomberg, youtube, or other providers who put the transcripts in their html.
 *   **Enhanced Summarization** More granular control over summary length and detail over personas.
-*   **TTS** 
+*   **TTS** Currently, there is only basic TTS from the browser, so if you want some natural voices, you should use Edge or you have integrated TTS API from elsewhere. (More support here is planned)
 
 ## Available Personas
 
