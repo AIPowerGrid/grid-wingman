@@ -1,4 +1,4 @@
-// Add this line
+// src/sidePanel/Settings.tsx
 import { Accordion, Box } from '@chakra-ui/react';
 
 import { Automation } from './Automation';
@@ -8,7 +8,9 @@ import { PageContext } from './PageContext';
 import { Params } from './Params';
 import { Persona } from './Persona';
 import { Themes } from './Themes';
+import { TtsSettings } from './TtsSettings'; // <-- Import the new component
 import { WebSearch } from './WebSearch';
+
 
 export const Settings = () => {
   const { config } = useConfig();
@@ -43,6 +45,7 @@ export const Settings = () => {
         <Themes />
         <Connect />
         <Persona />
+        <TtsSettings /> {/* <-- Add the TTS settings section here */}
         <PageContext />
         <WebSearch />
         <Params />

@@ -1,15 +1,37 @@
-import { useState, useLayoutEffect, useRef } from 'react';
+// src/sidePanel/Messages.tsx
+import { useState, useLayoutEffect, useRef, useEffect } from 'react';
 import toast from 'react-hot-toast';
-import { FiCopy } from 'react-icons/fi';
-import { FiRepeat } from 'react-icons/fi';
-import { Box, IconButton } from '@chakra-ui/react';
-import { motion } from 'framer-motion';
-import { SlVolume2 } from "react-icons/sl";
+import { FiCopy, FiRepeat, FiPlay, FiPause, FiSquare } from 'react-icons/fi';
+import { Box, IconButton, VStack } from '@chakra-ui/react';
 import { MessageTurn } from './ChatHistory';
 import { Message } from './Message';
-import {speakMessage} from '../util/ttsUtils';
+import {
+  speakMessage,
+  stopSpeech,
+  pauseSpeech,
+  resumeSpeech,
+  isCurrentlySpeaking,
+  isCurrentlyPaused,
+} from '../util/ttsUtils';
+import { useConfig } from './ConfigContext';
 
-// Define the props interface for better type safety
+// --- Helper Function to Clean Text for TTS ---
+const cleanTextForTTS = (text: string): string => {
+  let cleanedText = text;
+  // Remove markdown emphasis
+  cleanedText = cleanedText.replace(/(\*\*|__|\*|_)(.*?)\1/g, '$2');
+  // Remove list markers
+  cleanedText = cleanedText.replace(/^[*+-]\s+/gm, '');
+  // Replace all colons with a period and a space
+  cleanedText = cleanedText.replace(/:/g, '. '); // <--- Updated this line
+  // Replace slashes with spaces
+  cleanedText = cleanedText.replace(/\//g, ' ');
+  // Collapse multiple spaces
+  cleanedText = cleanedText.replace(/\s{2,}/g, ' ');
+  return cleanedText.trim();
+};
+// --- End Helper Function ---
+
 interface MessagesProps {
   turns?: MessageTurn[];
   isLoading?: boolean;
@@ -18,12 +40,37 @@ interface MessagesProps {
 }
 
 export const Messages: React.FC<MessagesProps> = ({
- turns = [], isLoading = false, onReload = () => {}, settingsMode = false
+  turns = [], isLoading = false, onReload = () => {}, settingsMode = false
 }) => {
-  const [hoveredIndex, setHoveredIndex] = useState(-1);
-    // --- Ref for the scrollable container ---
+  const [hoveredIndex, setHoveredIndex] = useState<number>(-1);
+  const [speakingIndex, setSpeakingIndex] = useState<number>(-1);
+  const [ttsIsPaused, setTtsIsPaused] = useState<boolean>(false);
+  const { config } = useConfig();
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null); // Ref for the container itself
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Effect to update local pause state based on global state (keep as is)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const currentlyPaused = isCurrentlyPaused();
+      const currentlySpeaking = isCurrentlySpeaking();
+
+      if (!currentlySpeaking && speakingIndex !== -1) {
+        setSpeakingIndex(-1);
+        setTtsIsPaused(false);
+      }
+      else if (currentlySpeaking && ttsIsPaused !== currentlyPaused) {
+        setTtsIsPaused(currentlyPaused);
+      }
+      else if (currentlyPaused && speakingIndex === -1) {
+         setTtsIsPaused(true);
+      }
+
+    }, 250);
+
+    return () => clearInterval(interval);
+  }, [speakingIndex, ttsIsPaused]);
 
   const copyMessage = (text: string) => {
     navigator.clipboard.writeText(text)
@@ -31,104 +78,182 @@ export const Messages: React.FC<MessagesProps> = ({
       .catch(() => toast.error('Failed to copy'));
   };
 
+  // --- TTS Handlers (keep as is) ---
+  const handlePlay = (index: number, text: string) => {
+    console.log(`Attempting to play index: ${index}`);
+    const textToSpeak = cleanTextForTTS(text);
+    console.log(`Cleaned text for TTS: "${textToSpeak}"`);
+
+    speakMessage(textToSpeak, config?.tts?.selectedVoice, {
+      onStart: () => {
+        console.log(`Speech started for index: ${index}`);
+        setSpeakingIndex(index);
+        setTtsIsPaused(false);
+      },
+      onEnd: () => {
+        console.log(`Speech ended for index: ${index}`);
+        if (speakingIndex === index) {
+            setSpeakingIndex(-1);
+            setTtsIsPaused(false);
+        }
+      },
+      onPause: () => {
+        console.log(`Speech paused for index: ${index}`);
+         if (speakingIndex === index) {
+            setTtsIsPaused(true);
+         }
+      },
+      onResume: () => {
+        console.log(`Speech resumed for index: ${index}`);
+         if (speakingIndex === index) {
+            setTtsIsPaused(false);
+         }
+      },
+    });
+  };
+
+  const handlePause = () => {
+    console.log("Handle pause called");
+    pauseSpeech();
+  };
+
+  const handleResume = () => {
+    console.log("Handle resume called");
+    resumeSpeech();
+  };
+
+  const handleStop = () => {
+    console.log("Handle stop called");
+    stopSpeech();
+    setSpeakingIndex(-1);
+    setTtsIsPaused(false);
+  };
+  // --- End TTS Handlers ---
+
+
+  // --- Revised useLayoutEffect for Scrolling ---
   useLayoutEffect(() => {
     const container = containerRef.current;
+    // We don't strictly need the endRef element itself if we use scrollTop
+
     if (container) {
-      // Only scroll if user is near the bottom (not scrolled up)
-      const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 200;
+      // Calculate distance from bottom BEFORE potential scroll adjustment
+      // scrollHeight: total height of the scrollable content
+      // scrollTop: how far down the user has scrolled from the top
+      // clientHeight: the visible height of the container
+      const scrollBottom = container.scrollHeight - container.scrollTop - container.clientHeight;
+
+      // Define a threshold (e.g., 200 pixels)
+      // Only auto-scroll if the user is already near the bottom
+      const isNearBottom = scrollBottom < 200;
+
+      // console.log(`Scroll Info: scrollHeight=${container.scrollHeight}, scrollTop=${container.scrollTop}, clientHeight=${container.clientHeight}, scrollBottom=${scrollBottom}, isNearBottom=${isNearBottom}`);
+
       if (isNearBottom) {
+        // Directly set scrollTop to the maximum value (scroll to bottom)
+        // This happens synchronously after DOM update but before paint,
+        // aiming to prevent the user from seeing the pre-scroll state.
+        // This might be less smooth than scrollIntoView but can prevent jumps.
         container.scrollTop = container.scrollHeight;
+
+        // --- Alternative: If the jump persists, try smooth scroll again ---
+        // messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        // --- Alternative 2: If smooth scroll causes jumps, try 'auto' (instant) ---
+        // messagesEndRef.current?.scrollIntoView({ behavior: 'auto', block: 'end' });
       }
+      // If the user has scrolled up significantly (isNearBottom is false),
+      // we don't auto-scroll, preserving their position.
     }
-  }, [turns]);
+  }, [turns]); // Dependency array: Re-run this effect when the 'turns' array changes.
 
   return (
     <Box
-      ref={containerRef} // Add ref here
+      ref={containerRef}
       background="var(--bg)"
       display="flex"
       flexDir="column"
       flexGrow={1}
-      id="messages"  
-      height="calc(100vh - 10rem)"
+      id="messages"
+      height="calc(100dvh - 8rem)"
       overflowY="scroll"
       paddingBottom="1rem"
       paddingTop="1rem"
       style={{ opacity: settingsMode ? 0 : 1 }}
       width="100%"
+      sx={{
+        '&::-webkit-scrollbar': { width: '8px' },
+        '&::-webkit-scrollbar-track': { background: 'var(--bg)' },
+        '&::-webkit-scrollbar-thumb': { background: 'var(--text-secondary)', borderRadius: '4px' },
+        '&::-webkit-scrollbar-thumb:hover': { background: 'var(--text)' },
+      }}
     >
       {turns.map(
         (turn, i) => turn && (
+          // Message rendering logic remains the same
           <Box
             key={turn.timestamp || `turn_${i}`}
-            alignItems="flex-end"
+            alignItems="flex-start"
             display="flex"
             justifyContent={turn.role === 'user' ? 'flex-start' : 'flex-end'}
             mb={0}
-            mt={3}
+            mt={2}
             width="100%"
+            position="relative"
             onMouseEnter={() => setHoveredIndex(i)}
             onMouseLeave={() => setHoveredIndex(-1)}
           >
+            {/* Assistant Controls (Left Side) */}
             {turn.role === 'assistant' && (
-              <Box display="flex" flexDirection="column" gap={0} mr={0}>
-                <IconButton
-                  aria-label="Copy"
-                  as={motion.div}
-                  borderRadius={16}
-                  icon={<FiCopy color="var(--text)" fontSize="1.5rem" />}
-                  opacity={hoveredIndex === i ? 1 : 0}
-                  transition="opacity 0.2s"
-                  variant="outlined"
-                  whileHover={{ scale: 1.1, cursor: 'pointer' }}
-                  onClick={() => copyMessage(turn.rawContent)}
-                />
-                <IconButton
-                  aria-label="Speak"
-                  as={motion.div}
-                  borderRadius={16}
-                  icon={<SlVolume2 color="var(--text)" fontSize="1.5rem" />}
-                  onClick={() => speakMessage(turn.rawContent)}
-                  opacity={hoveredIndex === i ? 1 : 0}
-                  transition="opacity 0.2s"
-                  variant="outlined"
-                  whileHover={{ scale: 1.1, cursor: 'pointer' }}
-                />
-                {i === turns.length - 1 && (
-                  <IconButton
-                    aria-label="Repeat"
-                    as={motion.div}
-                    borderRadius={16}
-                    icon={<FiRepeat color="var(--text)" fontSize="1.5rem" />}
-                    opacity={hoveredIndex === i ? 1 : 0}
-                    transition="opacity 0.2s"
-                    variant="outlined"
-                    whileHover={{ rotate: '90deg', cursor: 'pointer' }}
-                    onClick={onReload}
-                  />
+              <VStack
+                spacing={0}
+                mr={1}
+                opacity={(hoveredIndex === i || speakingIndex === i) ? 1 : 0}
+                transition="opacity 0.2s"
+                alignSelf="flex-end"
+                alignItems="center"
+                pb={1}
+              >
+                <IconButton aria-label="Copy" size="sm" variant="ghost" icon={<FiCopy color="var(--text)" />} onClick={() => copyMessage(turn.rawContent)} title="Copy message" />
+                {speakingIndex === i ? (
+                  ttsIsPaused ? (
+                    <IconButton aria-label="Resume" size="sm" variant="ghost" icon={<FiPlay color="var(--text)" />} onClick={handleResume} title="Resume speech" />
+                  ) : (
+                    <IconButton aria-label="Pause" size="sm" variant="ghost" icon={<FiPause color="var(--text)" />} onClick={handlePause} title="Pause speech" />
+                  )
+                ) : (
+                  <IconButton aria-label="Speak" size="sm" variant="ghost" icon={<FiPlay color="var(--text)" />} onClick={() => handlePlay(i, turn.rawContent)} title="Speak message" />
                 )}
-              </Box>
+                 {speakingIndex === i && (
+                    <IconButton aria-label="Stop" size="sm" variant="ghost" icon={<FiSquare color="var(--text)" />} onClick={handleStop} title="Stop speech" />
+                 )}
+                {i === turns.length - 1 && (
+                  <IconButton aria-label="Reload" size="sm" variant="ghost" icon={<FiRepeat color="var(--text)" />} onClick={onReload} title="Reload last prompt" />
+                )}
+              </VStack>
             )}
+
+            {/* The Message Bubble */}
             <Message turn={turn} index={i} />
+
+            {/* User Controls (Right Side) */}
             {turn.role === 'user' && (
-              <Box display="flex" flexDirection="column" gap={0} ml={0}>
-                <IconButton
-                  aria-label="Copy"
-                  as={motion.div}
-                  borderRadius={16}
-                  icon={<FiCopy color="var(--text)" fontSize="1.5rem" />}
-                  opacity={hoveredIndex === i ? 1 : 0}
-                  transition="opacity 0.2s"
-                  variant="outlined"
-                  whileHover={{ scale: 1.1, cursor: 'pointer' }}
-                  onClick={() => copyMessage(turn.rawContent)}
-                />
-              </Box>
+              <VStack
+                spacing={0}
+                ml={1}
+                opacity={hoveredIndex === i ? 1 : 0}
+                transition="opacity 0.2s"
+                alignSelf="flex-end"
+                alignItems="center"
+                pb={1}
+              >
+                <IconButton aria-label="Copy" size="sm" variant="ghost" icon={<FiCopy color="var(--text)" />} onClick={() => copyMessage(turn.rawContent)} title="Copy message" />
+              </VStack>
             )}
           </Box>
         )
       )}
+      {/* Div used for scrolling calculations (keep ref, even if not using scrollIntoView) */}
+      <div ref={messagesEndRef} style={{ height: '1px' }} />
     </Box>
   );
 };
-

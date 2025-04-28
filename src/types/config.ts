@@ -1,3 +1,5 @@
+// src/types/config.ts
+
 export interface Persona {
   Ein: string;
   Jan: string;
@@ -14,6 +16,12 @@ export interface Model {
   active?: boolean;
   context_length?: number;
   // Add other model-specific properties if needed
+}
+
+// Add TTS Settings interface
+export interface TtsSettings {
+  selectedVoice?: string; // Store the name of the selected voice
+  // Add other TTS settings like rate, pitch later if needed
 }
 
 export interface Config {
@@ -53,7 +61,7 @@ export interface Config {
   models?: Model[];
   selectedModel?: string;
   chatMode?: 'web' | 'page' | 'chat' | string;
-  theme?: string; // Add this line
+  theme?: string;
   customTheme?: {
     active: string;
     bg: string;
@@ -70,7 +78,8 @@ export interface Config {
     success: string;
     warning: string;
   };
-  panelOpen: boolean; // Add this property to Config interface
+  panelOpen: boolean;
+  tts?: TtsSettings; // Add the TTS settings object here
 }
 
 export interface ConfigContextType {
