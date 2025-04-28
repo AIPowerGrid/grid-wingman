@@ -53,7 +53,7 @@ export const speakMessage = (
   }
 
   const utterance = new SpeechSynthesisUtterance(text);
-  utterance.rate = 0.9; // Adjust rate as needed
+  utterance.rate = 1; // Adjust rate as needed
 
   // Set voice if provided and found
   if (voiceName) {
