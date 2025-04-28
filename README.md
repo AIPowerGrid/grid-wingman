@@ -22,9 +22,6 @@ Built on [sidellama](https://github.com/gyopak/sidellama).
         *   Open WebUI
         *   ...and any other platform that exposes an OpenAI-compatible API!
 
-
-    ~~*Note: use https://url/v1/chat/completions for custom openai endpoints. use localhost:xxxx as your address, don't add /v1.*~~
-
 *   **Diverse Personas:** Seven pre-built personas designed to cater to specific needs (see below).
 
 *   **Web Search Integration:** Enhanced access to information for context-aware AI interactions.
