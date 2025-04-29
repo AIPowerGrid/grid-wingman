@@ -20,7 +20,6 @@ import {
   PopoverHeader,
   PopoverBody,
   Checkbox,
-  CheckboxGroup,
 } from '@chakra-ui/react';
 import { useConfig } from './ConfigContext';
 import { SettingTitle } from './SettingsTitle';
@@ -210,10 +209,9 @@ const CustomThemePicker = ({ updateConfig, config }: { updateConfig: (newConfig:
       }
   );
 
-  const handleColorChange = (key: keyof typeof customTheme, value: string) => {
+  const handleColorChange = (key: keyof Omit<Theme, 'name'>, value: string) => {
     let newTheme = { ...customTheme, [key]: value };
 
-    // Pair code/pre and status colors dynamically
     if (key === 'text') {
       newTheme = {
         ...newTheme,
@@ -258,11 +256,9 @@ const CustomThemePicker = ({ updateConfig, config }: { updateConfig: (newConfig:
     setCustomTheme(newTheme);
 
     updateConfig({
-      customTheme: newTheme,
+      customTheme: { ...newTheme, name: 'custom' }, // Ensure name is included when updating config
       theme: 'custom',
     });
-
-    setTheme({ name: 'custom', ...newTheme });
   };
 
   return (
@@ -270,8 +266,7 @@ const CustomThemePicker = ({ updateConfig, config }: { updateConfig: (newConfig:
       <Tooltip aria-label="custom" background="var(--bg)" color="var(--text)" label="custom">
         <Box display="inline-block">
           {' '}
-          {/* Wrapper to make Tooltip work with PopoverTrigger */}
-          <PopoverTrigger>
+          <PopoverTrigger> 
             <Button
               _hover={{
                 background: customTheme.active,
@@ -289,7 +284,7 @@ const CustomThemePicker = ({ updateConfig, config }: { updateConfig: (newConfig:
           </PopoverTrigger>
         </Box>
       </Tooltip>
-      <PopoverContent>
+      <PopoverContent width="280px"> {/* Use fixed width */}
         <PopoverArrow />
         <PopoverCloseButton />
         <PopoverHeader>Custom Theme Colors</PopoverHeader>
@@ -330,7 +325,7 @@ export const Themes = () => {
   const { config, updateConfig } = useConfig();
   const currentFontSize = config?.fontSize || 12;
 
-  // Apply theme and texture setting on load/change
+  // Apply theme, texture, and font size settings on load/change
   useEffect(() => {
     const currentThemeName = config?.theme || 'paper';
     const isCustom = currentThemeName === 'custom';
@@ -342,7 +337,12 @@ export const Themes = () => {
       // Pass the paperTexture setting to setTheme
       setTheme(themeDefinition as Theme, config?.paperTexture ?? true);
     }
-  }, [config?.theme, config?.customTheme, config?.paperTexture]); // Add paperTexture dependency
+    // Apply font size
+    if (config?.fontSize) {
+      document.documentElement.style.setProperty('--global-font-size', `${config.fontSize}px`);
+    }
+  // Add fontSize dependency
+  }, [config?.theme, config?.customTheme, config?.paperTexture, config?.fontSize]);
 
   return (
     <AccordionItem border="2px solid var(--text)" borderRadius={16} mb={4} mt={0}>
@@ -351,66 +351,63 @@ export const Themes = () => {
       </AccordionButton>
       <AccordionPanel pb={4}>
         <Box>
-          <CheckboxGroup
-            colorScheme="blackAlpha"
-            defaultValue={config?.generateTitle ? ["create chat title"] : []}
-            onChange={(values) => {
-              updateConfig({ generateTitle: values.includes("create chat title") });
-            }}
-          >
+          {/* Wrap checkboxes in a Flex container for vertical stacking */}
+          <Flex direction="column" gap={2} mb={4}>
             <Checkbox
-              value="create chat title"
               color="var(--text)"
               fontWeight={800}
               fontSize="lg"
-              mb={2}
+              colorScheme="blackAlpha"
+              isChecked={config?.generateTitle ?? false}
+              onChange={(e) => {
+                updateConfig({ generateTitle: e.target.checked });
+              }}
               onClick={(e) => e.stopPropagation()} // Prevent accordion from toggling
             >
               create chat title
             </Checkbox>
-          </CheckboxGroup>
 
-          <CheckboxGroup
-            colorScheme="blackAlpha"
-            defaultValue={config?.backgroundImage ? ["background illustration"] : []}
-            onChange={(values) => {
-              updateConfig({ backgroundImage: values.includes("background illustration") });
-            }}
-          >
             <Checkbox
-              value="background illustration"
               color="var(--text)"
               fontWeight={800}
               fontSize="lg"
-              mb={2}
+              colorScheme="blackAlpha"
+              isChecked={config?.backgroundImage ?? false}
+              onChange={(e) => {
+                updateConfig({ backgroundImage: e.target.checked });
+              }}
               onClick={(e) => e.stopPropagation()} // Prevent accordion from toggling
             >
               background illustration
             </Checkbox>
-          </CheckboxGroup>
 
-          <CheckboxGroup
-            colorScheme="blackAlpha"
-            defaultValue={config?.paperTexture ? ["paper texture"] : []}
-            onChange={(values) => {
-              const newPaperTextureState = values.includes("paper texture");
-              updateConfig({ paperTexture: newPaperTextureState });
-              // Re-apply theme immediately when texture changes to update the data attribute
-              const currentTheme = themes.find(t => t.name === (config?.theme || 'paper')) || themes[0];
-              setTheme(currentTheme, newPaperTextureState);
-            }}
-          >
             <Checkbox
-              value="paper texture"
               color="var(--text)"
               fontWeight={800}
               fontSize="lg"
-              mb={2}
+              colorScheme="blackAlpha"
+              // Default paperTexture to true if undefined in config
+              isChecked={config?.paperTexture ?? true}
+              onChange={(e) => {
+                const newPaperTextureState = e.target.checked;
+                updateConfig({ paperTexture: newPaperTextureState });
+                // Re-apply theme immediately when texture changes to update the data attribute
+                // Need to determine the current theme object here
+                const currentThemeName = config?.theme || 'paper';
+                const isCustom = currentThemeName === 'custom';
+                const currentTheme = isCustom
+                  ? { name: 'custom', ...(config?.customTheme || themes.find(t => t.name === 'custom')) }
+                  : themes.find((t) => t.name === currentThemeName) || themes.find((t) => t.name === 'paper');
+
+                if (currentTheme) {
+                  setTheme(currentTheme as Theme, newPaperTextureState);
+                }
+              }}
               onClick={(e) => e.stopPropagation()} // Prevent accordion from toggling
             >
               paper texture
             </Checkbox>
-          </CheckboxGroup>
+          </Flex>
 
           <Text color="var(--text)" fontSize="lg" fontWeight={800} pb={2} pt={2} textAlign="left">
             font size
@@ -420,6 +417,7 @@ export const Themes = () => {
               max={20}
               min={7}
               onChange={(e) => {
+                // Update config, useEffect will handle applying the style
                 updateConfig({ fontSize: e });
               }}
             >
