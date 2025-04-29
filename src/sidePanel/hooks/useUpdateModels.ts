@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useRef } from 'react';
 import storage from 'src/util/storageUtil';
 import { useConfig } from '../ConfigContext';
 import { GEMINI_URL, GROQ_URL, OPENAI_URL, OPENROUTER_URL } from '../constants';
@@ -47,33 +47,33 @@ export const useUpdateModels = () => {
       });
     }
   }, [config, updateConfig]);
-  // // Throttled fetch function
-  // const lastFetchRef = useRef(0);
-  // const FETCH_INTERVAL = 1 * 60 * 1000; // 1 minutes
+  
+  const FETCH_INTERVAL =  30 * 1000; // 30s
+  const lastFetchRef = useRef(0);
 
   const fetchAllModels = useCallback(async () => {
-
-    // const now = Date.now();
-    // if (now - lastFetchRef.current < FETCH_INTERVAL) {
-    //   console.log('[useUpdateModels] Model fetch throttled.');
-    //   return;
-    // }
-    // lastFetchRef.current = now;
-
-
-    // Ollama
+    const now = Date.now();
+    if (now - lastFetchRef.current < FETCH_INTERVAL) {
+      console.log('[useUpdateModels] Model fetch throttled');
+      return;
+    }
+    lastFetchRef.current = now;
 
     if (config?.ollamaUrl && config?.ollamaConnected) {
       console.log('[useUpdateModels] Fetching Ollama models...');
       const ollamaModels = await fetchDataSilently(`${config.ollamaUrl}/api/tags`);
       if (!ollamaModels) {
         updateConfig({ ollamaConnected: false, ollamaUrl: '' });
+        // Clear existing ollama models on fetch failure
+        updateModels([], 'ollama');
       } else {
         const parsedModels = (ollamaModels?.models as Model[] ?? []).map(m => ({
           ...m, id: m.id, host: 'ollama'
         }));
-        updateModels(parsedModels, parsedModels[3]?.host);
+        updateModels(parsedModels, 'ollama');
       }
+    } else {
+      updateModels([], 'ollama');
     }
 
     // Gemini
@@ -84,8 +84,9 @@ export const useUpdateModels = () => {
         const parsedModels = (geminiModels?.data as Model[] ?? []).filter(m => m.id.startsWith('models/gemini')).map(m => ({
           ...m, id: m.id, host: 'gemini'
         }));
-        updateModels(parsedModels, parsedModels[20]?.host);
+        updateModels(parsedModels, 'gemini');
       }
+    } else {updateModels([], 'gemini');
     }
 
     // LM Studio
@@ -95,12 +96,16 @@ export const useUpdateModels = () => {
       const lmStudioModels = await fetchDataSilently(`${config.lmStudioUrl}/v1/models`);
       if (!lmStudioModels) {
         updateConfig({ lmStudioConnected: false, lmStudioUrl: '' });
+        // Clear existing lmStudio models on fetch failure
+        updateModels([], 'lmStudio');
       } else {
         const parsedModels = (lmStudioModels?.data as Model[] ?? []).map(m => ({
           ...m, id: m.id, host: 'lmStudio'
         }));
-        updateModels(parsedModels, parsedModels[3]?.host);
+        updateModels(parsedModels, 'lmStudio');
       }
+    } else {
+      updateModels([], 'lmStudio');
     }
 
     // Groq
@@ -111,10 +116,11 @@ export const useUpdateModels = () => {
         const parsedModels = (groqModels?.data as Model[] ?? []).map(m => ({
           ...m, id: m.id, host: 'groq'
         }));
-        updateModels(parsedModels, parsedModels[3]?.host);
+        updateModels(parsedModels, 'groq');
       }
+    } else {      
+      updateModels([], 'groq');
     }
-
     // OpenAI
     if (config?.openAiApiKey) {
       console.log('[useUpdateModels] Fetching OpenAI models...');
@@ -123,8 +129,10 @@ export const useUpdateModels = () => {
         const parsedModels = (openAiModels?.data as Model[] ?? []).filter(m => m.id.startsWith('gpt-')).map(m => ({
           ...m, id: m.id, host: 'openai'
         }));
-        updateModels(parsedModels, parsedModels[5]?.host);
+        updateModels(parsedModels, 'openai');
       }
+    } else {
+      updateModels([], 'openai');
     }
 
     // OpenRouter
@@ -135,12 +143,14 @@ export const useUpdateModels = () => {
         const parsedModels = (openRouterModels?.data as Model[] ?? []).map(m => ({
           ...m, id: m.id, context_length: m.context_length, host: 'openrouter'
         }));
-        updateModels(parsedModels, parsedModels[2]?.host);
+        updateModels(parsedModels, 'openrouter');
       }
+    } else {
+      updateModels([], 'openrouter');
     }
 
     // Custom Endpoint
-    if (config?.customEndpoint || config?.customApiKey) {
+    if (config?.customEndpoint) { // Check only for the endpoint URL existence
       const normalizedUrl = normalizeApiEndpoint(config?.customEndpoint);
       console.log('[useUpdateModels] Fetching Custom Endpoint models...');
       const customModels = await fetchDataSilently(
@@ -154,8 +164,16 @@ export const useUpdateModels = () => {
         const parsedModels = (modelsArray as Model[]).map(m => ({
           ...m, id: m.id, host: 'custom'
         }));
-        updateModels(parsedModels, parsedModels[3]?.host);
+        updateModels(parsedModels,'custom');
+      } else {
+        // Fetch failed, clear existing custom models and mark as disconnected
+        console.log('[useUpdateModels] Failed to fetch from Custom Endpoint. Clearing models.');
+        updateModels([], 'custom');
+        // Optionally, update a 'customConnected' flag if you have one:
+        // updateConfig({ customConnected: false });
       }
+    } else {
+      updateModels([], 'custom');
     }
   }, [config, updateModels, updateConfig]);
 
