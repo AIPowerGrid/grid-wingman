@@ -207,6 +207,7 @@ export const Messages: React.FC<MessagesProps> = ({
             mb={0}
             mt={2}
             width="100%"
+            px={2} // Add some horizontal padding so shadow isn't clipped
             position="relative"
             onMouseEnter={() => setHoveredIndex(i)}
             onMouseLeave={() => setHoveredIndex(-1)}

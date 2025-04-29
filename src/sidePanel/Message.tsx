@@ -366,6 +366,7 @@ export const Message: React.FC<MessageProps> = ({ turn, index }) => {
       pl={4}
       pr={4}
       pt={2}
+      boxShadow="0 4px 12px rgba(0, 0, 0, 0.1)" // Soft shadow added here
       sx={{
         // Keep position relative for potential future absolute positioned children
         textAlign: 'left',
