@@ -73,19 +73,21 @@ export const Settings = () => {
             _last: { mb: 0 } // No margin for the last item
           },
           '.chakra-accordion__button': {
-             bg: controlBg, // Button itself use same background as item.
+             bg: controlBg, // Use the control background
              color: 'var(--text)',
              fontWeight: 'medium', // Match drawer button weight
              fontSize: 'lg', // Match drawer button size (adjust if needed)
-             py: 2, // Make shorter (less vertical padding)
+             h: '36px', // Explicit height like drawer buttons
+             // py: 2, // Remove py if using h
              px: 4, // Horizontal padding for button
              borderColor: subtleBorderColor,
              borderWidth: '1px',
+             borderRadius: 'xl', // Match drawer button roundness (applied here for consistency)
+             boxShadow: floatingShadow, // Add the shadow
+             filter: controlFilter, // Add the filter
              _hover: {
-               // Use a subtle hover effect, maybe adjust brightness slightly
                filter: hoverFilter,
                borderColor: 'var(--active)',
-               bg: controlBg, // Keep control background on hover
              },
              _focus: {
                 boxShadow: 'none', // Remove default focus ring if desired
@@ -96,7 +98,7 @@ export const Settings = () => {
              }
           },
           '.chakra-accordion__panel': {
-            pt: 0, // Remove default top padding
+            pt: 2, // Add some top padding (adjust value as needed)
             pb: 4, // Panel bottom padding
             px: 4, // Panel horizontal padding
             bg: 'transparent', // Panel itself is transparent

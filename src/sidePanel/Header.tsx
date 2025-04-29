@@ -532,12 +532,12 @@ const SettingsDrawer = ({
             {/* Export Section */}
             <VStack spacing={3} align="stretch">
               <Text color="var(--text)" opacity={0.8} fontSize="lg" fontWeight="medium" mb={-1} textTransform="uppercase">
-                Export
+                Export Current Chat
               </Text>
               {[
-                { label: "Export Chat (text)", action: () => { onClose(); downloadText(); } },
-                { label: "Export Chat (json)", action: () => { onClose(); downloadJson(); } },
-                { label: "Export Chat (image)", action: () => { downloadImage(); onClose(); } },
+                { label: "Text", action: () => { onClose(); downloadText(); } },
+                { label: "JSON", action: () => { onClose(); downloadJson(); } },
+                { label: "Image", action: () => { downloadImage(); onClose(); } },
               ].map(item => (
                 <Button
                   size={controlSize}
