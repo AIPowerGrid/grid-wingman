@@ -18,7 +18,7 @@ import {
   Text,
   Tooltip,
   useDisclosure,
-  Image,
+  Link,
   VStack,
   useColorModeValue,
 } from '@chakra-ui/react';
@@ -279,6 +279,7 @@ const SettingsDrawer = ({
                 </Tooltip>
 
                 {/* Cognito Title */}
+              <Link href="https://github.com/3-ark/Cognito" isExternal>
                 <Heading
                   as="h3"
                   size="md"
@@ -295,6 +296,9 @@ const SettingsDrawer = ({
                 >
                   Cognito
                 </Heading>
+              </Link>
+
+                {/* Theme Toggle (Dark/Light) */}
 
                 {/* Close Button */}
                 <Tooltip
