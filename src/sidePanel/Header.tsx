@@ -159,24 +159,14 @@ const SettingsDrawer = ({
         model.host?.toLowerCase()?.includes(searchQuery.toLowerCase())
     ) || [];
 
-  // Apply theme on load/change
-  React.useEffect(() => {
-    const currentThemeName = config?.theme || 'paper';
-    const themeToApply =
-      themes.find((t) => t.name === currentThemeName) ||
-      themes.find((t) => t.name === 'paper'); // Fallback
-    if (themeToApply) {
-      setTheme(themeToApply);
-    }
-  }, [config?.theme]);
-
   // Theme toggle function
   const toggleTheme = () => {
     const currentThemeName = config?.theme || 'paper';
     const nextThemeName = currentThemeName === 'dark' ? 'paper' : 'dark';
+    const paperTextureEnabled = config?.paperTexture ?? true; // Get current texture state
     const nextTheme = themes.find((t) => t.name === nextThemeName);
     if (nextTheme) {
-      updateConfig({ theme: nextThemeName });
+      updateConfig({ theme: nextThemeName }); // Only update theme name here
       setTheme(nextTheme);
     }
   };
@@ -184,9 +174,7 @@ const SettingsDrawer = ({
   const isDark = config?.theme === 'dark';
 
   // Define subtle border color
-  const subtleBorderColor = 'rgba(0, 0, 0, 0.1)';
-  const subtleBorderColorDark = 'rgba(255, 255, 255, 0.1)';
-  const currentSubtleBorder = isDark ? subtleBorderColorDark : subtleBorderColor;
+  const subtleBorderColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
 
   // Define floating shadow
   const floatingShadow =
@@ -212,38 +200,32 @@ const SettingsDrawer = ({
   return (
     <Drawer isOpen={isOpen} placement="left" size="sm" onClose={onClose}>
       <DrawerOverlay bg="blackAlpha.500" />
-<DrawerContent
+<DrawerContent // Add the class here for CSS targeting
+    className="settings-drawer-content"
     bg="var(--bg)" // Main background
     color="var(--text)"
     boxShadow="xl"
     borderRightWidth={0}
     borderRadius={0}
     sx={{
-        position: 'relative',
-        height: '100dvh', // Keep this
-        maxHeight: '100dvh', // Keep this
-        overflow: 'hidden', // Keep this: Prevents the *entire* drawer from scrolling
-        '&::before': {
-            content: '""',
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundImage: 'url(assets/images/paper-texture.png)',
-            backgroundSize: '512px',
-            backgroundRepeat: 'repeat',
-            opacity: 0.5,
-            pointerEvents: 'none',
-            mixBlendMode: 'multiply',
-            filter: 'contrast(1) brightness(1)',
-            zIndex: 5,
-        },
+        position: 'relative', // Still needed for z-index stacking
+        height: '100dvh',
+        maxHeight: '100dvh',
+        overflow: 'hidden', // Prevents the *entire* drawer from scrolling
+        // Texture is now applied globally via CSS in index.html targeting .settings-drawer-content
         '> *': { position: 'relative', zIndex: 1 },
     }}
 >
-    {/* *** CHANGE overflowY here *** */}
-    <DrawerBody p={0} overflowY="auto" display="flex" flexDirection="column" height="100%">
+    {/* Add class for texture targeting */}
+    <DrawerBody
+        className="settings-drawer-body" // Add class here
+        p={0}
+        overflowY="auto"
+        display="flex"
+        flexDirection="column"
+        height="100%"
+        position="relative" // Needed for the ::before pseudo-element
+    >
         {/* Main VStack for content */}
         {/* flex={1} allows this VStack to grow and push the signature down */}
         <VStack spacing={5} align="stretch" px={sectionPaddingX} py={4} flex={1}>
@@ -346,9 +328,9 @@ const SettingsDrawer = ({
                 size={controlSize}
                 value={config?.persona || ''}
                 onChange={(e) => updateConfig({ persona: e.target.value })}
-                bg={controlBg} // *** UPDATED Background ***
-                borderColor={currentSubtleBorder}
-                borderWidth="1px"
+                bg={controlBg}
+                borderColor={subtleBorderColor}
+                borderWidth="1px" 
                 color="var(--text)"
                 borderRadius="md"
                 boxShadow={floatingShadow}
@@ -408,8 +390,8 @@ const SettingsDrawer = ({
                   }}
                   onBlur={() => setTimeout(() => setInputFocused(false), 200)}
                   bg={controlBg} // *** UPDATED Background ***
-                  borderColor={currentSubtleBorder}
-                  borderWidth="1px"
+                  borderColor={subtleBorderColor}
+                  borderWidth="1px" 
                   color="var(--text)"
                   borderRadius="md"
                   boxShadow={floatingShadow}
@@ -438,7 +420,7 @@ const SettingsDrawer = ({
                     borderColor="var(--text)"
                     borderRadius="md"
                     boxShadow="md"
-                    zIndex={10} // Ensure dropdown is above texture pseudo-element
+                    zIndex={1} // Ensure dropdown is above texture pseudo-element
                   >
                     {filteredModels.length > 0 ? (
                       filteredModels.map((model) => (
@@ -490,7 +472,7 @@ const SettingsDrawer = ({
                   onClose();
                 }}
                 variant="outline"
-                borderColor={currentSubtleBorder}
+                borderColor={subtleBorderColor}
                 color="var(--text)"
                 bg={controlBg} // *** UPDATED Background ***
                 boxShadow={floatingShadow}
@@ -519,7 +501,7 @@ const SettingsDrawer = ({
                   onClose();
                 }}
                 variant="outline"
-                borderColor={currentSubtleBorder}
+                borderColor={subtleBorderColor}
                 color="var(--text)"
                 bg={controlBg} // *** UPDATED Background ***
                 boxShadow={floatingShadow}
@@ -558,7 +540,7 @@ const SettingsDrawer = ({
                   key={item.label}
                   onClick={item.action}
                   variant="outline"
-                  borderColor={currentSubtleBorder}
+                  borderColor={subtleBorderColor}
                   color="var(--text)"
                   bg={controlBg} // *** UPDATED Background ***
                   boxShadow={floatingShadow}
@@ -615,14 +597,6 @@ export const Header = ({
 
   const visibleTitle = chatTitle && !settingsMode && !historyMode;
 
-  React.useEffect(() => {
-    const currentThemeName = config?.theme || 'paper';
-    const themeToApply = themes.find(t => t.name === currentThemeName) || themes.find(t => t.name === 'paper');
-    if (themeToApply) {
-      setTheme(themeToApply);
-    }
-  }, [config?.theme]);
-
   return (
     <Box
       bg="var(--active)"
@@ -631,7 +605,7 @@ export const Header = ({
       borderColor="var(--text)"
       position="sticky"
       top={0}
-      zIndex={10}
+      zIndex={1}
     >
       <Flex
         alignItems="center"

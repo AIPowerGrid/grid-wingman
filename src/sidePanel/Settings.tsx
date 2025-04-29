@@ -18,17 +18,6 @@ export const Settings = () => {
   const defaultIndex = (config?.models || [])?.length === 0 ? 1 : undefined;
   const isDark = config?.theme === 'dark';
 
-  // Apply theme on load/change (similar to Header.tsx)
-  React.useEffect(() => {
-    const currentThemeName = config?.theme || 'paper';
-    const themeToApply =
-      themes.find((t) => t.name === currentThemeName) ||
-      themes.find((t) => t.name === 'paper'); // Fallback
-    if (themeToApply) {
-      setTheme(themeToApply);
-    }
-  }, [config?.theme]);
-
   // Define control styles (can be adjusted or moved to theme variables if preferred)
   const controlBg = isDark
     ? 'rgba(255, 255, 255, 0.04)'
@@ -37,8 +26,6 @@ export const Settings = () => {
   const subtleBorderColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
   const floatingShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)';
   const hoverFilter = `${controlFilter} brightness(0.98)`;
-
-  const applyPaperTexture = config?.paperTexture ?? true;
 
   return (
     <Box
@@ -50,7 +37,7 @@ export const Settings = () => {
       display="flex"
       flexDir="column"
       overflowY="scroll" // Allow scrolling for content
-      overflowX="hidden"
+      overflowX="hidden" // Use conditional background
       bg="var(--bg)" // Set base background
       color="var(--text)"
       // Apply texture and consistent padding like the drawer
@@ -58,25 +45,8 @@ export const Settings = () => {
       pt="56px" // Keep padding-top to account for the fixed Header height
       pb={4} // Bottom padding
       sx={{
-        position: 'relative', // Needed for pseudo-element positioning
-        // Apply paper texture using ::before pseudo-element
-        '&::before': {
-          content: '""',
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundImage: 'url(assets/images/paper-texture.png)', // Ensure path is correct
-          backgroundSize: '512px',
-          backgroundRepeat: 'repeat',
-          opacity: 0.5, // Match drawer opacity
-          pointerEvents: 'none',
-          mixBlendMode: 'multiply', // Match drawer blend mode
-          filter: 'contrast(1) brightness(1)', // Match drawer filter
-          zIndex: 0, // Behind content
-          display: applyPaperTexture ? 'block' : 'none',
-        },
+        position: 'relative', // Still needed for z-index stacking context
+        // Texture is now applied globally via CSS in index.html targeting #settings
         // Ensure direct children are above the texture
         '> *': { position: 'relative', zIndex: 1 },
       }}

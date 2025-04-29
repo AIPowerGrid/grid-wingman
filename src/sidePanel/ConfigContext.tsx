@@ -116,20 +116,17 @@ export const ConfigProvider = ({ children }) => {
   useEffect(() => {
     // Apply font size
     const baseSize = config?.fontSize || defaultConfig.fontSize;
-    
     document.documentElement.style.setProperty('font-size', `${baseSize}px`);
 
-    const applyTheme = () => {
-      const themeToApply = config.theme === 'custom'
-        ? { name: 'custom', ...config.customTheme }
-        : themes.find(t => t.name === config.theme) || themes[0];
-      
-      setTheme(themeToApply);
-    };
+   // Apply theme and texture
+   const themeToApply = config.theme === 'custom'
+   ? { name: 'custom', ...config.customTheme }
+   : themes.find(t => t.name === config.theme) || themes.find(t => t.name === 'paper') || themes[0]; // Added paper fallback
+ const paperTextureEnabled = config.paperTexture ?? defaultConfig.paperTexture; // Use default if undefined
 
-    applyTheme(); // Use the setTheme function from Themes.tsx
+ setTheme(themeToApply, paperTextureEnabled); // Pass texture state to setTheme
 
-  }, [config?.fontSize, config.customTheme, config?.theme]); // Add config.theme dependency
+}, [loading, config?.fontSize, config?.customTheme, config?.theme, config?.paperTexture]); // Add dependencies: loading, paperTexture
 
   const updateConfig = (newConfig: Partial<Config>) => {
     setConfig(prev => {

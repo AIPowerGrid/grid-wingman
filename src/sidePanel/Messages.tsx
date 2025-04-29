@@ -178,7 +178,7 @@ export const Messages: React.FC<MessagesProps> = ({
   return (
     <Box
       ref={containerRef}
-      background="var(--bg)"
+      background={config?.paperTexture ? 'transparent' : 'var(--bg)'} // Conditionally set background
       display="flex"
       flexDir="column"
       flexGrow={1}

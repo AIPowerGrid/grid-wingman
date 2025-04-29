@@ -45,7 +45,7 @@ export const AddToChat = () => {
         minWidth="auto" // Adjusted minWidth
         p={0} // Remove padding from MenuList itself
         overflow="hidden" // Ensure border radius clips children
-        zIndex={4}
+        zIndex={2}
         mr="1.5rem" // Adjusted margin to align with button
       >
         <MenuItem

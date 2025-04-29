@@ -43,34 +43,54 @@
     --bold: #af1b1b;
     --italic: #09993e;
     --link: #003bb9;
-    font-family: 'Poppins', sans-serif; /* Changed from Inter to Poppins */
+    font-family: 'poppins', sans-serif; /* Changed from Inter to Poppins */
 }
 
 body {
     margin: 0;
     position: relative;
     background-color: var(--bg);
-    font-family: 'Poppins', sans-serif; /* Changed from Inter to Poppins */
+    font-family: 'poppins', sans-serif; /* Changed from Inter to Poppins */
     font-weight: 400; /* Add base weight */
 }
 
-/* Add paper texture overlay */
-body::before {
-    content: "";
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    width: 100%;
-    height: 100%;
-    background-image: url('assets/images/paper-texture.png');
-    background-size: 512px; /* Adjust size as needed */
-    background-repeat: repeat;
-    opacity: 0.5;
-    pointer-events: none; /* Makes it non-interactive */
-    mix-blend-mode: multiply; /* Blends with background color */
-    z-index: 100; /* Places behind content */
+/* --- Global Paper Texture Styles --- */
+/* Apply texture conditionally based on html[data-paper-texture="true"] */
+
+/* Base texture for the body background */
+html[data-paper-texture="true"] body::before {
+  content: "";
+  position: fixed; /* Body overlay needs to be fixed */
+  top: 0; left: 0; right: 0; bottom: 0;
+  width: 100%; height: 100%;
+  background-image: url('assets/images/paper-texture.png');
+  background-size: 512px;
+  background-repeat: repeat;
+  opacity: 0.5;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+  filter: contrast(1) brightness(1);
+  z-index: 100;
+}
+
+/* Texture for specific component overlays */
+html[data-paper-texture="true"] .chatMessage::before,
+html[data-paper-texture="true"] #settings::before,
+html[data-paper-texture="true"] .settings-drawer-body::before, /* Target DrawerBody */
+html[data-paper-texture="true"] #chat-history::before { /* Target Chat History container */
+  content: "";
+  position: absolute; /* Use absolute positioning relative to the component */
+  top: 0; left: 0; right: 0; bottom: 0;
+  width: 100%; height: 100%;
+  background-image: url('assets/images/paper-texture.png');
+  background-size: 512px;
+  background-repeat: repeat;
+  opacity: 0.5;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+  filter: contrast(1) brightness(1);
+  z-index: 0; /* Behind component content (requires content position:relative) */
+  border-radius: inherit; /* Inherit border-radius from parent */
 }
 
 #root {
@@ -104,7 +124,7 @@ em {
     font-style: italic;
 }
 </style>
-<div id="root" style="background-color: var(--bg);"></div>
+<div id="root"></div>
 </body>
 
 

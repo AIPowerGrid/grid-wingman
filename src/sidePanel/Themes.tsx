@@ -134,7 +134,10 @@ export const themes: Theme[] = [
   },
 ];
 
-export const setTheme = (c: Theme) => {
+// Update setTheme to accept the full config or relevant parts
+export const setTheme = (c: Theme, paperTextureEnabled: boolean = true) => {
+  // Apply data attribute for global texture control
+  document.documentElement.dataset.paperTexture = String(paperTextureEnabled);
   storage.setItem('theme', c.name);
   document.documentElement.style.setProperty('--active', c.active);
   document.documentElement.style.setProperty('--bg', c.bg);
@@ -327,12 +330,19 @@ export const Themes = () => {
   const { config, updateConfig } = useConfig();
   const currentFontSize = config?.fontSize || 12;
 
-  // Load custom theme from config if it exists
+  // Apply theme and texture setting on load/change
   useEffect(() => {
-    if (config?.theme === 'custom' && config?.customTheme) {
-      setTheme({ name: 'custom', ...config.customTheme });
+    const currentThemeName = config?.theme || 'paper';
+    const isCustom = currentThemeName === 'custom';
+    const themeDefinition = isCustom
+      ? { name: 'custom', ...(config?.customTheme || themes.find(t => t.name === 'custom')) }
+      : themes.find((t) => t.name === currentThemeName) || themes.find((t) => t.name === 'paper'); // Fallback
+
+    if (themeDefinition) {
+      // Pass the paperTexture setting to setTheme
+      setTheme(themeDefinition as Theme, config?.paperTexture ?? true);
     }
-  }, [config?.theme, config?.customTheme]);
+  }, [config?.theme, config?.customTheme, config?.paperTexture]); // Add paperTexture dependency
 
   return (
     <AccordionItem border="2px solid var(--text)" borderRadius={16} mb={4} mt={0}>
@@ -383,7 +393,11 @@ export const Themes = () => {
             colorScheme="blackAlpha"
             defaultValue={config?.paperTexture ? ["paper texture"] : []}
             onChange={(values) => {
-              updateConfig({ paperTexture: values.includes("paper texture") });
+              const newPaperTextureState = values.includes("paper texture");
+              updateConfig({ paperTexture: newPaperTextureState });
+              // Re-apply theme immediately when texture changes to update the data attribute
+              const currentTheme = themes.find(t => t.name === (config?.theme || 'paper')) || themes[0];
+              setTheme(currentTheme, newPaperTextureState);
             }}
           >
             <Checkbox

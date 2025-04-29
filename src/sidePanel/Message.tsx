@@ -367,34 +367,15 @@ export const Message: React.FC<MessageProps> = ({ turn, index }) => {
       pr={4}
       pt={2}
       sx={{
+        // Keep position relative for potential future absolute positioned children
         textAlign: 'left',
         position: 'relative',
-        '&::before': {
-          content: '""',
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundImage: 'url(assets/images/paper-texture.png)',
-          backgroundSize: '512px',
-          backgroundRepeat: 'repeat',
-          opacity: 0.5,
-          pointerEvents: 'none',
-          borderRadius: '14px',
-          mixBlendMode: 'multiply',
-          filter: 'contrast(1) brightness(1) sharpen(0)',
-          boxShadow: `
-            inset 0 2px 4px rgba(255, 255, 255, 0.2),
-            inset 0 -2px 4px rgba(0, 0, 0, 0.2),
-            0 2px 4px rgba(0, 0, 0, 0.1),
-            0 4px 8px rgba(0, 0, 0, 0.1),
-            0 8px 16px rgba(0, 0, 0, 0.1)
-          `
-        }
       }}
     >
-      <div className="message-markdown">
+      {/* Relative positioning lifts content above ::before (which has z-index: 0) */}
+      <div className="message-markdown" style={{
+        position: 'relative'
+      }}>
         {turn.role === 'assistant' && turn.webDisplayContent && (
           <div className="message-prefix">
             <Markdown
