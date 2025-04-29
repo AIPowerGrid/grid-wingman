@@ -62,7 +62,7 @@ export const Settings = () => {
         sx={{
           '.chakra-accordion__item': {
             border: 'none', // Remove default accordion item borders
-            borderRadius: 'md',
+            borderRadius: 'xl', // Make rounder
             boxShadow: floatingShadow,
             bg: controlBg,
             filter: controlFilter,
@@ -77,7 +77,7 @@ export const Settings = () => {
              color: 'var(--text)',
              fontWeight: 'medium', // Match drawer button weight
              fontSize: 'lg', // Match drawer button size (adjust if needed)
-             py: 3, // Vertical padding for button
+             py: 2, // Make shorter (less vertical padding)
              px: 4, // Horizontal padding for button
              borderColor: subtleBorderColor,
              borderWidth: '1px',

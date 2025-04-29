@@ -181,9 +181,9 @@ const SettingsDrawer = ({
     '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'; // Chakra 'md' shadow
 
   // Define larger size for interactive elements
-  const controlSize = 'lg'; // Use Chakra's large size for Select, Input, Button
+  const controlSize = 'md'; // Use Chakra's large size for Select, Input, Button
 
-  // Define increased padding for buttons (adjust as needed)
+  // Define horizontal padding for buttons (adjust as needed)
   const buttonPaddingX = '1rem'; // Horizontal padding for buttons (internal to button)
   const sectionPaddingX = '1.5rem'; // *** UPDATED: Horizontal padding for sections ***
 
@@ -330,10 +330,11 @@ const SettingsDrawer = ({
                 onChange={(e) => updateConfig({ persona: e.target.value })}
                 bg={controlBg}
                 borderColor={subtleBorderColor}
-                borderWidth="1px" 
+                borderWidth="1px"
+                h="36px"
                 color="var(--text)"
-                borderRadius="md"
-                boxShadow={floatingShadow}
+                borderRadius="xl" // Make rounder
+                boxShadow={floatingShadow} // Keep shadow
                 filter={controlFilter} // *** ADDED Filter ***
                 _hover={{
                   borderColor: 'var(--active)',
@@ -390,13 +391,14 @@ const SettingsDrawer = ({
                   }}
                   onBlur={() => setTimeout(() => setInputFocused(false), 200)}
                   bg={controlBg} // *** UPDATED Background ***
+                  h="36px" // Make shorter
                   borderColor={subtleBorderColor}
-                  borderWidth="1px" 
+                  borderWidth="1px"
                   color="var(--text)"
-                  borderRadius="md"
-                  boxShadow={floatingShadow}
+                  borderRadius="xl" // Make rounder
+                  boxShadow={floatingShadow} // Keep shadow
                   filter={controlFilter} // *** ADDED Filter ***
-                  _hover={{
+                  _hover={{ // Keep hover/focus styles
                     borderColor: 'var(--active)',
                     filter: `${controlFilter} brightness(0.98)`, // Combine filters
                   }}
@@ -472,6 +474,7 @@ const SettingsDrawer = ({
                   onClose();
                 }}
                 variant="outline"
+                h="36px" // Make shorter
                 borderColor={subtleBorderColor}
                 color="var(--text)"
                 bg={controlBg} // *** UPDATED Background ***
@@ -489,8 +492,8 @@ const SettingsDrawer = ({
                 justifyContent="flex-start"
                 fontWeight="medium"
                 w="full"
-                borderRadius="md"
-                px={buttonPaddingX} // Apply internal horizontal padding
+                borderRadius="xl" // Make rounder
+                // px={buttonPaddingX} // Removed, height controls padding better
               >
                 Configuration
               </Button>
@@ -501,6 +504,7 @@ const SettingsDrawer = ({
                   onClose();
                 }}
                 variant="outline"
+                h="36px" // Make shorter
                 borderColor={subtleBorderColor}
                 color="var(--text)"
                 bg={controlBg} // *** UPDATED Background ***
@@ -518,8 +522,8 @@ const SettingsDrawer = ({
                 justifyContent="flex-start"
                 fontWeight="medium"
                 w="full"
-                borderRadius="md"
-                px={buttonPaddingX} // Apply internal horizontal padding
+                borderRadius="xl" // Make rounder
+                // px={buttonPaddingX} // Removed, height controls padding better
               >
                 Chat History
               </Button>
@@ -540,6 +544,7 @@ const SettingsDrawer = ({
                   key={item.label}
                   onClick={item.action}
                   variant="outline"
+                  h="36px" // Make shorter
                   borderColor={subtleBorderColor}
                   color="var(--text)"
                   bg={controlBg} // *** UPDATED Background ***
@@ -554,8 +559,8 @@ const SettingsDrawer = ({
                     bg: 'var(--active)', // Use active color for click feedback
                     filter: 'brightness(0.95)', // Standard active filter
                   }}
-                  justifyContent="flex-start" fontWeight="medium" w="full" borderRadius="md"
-                  px={buttonPaddingX} // Apply internal horizontal padding
+                  justifyContent="flex-start" fontWeight="medium" w="full" borderRadius="xl" // Make rounder
+                  // px={buttonPaddingX} // Removed, height controls padding better
                 >
                   {item.label}
                 </Button>
