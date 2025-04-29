@@ -51,7 +51,7 @@ export const Input = ({ ...props }) => {
         }}
         autoComplete="off"
         background="var(--bg)"
-        border="2px"
+        border="1px"
         borderColor="var(--text)"
         borderRadius={16}
         color="var(--text)"

@@ -7,7 +7,7 @@ export const Send = ({ isLoading, onSend }: { isLoading: boolean, onSend: () => 
     aria-label="Send"
     as={motion.div}
     background="var(--bg)"
-    border="2px solid var(--text)"
+    border="1px solid var(--text)"
     borderRadius={16}
     icon={
       isLoading ? (

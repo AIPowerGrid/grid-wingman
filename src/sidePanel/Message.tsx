@@ -351,7 +351,7 @@ export const Message: React.FC<MessageProps> = ({ turn, index }) => {
   return (
     <Box
       background={turn.role === 'assistant' ? 'var(--active)' : 'var(--bg)'}
-      border="2px"
+      border="1px"
       borderColor={turn.role === 'assistant' ? 'var(--text)' : 'var(--text)'}
       borderRadius={16}
       className="chatMessage"

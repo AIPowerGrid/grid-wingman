@@ -14,7 +14,7 @@ export const AddToChat = () => {
         aria-label="Add to chat"
         as={Button}
         background="var(--bg)"
-        border="2px solid var(--text)"
+        border="1px solid var(--text)"
         borderRadius={16}
         color="var(--text)"
         fontSize="sm"
@@ -38,7 +38,7 @@ export const AddToChat = () => {
       </MenuButton>
       <MenuList
         background="var(--active)"
-        border="2px solid var(--text)" // Apply border once here
+        border="1px solid var(--text)" // Apply border once here
         borderRadius="md" // Optional: add some rounding
         marginTop="1px"
         height="auto" // Allow height to adjust based on content
@@ -51,7 +51,7 @@ export const AddToChat = () => {
         <MenuItem
           _hover={{ background: 'var(--bg)' }}
           background={!config?.chatMode ? 'var(--bg)' : 'transparent'} // Use transparent for non-active
-          borderBottom="2px solid var(--text)" // Remove individual borders
+          borderBottom="1px solid var(--text)" // Remove individual borders
           color="var(--text)"
           fontSize="md"
           fontWeight={800}
@@ -65,7 +65,7 @@ export const AddToChat = () => {
         <MenuItem
           _hover={{ background: 'var(--bg)' }}
           background={config?.chatMode === 'page' ? 'var(--bg)' : 'transparent'}
-          borderBottom="2px solid var(--text)"
+          borderBottom="1px solid var(--text)"
           color="var(--text)"
           fontSize="md"
           fontWeight={800}

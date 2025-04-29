@@ -147,7 +147,7 @@ const generateChatId = () => `chat_${Math.random().toString(16).slice(2)}`;
 const MessageTemplate = ({ children, onClick }: { children: React.ReactNode, onClick: () => void }) => ( // Keep type annotation
   <Box
     background="var(--active)"
-    border="2px solid var(--text)"
+    border="1px solid var(--text)"
     borderRadius={16}
     color="var(--text)"
     cursor="pointer"
@@ -552,7 +552,7 @@ const Cognito = () => {
         {!settingsMode && !historyMode && (
           <Box
             background="var(--active)"
-            borderTop="2px solid var(--text)"
+            borderTop="1px solid var(--text)"
             display="flex"
             justifyContent="space-between"
             pb={1}
