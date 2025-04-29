@@ -27,7 +27,7 @@ Built on [sidellama](https://github.com/gyopak/sidellama).
 *   **Web Search Integration:** Enhanced access to information for context-aware AI interactions.
 *   **Page context reading** Transcripts reading included for Bloomberg, youtube, or other providers who put the transcripts in their html.
 *   **Enhanced Summarization** More granular control over summary length and detail over personas.
-*   **TTS** Currently, there is only basic TTS from the browser, so if you want some natural voices, you should use Edge or you have integrated TTS API from elsewhere. (More support here is planned)
+*   **TTS** Currently, there is only basic TTS from the browser, so if you want some natural voices, you should use Edge or you have integrated TTS API from elsewhere. https://github.com/ken107/piper-browser-extension here is a very good chrome extension which can add local TTS service directly to chrome, so you can find the downloaded models in the select dropdown in setting. And I find some https://github.com/remsky/Kokoro-FastAPI https://github.com/Lex-au/Orpheus-FastAPI, maybe we can integrate with them too. I have put a .tsx like that in the files anyway. I will look into this futher. I holp someone can add this if possible, because so far it's good enough for me. But still it's better to have some more choices without breaking anything.
 
 ## Available Personas
 
