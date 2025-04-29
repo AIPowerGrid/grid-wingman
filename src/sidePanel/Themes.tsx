@@ -176,8 +176,6 @@ const ThemeButton = ({ theme, updateConfig }: { theme: Theme; updateConfig: (new
       border="2px solid var(--text)"
       borderRadius={16}
       color="var(--text)"
-      mb={2}
-      mr={2}
       size="md"
       onClick={() => {
         updateConfig({ theme: theme.name });
@@ -277,14 +275,12 @@ const CustomThemePicker = ({ updateConfig, config }: { updateConfig: (newConfig:
               border="2px solid var(--text)"
               borderRadius={16}
               color={customTheme.text}
-              mb={2}
-              mr={2}
               size="md"
             />
           </PopoverTrigger>
         </Box>
       </Tooltip>
-      <PopoverContent width="280px"> {/* Use fixed width */}
+      <PopoverContent width="280px" zIndex="popover"> {/* Reset zIndex, rely on stacking context fix */}
         <PopoverArrow />
         <PopoverCloseButton />
         <PopoverHeader>Custom Theme Colors</PopoverHeader>
@@ -349,10 +345,10 @@ export const Themes = () => {
       <AccordionButton _hover={{ backgroundColor: 'transparent' }} paddingBottom={1} paddingRight={2}>
         <SettingTitle icon="🎨" padding={0} text="Themes" />
       </AccordionButton>
+      {/* Use Flex column for the entire panel content */}
       <AccordionPanel pb={4}>
-        <Box>
-          {/* Wrap checkboxes in a Flex container for vertical stacking */}
-          <Flex direction="column" gap={2} mb={4}>
+        <Flex direction="column" gap={4}> {/* Add gap between sections */}
+          <Flex direction="column" gap={2}> {/* Checkboxes section */}
             <Checkbox
               color="var(--text)"
               fontWeight={800}
@@ -409,8 +405,8 @@ export const Themes = () => {
             </Checkbox>
           </Flex>
 
-          <Text color="var(--text)" fontSize="lg" fontWeight={800} pb={2} pt={2} textAlign="left">
-            font size
+          <Box> {/* Font size section */}
+            <Text color="var(--text)" fontSize="lg" fontWeight={800} pb={2} textAlign="left">font size</Text>
             <Slider
               defaultValue={currentFontSize}
               id="slider"
@@ -426,21 +422,21 @@ export const Themes = () => {
               </SliderTrack>
               <SliderThumb background="var(--text)" style={{ zoom: 1.5 }} />
             </Slider>
-          </Text>
-        </Box>
-        <Box>
-          <Text color="var(--text)" fontSize="lg" fontWeight={800} pb={2} textAlign="left">
-            theme
-          </Text>
-          <Box display="flex" flexWrap="wrap">
-            {themes
-              .filter((t) => t.name !== 'custom')
-              .map((theme) => (
-                <ThemeButton key={theme.name} theme={theme} updateConfig={updateConfig} />
-              ))}
-            <CustomThemePicker updateConfig={updateConfig} config={config} />
           </Box>
+
+          <Box> {/* Theme selection section */}
+            <Text color="var(--text)" fontSize="lg" fontWeight={800} pb={2} textAlign="left">theme</Text>
+            {/* Use Flex wrap and gap for theme buttons */}
+            <Flex wrap="wrap" gap={2}>
+              {themes
+                .filter((t) => t.name !== 'custom')
+                .map((theme) => (
+                  <ThemeButton key={theme.name} theme={theme} updateConfig={updateConfig} />
+                ))}
+              <CustomThemePicker updateConfig={updateConfig} config={config} />
+            </Flex>
         </Box>
+        </Flex>
       </AccordionPanel>
     </AccordionItem>
   );

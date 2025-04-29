@@ -65,10 +65,10 @@ export const Settings = () => {
             borderRadius: 'xl', // Make rounder
             boxShadow: floatingShadow,
             bg: controlBg,
-            filter: controlFilter,
+            // filter: controlFilter, // Remove filter to avoid creating stacking context
             borderColor: subtleBorderColor,
             borderWidth: '1px',
-            overflow: 'hidden', // Ensure border-radius applies correctly
+            // overflow: 'hidden', // Temporarily remove to test panel height
             mb: 4, // Add margin between accordion items
             _last: { mb: 0 } // No margin for the last item
           },
