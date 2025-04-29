@@ -74,9 +74,7 @@ html[data-paper-texture="true"] body::before {
 }
 
 /* Texture for specific component overlays */
-html[data-paper-texture="true"] .chatMessage::before,
-html[data-paper-texture="true"] .settings-drawer-body::before, /* Target DrawerBody */
-html[data-paper-texture="true"] #chat-history::before { /* Target Chat History container */
+html[data-paper-texture="true"] .settings-drawer-body::before { /* Target DrawerBody */
   content: "";
   position: absolute; /* Use absolute positioning relative to the component */
   top: 0; left: 0; right: 0; bottom: 0;
