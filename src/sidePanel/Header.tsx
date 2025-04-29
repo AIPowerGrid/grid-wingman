@@ -276,7 +276,7 @@ const SettingsDrawer = ({
                   borderRadius="md"
                   mx="auto"
                 >
-                  Cognito <sub>v2.0</sub>
+                  Cognito <sub>v2.1</sub>
                 </Heading>
               </Link>
 
