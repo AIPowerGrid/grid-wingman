@@ -18,16 +18,25 @@ import { useConfig } from './ConfigContext';
 // --- Helper Function to Clean Text for TTS ---
 const cleanTextForTTS = (text: string): string => {
   let cleanedText = text;
-  // Remove markdown emphasis
+  // 1. Remove markdown emphasis (bold/italic) - Keep this
   cleanedText = cleanedText.replace(/(\*\*|__|\*|_)(.*?)\1/g, '$2');
-  // Remove list markers
+
+  // 2. Remove list markers at the start of lines - Keep this
   cleanedText = cleanedText.replace(/^[*+-]\s+/gm, '');
-  // Replace all colons with a period and a space
-  cleanedText = cleanedText.replace(/:/g, '. '); // <--- Updated this line
-  // Replace slashes with spaces
+
+  // 3. Remove any remaining asterisks (that weren't part of emphasis/lists)
+  cleanedText = cleanedText.replace(/\*/g, ''); // Added this line
+
+  // 4. Remove all colons entirely (instead of replacing with period)
+  cleanedText = cleanedText.replace(/:/g, '.'); // Changed this line
+
+  // 5. Replace slashes with spaces - Keep this
   cleanedText = cleanedText.replace(/\//g, ' ');
-  // Collapse multiple spaces
+
+  // 6. Collapse multiple spaces into one - Keep this
   cleanedText = cleanedText.replace(/\s{2,}/g, ' ');
+
+  // 7. Trim whitespace from start/end - Keep this
   return cleanedText.trim();
 };
 // --- End Helper Function ---

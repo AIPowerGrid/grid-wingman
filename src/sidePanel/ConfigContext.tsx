@@ -59,6 +59,14 @@ const defaultConfig: Config = {
     bold: '#af1b1b',
     link: '#003bb9',
     italic: '#09993e',
+    codeFg: '#c2e7b5',
+    codeBg: '#eadbdb',
+    preBg: '#eadbd',
+    preFg: '#c2e7b5',
+    tableBorder: '#eadbd',
+    error: '#af1b1b',
+    warning: '#388e3c',
+    success: '#7eaa6e',
   },
   personas,
   generateTitle: true,
@@ -80,6 +88,7 @@ const defaultConfig: Config = {
   ollamaConnected: false,
   fontSize: 14, // Add this line to set base font size
   panelOpen: false,
+  paperTexture: true,
   // ... add defaults for groq, gemini, openai etc.
 };
 

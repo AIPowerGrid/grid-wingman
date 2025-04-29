@@ -78,6 +78,7 @@ export interface Config {
     success: string;
     warning: string;
   };
+  paperTexture?: boolean;
   panelOpen: boolean;
   tts?: TtsSettings; // Add the TTS settings object here
 }
@@ -86,3 +87,4 @@ export interface ConfigContextType {
   config: Config;
   updateConfig: (newConfig: Partial<Config>) => void;
 }
+
