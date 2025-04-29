@@ -532,7 +532,7 @@ const SettingsDrawer = ({
             {/* Export Section */}
             <VStack spacing={3} align="stretch">
               <Text color="var(--text)" opacity={0.8} fontSize="lg" fontWeight="medium" mb={-1} textTransform="uppercase">
-                Export Current Chat
+              Export Now
               </Text>
               {[
                 { label: "Text", action: () => { onClose(); downloadText(); } },
