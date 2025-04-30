@@ -470,7 +470,7 @@ const Cognito = () => {
                 <Messages
                   isLoading={isLoading}
                   turns={turns}
-              settingsMode={settingsMode}
+                  settingsMode={settingsMode}
                   onReload={onReload}
                 />
               )}
