@@ -95,16 +95,17 @@ const handleListen = useCallback(async () => {
       title: 'Microphone access needed',
       description: 'Please allow access to the microphone in your browser settings.',
       status: 'error',
-      duration: 5000
+      duration: 2000
     });
   }
 }, []);
 
-const handleStop = () => {
-  recognitionRef.current?.stop();
-  recognitionRef.current = null;
-  setIsListening(false);
-};
+// this function is not used in the current code, because this function is not functional well. but maybe later
+// const handleStop = () => {
+//   recognitionRef.current?.stop();
+//   recognitionRef.current = null;
+//   setIsListening(false);
+// };
 
 
 useEffect(() => {
