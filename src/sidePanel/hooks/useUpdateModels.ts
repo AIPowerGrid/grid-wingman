@@ -5,9 +5,9 @@ import { GEMINI_URL, GROQ_URL, OPENAI_URL, OPENROUTER_URL } from '../constants';
 import type { Model } from 'src/types/config';
 import { normalizeApiEndpoint } from 'src/background/util';
 
-const fetchDataSilently = async (url: string, params = {}) => {
+const fetchDataSilently = async (url: string, ModelSettingsPanel = {}) => {
   try {
-    const res = await fetch(url, params);
+    const res = await fetch(url, ModelSettingsPanel);
     if (!res.ok) {
       console.error(`[fetchDataSilently] HTTP error! Status: ${res.status} for URL: ${url}`);
       return undefined;

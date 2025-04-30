@@ -39,6 +39,7 @@ export const isCurrentlyPaused = (): boolean => window.speechSynthesis.paused;
 export const speakMessage = (
   text: string,
   voiceName?: string,
+  rate: number = 1, // Add rate parameter with default
   callbacks?: {
     onStart?: () => void;
     onEnd?: () => void;
@@ -53,7 +54,7 @@ export const speakMessage = (
   }
 
   const utterance = new SpeechSynthesisUtterance(text);
-  utterance.rate = 1; // Adjust rate as needed
+  utterance.rate = rate; // Use the provided rate
 
   // Set voice if provided and found
   if (voiceName) {

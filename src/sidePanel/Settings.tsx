@@ -6,7 +6,7 @@ import { Automation } from './Automation';
 import { useConfig } from './ConfigContext';
 import { Connect } from './Connect';
 import { PageContext } from './PageContext';
-import { Params } from './Params';
+import { ModelSettingsPanel } from './ModelSettingsPanel';
 import { Persona } from './Persona';
 import { themes, setTheme, Themes } from './Themes'; // Import themes and setTheme
 import { TtsSettings } from './TtsSettings';
@@ -112,11 +112,11 @@ export const Settings = () => {
         {/* Render Accordion Items */}
         <Themes />
         <Connect />
+        <ModelSettingsPanel />
         <Persona />
         <TtsSettings />
         <PageContext />
         <WebSearch />
-        <Params />
         <Automation />
       </Accordion>
     </Box>

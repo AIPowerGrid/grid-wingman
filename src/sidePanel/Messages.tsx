@@ -93,7 +93,7 @@ export const Messages: React.FC<MessagesProps> = ({
     const textToSpeak = cleanTextForTTS(text);
     console.log(`Cleaned text for TTS: "${textToSpeak}"`);
 
-    speakMessage(textToSpeak, config?.tts?.selectedVoice, {
+    speakMessage(textToSpeak, config?.tts?.selectedVoice, config?.tts?.rate, { // Pass config.tts.rate here
       onStart: () => {
         console.log(`Speech started for index: ${index}`);
         setSpeakingIndex(index);

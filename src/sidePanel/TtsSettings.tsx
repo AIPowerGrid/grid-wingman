@@ -9,6 +9,10 @@ import {
   Select,
   Spinner,
   Text,
+  Slider,            // Import Slider components
+  SliderTrack,
+  SliderFilledTrack,
+  SliderThumb,
 } from '@chakra-ui/react';
 import { useConfig } from './ConfigContext';
 import { getAvailableVoices, VoiceOption } from '../util/ttsUtils';
@@ -55,6 +59,16 @@ export const TtsSettings = () => {
     });
   };
 
+  const handleRateChange = (value: number) => {
+    updateConfig({
+      tts: {
+        ...config.tts,
+        rate: value,
+      },
+    });
+  };
+
+  const currentRate = config.tts?.rate ?? 1; // Default to 1 if not set
   return (
     // Apply styles similar to Persona AccordionItem
     <AccordionItem
@@ -73,7 +87,7 @@ export const TtsSettings = () => {
         />
       </AccordionButton>
       {/* Adjust panel padding */}
-      <AccordionPanel p={2} pt={2}>
+      <AccordionPanel p={4} pt={2}> {/* Increased padding slightly */}
         {loadingVoices ? (
           <Spinner size="md" color="var(--text)" />
         ) : errorLoading ? (
@@ -115,7 +129,27 @@ export const TtsSettings = () => {
             No voices available in this browser.
           </Text>
         )}
-        {/* Add controls for rate, pitch etc. here later if needed */}
+
+        {/* Rate Slider */}
+        {!loadingVoices && !errorLoading && voices.length > 0 && ( // Only show slider if voices loaded successfully
+          <Box mt={4}>
+            <Text color="var(--text)" fontSize="md" fontWeight="600" mb={2}>
+              Speech Rate ({currentRate.toFixed(1)})
+            </Text>
+            <Slider
+              min={0.5} // Min rate
+              max={2}   // Max rate
+              step={0.1} // Step increment
+              value={currentRate}
+              onChange={handleRateChange}
+            >
+              <SliderTrack bg="var(--text-muted)"> {/* Use a muted track color */}
+                <SliderFilledTrack bg="var(--text)" />
+              </SliderTrack>
+              <SliderThumb bg="var(--text)" boxSize={5} /> {/* Slightly larger thumb */}
+            </Slider>
+          </Box>
+        )}
       </AccordionPanel>
     </AccordionItem>
   );

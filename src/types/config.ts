@@ -1,5 +1,7 @@
 // src/types/config.ts
 
+import { Value } from "sass";
+
 export interface Persona {
   Ein: string;
   Jan: string;
@@ -21,7 +23,9 @@ export interface Model {
 // Add TTS Settings interface
 export interface TtsSettings {
   selectedVoice?: string; // Store the name of the selected voice
-  // Add other TTS settings like rate, pitch later if needed
+  rate?:number;
+  pitch?:number;
+  volume?:number; // Add other TTS settings like rate, pitch later if needed
 }
 
 export interface Config {
@@ -33,7 +37,11 @@ export interface Config {
   webLimit?: number;
   pageMode?: 'text' | 'html';
   contextLimit?: number;
-  params?: Record<string, unknown>; // For model parameters like temperature
+  ModelSettingsPanel?: Record<string, unknown>; // For model parameters like temperature
+  temperature?: number;
+  maxTokens?: number;
+  topP?: number;
+  presencePenalty?: number;
   lmStudioUrl?: string;
   lmStudioConnected?: boolean;
   lmStudioError?: string | unknown;
@@ -87,4 +95,3 @@ export interface ConfigContextType {
   config: Config;
   updateConfig: (newConfig: Partial<Config>) => void;
 }
-

@@ -276,7 +276,7 @@ const SettingsDrawer = ({
                   borderRadius="md"
                   mx="auto"
                 >
-                  Cognito <sub>v2.1</sub>
+                  Cognito <Box as="sub" sx={{ mixBlendMode: 'difference' }}>v2.2</Box>
                 </Heading>
               </Link>
 

@@ -229,7 +229,11 @@ const useSendMessage = (
         messages: [
           { role: 'system', content: systemContent },
           ...messageForApi
-        ]
+        ],
+        temperature: config?.temperature ?? 0.7,
+        max_tokens: config?.maxTokens ?? 2048,
+        top_p: config?.topP ?? 1,
+        presence_penalty: config?.presencePenalty ?? 0,
       },
       (part: string, isFinished?: boolean, isError?: boolean) => {
         console.log(`[${callId}] fetchDataAsStream Callback: isFinished=${isFinished}, part length=${part?.length ?? 0}`);
