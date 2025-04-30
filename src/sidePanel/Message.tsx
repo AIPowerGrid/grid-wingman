@@ -378,7 +378,8 @@ export const EditableMessage: React.FC<MessageProps> = ({
       fontSize="md"
       fontStyle={'normal'}
       fontWeight={600}
-      maxWidth="calc(100% - 3rem)"
+      // Let's try explicitly setting width instead of maxWidth
+      width="calc(100% - 3rem)" // Or try "98%" if you prefer that look
       ml={2}
       mr={2}
       pb={1}
