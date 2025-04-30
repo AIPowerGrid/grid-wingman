@@ -4,7 +4,7 @@ import toast from 'react-hot-toast';
 import { FiCopy, FiRepeat, FiPlay, FiPause, FiSquare } from 'react-icons/fi';
 import { Box, IconButton, VStack } from '@chakra-ui/react';
 import { MessageTurn } from './ChatHistory';
-import { Message } from './Message';
+import { EditableMessage } from './Message'; // Rename import for clarity if Message becomes EditableMessage internally
 import {
   speakMessage,
   stopSpeech,
@@ -46,12 +46,16 @@ interface MessagesProps {
   isLoading?: boolean;
   onReload?: () => void;
   settingsMode?: boolean;
+  onEditTurn: (index: number, newContent: string) => void; // Add prop for editing
 }
 
 export const Messages: React.FC<MessagesProps> = ({
-  turns = [], isLoading = false, onReload = () => {}, settingsMode = false
+  turns = [], isLoading = false, onReload = () => {}, settingsMode = false, onEditTurn // Destructure new prop
 }) => {
   const [hoveredIndex, setHoveredIndex] = useState<number>(-1);
+  const [editingIndex, setEditingIndex] = useState<number | null>(null); // State for which message is being edited
+  const [editText, setEditText] = useState<string>(''); // State for the text being edited
+
   const [speakingIndex, setSpeakingIndex] = useState<number>(-1);
   const [ttsIsPaused, setTtsIsPaused] = useState<boolean>(false);
   const { config } = useConfig();
@@ -139,6 +143,25 @@ export const Messages: React.FC<MessagesProps> = ({
   };
   // --- End TTS Handlers ---
 
+  // --- Edit Handlers ---
+  const startEdit = (index: number, currentContent: string) => {
+    setEditingIndex(index);
+    setEditText(currentContent);
+  };
+
+  const cancelEdit = () => {
+    setEditingIndex(null);
+    setEditText('');
+  };
+
+  const saveEdit = () => {
+    if (editingIndex !== null && editText.trim()) { // Ensure there's an index and non-empty text
+      onEditTurn(editingIndex, editText);
+    }
+    cancelEdit(); // Exit editing mode regardless
+  };
+  // --- End Edit Handlers ---
+
 
   // --- Revised useLayoutEffect for Scrolling ---
   useLayoutEffect(() => {
@@ -223,7 +246,10 @@ export const Messages: React.FC<MessagesProps> = ({
                 alignItems="center"
                 pb={1}
               >
-                <IconButton aria-label="Copy" size="sm" variant="ghost" icon={<FiCopy color="var(--text)" />} onClick={() => copyMessage(turn.rawContent)} title="Copy message" />
+                {/* Only show copy button if not editing */}
+                {editingIndex !== i && (
+                  <IconButton aria-label="Copy" size="sm" variant="ghost" icon={<FiCopy color="var(--text)" />} onClick={() => copyMessage(turn.rawContent)} title="Copy message" />
+                )}
                 {speakingIndex === i ? (
                   ttsIsPaused ? (
                     <IconButton aria-label="Resume" size="sm" variant="ghost" icon={<FiPlay color="var(--text)" />} onClick={handleResume} title="Resume speech" />
@@ -243,7 +269,15 @@ export const Messages: React.FC<MessagesProps> = ({
             )}
 
             {/* The Message Bubble */}
-            <Message turn={turn} index={i} />
+            <EditableMessage // Use the potentially renamed component
+              turn={turn}
+              index={i}
+              isEditing={editingIndex === i}
+              editText={editText}
+              onStartEdit={startEdit}
+              onSetEditText={setEditText}
+              onSaveEdit={saveEdit}
+              onCancelEdit={cancelEdit} />
 
             {/* User Controls (Right Side) */}
             {turn.role === 'user' && (
@@ -256,7 +290,10 @@ export const Messages: React.FC<MessagesProps> = ({
                 alignItems="center"
                 pb={1}
               >
-                <IconButton aria-label="Copy" size="sm" variant="ghost" icon={<FiCopy color="var(--text)" />} onClick={() => copyMessage(turn.rawContent)} title="Copy message" />
+                {/* Only show copy button if not editing */}
+                {editingIndex !== i && (
+                  <IconButton aria-label="Copy" size="sm" variant="ghost" icon={<FiCopy color="var(--text)" />} onClick={() => copyMessage(turn.rawContent)} title="Copy message" />
+                )}
               </VStack>
             )}
           </Box>

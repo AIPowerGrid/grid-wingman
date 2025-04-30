@@ -431,6 +431,19 @@ const Cognito = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Empty dependency array ensures this runs only on mount and unmount
 
+  // Function to handle editing a specific turn
+  const handleEditTurn = (index: number, newContent: string) => {
+    setTurns(prevTurns => {
+      const updatedTurns = [...prevTurns];
+      // Update the turn regardless of the role for visual editing
+      if (updatedTurns[index]) {
+        updatedTurns[index] = { ...updatedTurns[index], rawContent: newContent };
+      }
+      return updatedTurns;
+    });
+    // The useEffect for saving chat will automatically pick up the change in 'turns'
+  };
+
   const [isHovering, setIsHovering] = useState(false);
 
   return (
@@ -472,6 +485,7 @@ const Cognito = () => {
                   turns={turns}
                   settingsMode={settingsMode}
                   onReload={onReload}
+                  onEditTurn={handleEditTurn} // Pass the edit handler down
                 />
               )}
           {!settingsMode && !historyMode && turns.length === 0 && !config?.chatMode && (

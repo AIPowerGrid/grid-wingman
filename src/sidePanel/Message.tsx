@@ -4,6 +4,15 @@ import {
 } from 'react';
 import Markdown from 'react-markdown';
 import { FiCopy } from 'react-icons/fi';
+import AutosizeTextarea from 'react-textarea-autosize'; // Import the autosize component
+import { CheckIcon, CloseIcon } from '@chakra-ui/icons';
+import {
+  Textarea,
+  HStack,
+  VStack,
+  Button as ChakraButton, // Alias to avoid naming conflict if needed elsewhere
+} from '@chakra-ui/react';
+
 import {
   Box, Button, Collapse, IconButton, useDisclosure
 } from '@chakra-ui/react';
@@ -340,11 +349,21 @@ const markdownComponents = {
 
 interface MessageProps {
   turn: MessageTurn;
-  index: number;
+  index: number; // Keep index
+  // Add editing props
+  isEditing: boolean;
+  editText: string;
+  onStartEdit: (index: number, currentContent: string) => void;
+  onSetEditText: (text: string) => void;
+  onSaveEdit: () => void;
+  onCancelEdit: () => void;
 }
 
-export const Message: React.FC<MessageProps> = ({ turn, index }) => {
-  const contentToRender = turn.rawContent || '';
+// Rename component to reflect its new capability
+export const EditableMessage: React.FC<MessageProps> = ({
+  turn, index, isEditing, editText, onStartEdit, onSetEditText, onSaveEdit, onCancelEdit
+}) => {
+  const contentToRender = turn.rawContent || ''; // Still needed for display mode and starting edit
   const parts = contentToRender.split(/(<think>[\s\S]*?<\/think>)/g).filter(part => part && part.trim() !== '');
   const thinkRegex = /<think>([\s\S]*?)<\/think>/;
 
@@ -372,47 +391,82 @@ export const Message: React.FC<MessageProps> = ({ turn, index }) => {
         textAlign: 'left',
         position: 'relative',
       }}
+      // Add double-click handler ONLY for user messages to initiate editing
+      onDoubleClick={() => {
+        // Allow editing for both user and assistant messages
+        if (!isEditing) {
+          onStartEdit(index, turn.rawContent);
+        }
+      }}
+      title={"Double-click to edit"} // Add tooltip hint for all messages
     >
-      {/* Relative positioning lifts content above ::before (which has z-index: 0) */}
-      <div className="message-markdown" style={{
-        position: 'relative'
-      }}>
-        {turn.role === 'assistant' && turn.webDisplayContent && (
-          <div className="message-prefix">
-            <Markdown
-              remarkPlugins={[
-                [remarkGfm, { singleTilde: false }],
-                remarkMath,
-                remarkSupersub
-              ]}
-              components={markdownComponents}
-            >
-              {`**From the Internet**\n${turn.webDisplayContent}\n\n---\n\n`}
-            </Markdown>
-          </div>
-        )}
-        {parts.map((part, partIndex) => {
-          const match = part.match(thinkRegex);
-          if (match && match[1]) {
-            return <ThinkingBlock key={`think_${partIndex}`} content={match[1]} />;
-          } else {
-            return (
-              <div key={`content_${partIndex}`} className="message-content">
+      {isEditing ? (
+        // --- Editing UI ---
+        <VStack spacing={2} align="stretch" width="100%">
+          <Textarea
+            as={AutosizeTextarea} // Use the autosize component
+            value={editText}
+            onChange={(e) => onSetEditText(e.target.value)}
+            placeholder="Edit your message..."
+            size="md" // Adjust size as needed
+            width="100%"// Adjust to fit the container
+            minRows={3} // Start with a minimum of 3 rows
+            // minHeight="100px" // Or set a larger minHeight if you prefer over minRows
+            bg="var(--bg)" // Use background color for contrast
+            color="var(--text)"
+            borderColor="var(--text)"
+            focusBorderColor="var(--link)" // Use link color for focus
+            _hover={{ borderColor: "var(--link)" }}
+            autoFocus // Focus the textarea when editing starts
+          />
+          <HStack justify="flex-end" spacing={2}>
+            <IconButton
+              aria-label="Save edit"
+              icon={<CheckIcon />}
+              size="sm"
+              colorScheme="green" // Use Chakra color schemes
+              variant="solid"
+              onClick={onSaveEdit}
+              title="Save changes"
+            />
+            <IconButton
+              aria-label="Cancel edit"
+              icon={<CloseIcon />}
+              size="sm"
+              colorScheme="red" // Use Chakra color schemes
+              variant="outline"
+              onClick={onCancelEdit}
+              title="Discard changes"
+            />
+          </HStack>
+        </VStack>
+      ) : (
+        // --- Display UI (Original Content) ---
+        <div className="message-markdown" style={{ position: 'relative' }}>
+          {turn.role === 'assistant' && turn.webDisplayContent && (
+            <div className="message-prefix">
+              <Markdown remarkPlugins={[[remarkGfm, { singleTilde: false }], remarkMath, remarkSupersub]} components={markdownComponents}>
+                {`**From the Internet**\n${turn.webDisplayContent}\n\n---\n\n`}
+              </Markdown>
+            </div>
+          )}
+          {parts.map((part, partIndex) => {
+            const match = part.match(thinkRegex);
+            if (match && match[1]) {
+              return <ThinkingBlock key={`think_${partIndex}`} content={match[1]} />;
+            } else {
+              return (
+                <div key={`content_${partIndex}`} className="message-content">
                 <Markdown
-                  remarkPlugins={[
-                    [remarkGfm, { singleTilde: false }],
-                    remarkMath,
-                    remarkSupersub
-                  ]}
+                  remarkPlugins={[[remarkGfm, { singleTilde: false }], remarkMath, remarkSupersub]}
                   components={markdownComponents}
-                >
-                  {part}
-                </Markdown>
-              </div>
-            );
-          }
-        })}
-      </div>
+                >{part}</Markdown>
+                </div>
+              );
+            }
+          })}
+        </div>
+      )}
     </Box>
   );
 };
