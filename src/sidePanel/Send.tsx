@@ -26,6 +26,6 @@ export const Send = ({ isLoading, onSend }: { isLoading: boolean, onSend: () => 
     pb={0}
     pt={0}
     height="2rem"
-    isDisabled={isLoading}
-  />
+    isDisabled={isLoading || !('SpeechRecognition' in window || 'webkitSpeechRecognition' in window)}
+    />
 );
