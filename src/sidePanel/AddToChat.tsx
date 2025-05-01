@@ -30,10 +30,12 @@ export const AddToChat = () => {
           _hover={{ bg: "rgba(0, 0, 0, 0.1)" }} // Added hover effect
           zIndex={2}
         >
-            {!config?.chatMode && (
-              < GoArrowSwitch  color="var(--text)" fontSize="1.25rem" />
-            )}
-            {config?.chatMode && config.chatMode.toUpperCase()}
+          <Center>
+              {!config?.chatMode && (
+                < GoArrowSwitch  color="var(--text)" fontSize="1.25rem" />
+              )}
+              {config?.chatMode && config.chatMode.toUpperCase()}
+          </Center>
         </MenuButton>
       </Tooltip>
       <MenuList
