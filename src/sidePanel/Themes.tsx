@@ -25,7 +25,7 @@ import { useConfig } from './ConfigContext';
 import { SettingTitle } from './SettingsTitle';
 import { useState, useEffect } from 'react';
 import { Config } from '../types/config';
-import storage from '../util/storageUtil';
+import storage from '../background/storageUtil';
 
 type Theme = {
   name: string;

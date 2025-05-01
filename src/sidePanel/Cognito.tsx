@@ -25,7 +25,7 @@ import {
 } from './messageUtils';
 import { Send } from './Send';
 import { Settings } from './Settings';
-import storage from '../util/storageUtil';
+import storage from '../background/storageUtil';
 
 function bridge() {
     // Collect image alt texts

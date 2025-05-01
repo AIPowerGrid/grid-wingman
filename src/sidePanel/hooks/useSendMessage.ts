@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction, useRef } from 'react';
 import { MessageTurn } from '../ChatHistory'; // Adjust path if needed
 import { fetchDataAsStream, webSearch, processQueryWithAI } from '../network';
-import storage from 'src/util/storageUtil';// --- Interfaces (Model, Config, ApiMessage) remain the same ---
+import storage from 'src/background/storageUtil';// --- Interfaces (Model, Config, ApiMessage) remain the same ---
 import type { Config, Model } from 'src/types/config';
 import { normalizeApiEndpoint } from 'src/background/util';
 interface ApiMessage {

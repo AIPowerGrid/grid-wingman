@@ -9,7 +9,7 @@ import { Config, ConfigContextType } from '../types/config';
 import { setTheme, themes } from './Themes'; // Import themes and setTheme
 
 // Add this import statement at the top of the file
-import storage from '../util/storageUtil';
+import storage from '../background/storageUtil';
 
 export const ConfigContext = createContext<ConfigContextType>({} as ConfigContextType);
 

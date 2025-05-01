@@ -12,7 +12,7 @@ import {
   resumeSpeech,
   isCurrentlySpeaking,
   isCurrentlyPaused,
-} from '../util/ttsUtils';
+} from '../background/ttsUtils';
 import { useConfig } from './ConfigContext';
 
 // --- Helper Function to Clean Text for TTS ---

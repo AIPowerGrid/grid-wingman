@@ -15,7 +15,7 @@ import {
   SliderThumb,
 } from '@chakra-ui/react';
 import { useConfig } from './ConfigContext';
-import { getAvailableVoices, VoiceOption } from '../util/ttsUtils';
+import { getAvailableVoices, VoiceOption } from '../background/ttsUtils';
 import { SettingTitle } from './SettingsTitle'; // Import SettingTitle
 
 export const TtsSettings = () => {

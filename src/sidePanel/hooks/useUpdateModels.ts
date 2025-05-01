@@ -1,5 +1,5 @@
 import { useCallback, useState, useRef } from 'react';
-import storage from 'src/util/storageUtil';
+import storage from 'src/background/storageUtil';
 import { useConfig } from '../ConfigContext';
 import { GEMINI_URL, GROQ_URL, OPENAI_URL, OPENROUTER_URL } from '../constants';
 import type { Model } from 'src/types/config';

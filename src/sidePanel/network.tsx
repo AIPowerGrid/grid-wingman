@@ -2,7 +2,7 @@ import { events } from 'fetch-event-stream';
 import { cleanUrl } from './WebSearch';
 import '../types/config.ts';
 import type { Config, Model } from 'src/types/config';
-import { speakMessage } from '../util/ttsUtils'
+import { speakMessage } from '../background/ttsUtils'
 
 interface ApiMessage {
   role: 'user' | 'assistant' | 'system';
