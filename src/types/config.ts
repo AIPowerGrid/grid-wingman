@@ -85,6 +85,7 @@ export interface Config {
     error: string;
     success: string;
     warning: string;
+    name: string;
   };
   paperTexture?: boolean;
   panelOpen: boolean;
