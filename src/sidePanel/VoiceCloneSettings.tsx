@@ -1,3 +1,4 @@
+// Project: Voice Cloning App not in use yet, for further development
 import { useState } from 'react';
 import { Button, Box, Slider, Select } from '@chakra-ui/react';
 import { AccordionItem, AccordionPanel } from '@chakra-ui/react';
