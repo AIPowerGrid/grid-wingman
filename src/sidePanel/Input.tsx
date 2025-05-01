@@ -36,8 +36,6 @@ const { config } = useConfig();
 const ref = useRef<HTMLTextAreaElement>(null);
 const [isListening, setIsListening] = useState(false);
 const toast = useToast(); // For showing errors
-const isStartingRef = useRef(false); // Ref to prevent rapid re-entry during start
-const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null); // Ref for debounce timeout
 
 // Use a ref to ensure we always have the latest setMessage without causing effect re-runs
 const setMessageRef = useRef(setMessage);
@@ -81,7 +79,7 @@ const handleListen = useCallback(async () => {
         title: 'Speech Error',
         description: event.error,
         status: 'error',
-        duration: 4000,
+        duration: 2000,
       });
       setIsListening(false);
     };
@@ -158,14 +156,11 @@ useEffect(() => {
         id="user-input"
         placeholder={placeholder}
         position="relative"
-        pl={4}
-        pr={12}
         size="sm"
         value={message}
         width="100%"
         zIndex={1}
         autoFocus
-        p={1}
         onChange={event => setMessage(event.target.value)}
         onKeyDown={event => {
           if (isLoading) return;
@@ -176,6 +171,11 @@ useEffect(() => {
             onSend();
             setMessage('');
           }
+        }}
+        sx={{
+          // Use a specific pixel value for precise control inside the textarea
+          paddingLeft: '3',
+          paddingRight: '3' // Adjust this value (e.g., '18px', '20px') as needed
         }}
       />
     </Box>
