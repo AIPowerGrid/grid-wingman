@@ -17,6 +17,7 @@ import {
 } from '@chakra-ui/react';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
+import { useConfig } from './ConfigContext'; // <-- Import useConfig
 import remarkSupersub from 'remark-supersub';
 import { MessageTurn } from './ChatHistory';
 
@@ -362,6 +363,7 @@ interface MessageProps {
 export const EditableMessage: React.FC<MessageProps> = ({
   turn, index, isEditing, editText, onStartEdit, onSetEditText, onSaveEdit, onCancelEdit
 }) => {
+  const { config } = useConfig(); // <-- Get config
   const contentToRender = turn.rawContent || ''; // Still needed for display mode and starting edit
   const parts = contentToRender.split(/(<think>[\s\S]*?<\/think>)/g).filter(part => part && part.trim() !== '');
   const thinkRegex = /<think>([\s\S]*?)<\/think>/;
@@ -372,7 +374,7 @@ export const EditableMessage: React.FC<MessageProps> = ({
       border="1px"
       borderColor={turn.role === 'assistant' ? 'var(--text)' : 'var(--text)'}
       borderRadius={16}
-      className="chatMessage"
+      className={`chatMessage ${config?.paperTexture ? 'chat-message-bubble' : ''}`} // <-- Add conditional class
       color={'var(--text)'}
       fontSize="md"
       fontStyle={'normal'}
@@ -442,7 +444,7 @@ export const EditableMessage: React.FC<MessageProps> = ({
         </VStack>
       ) : (
         // --- Display UI (Original Content) ---
-        <div className="message-markdown" style={{ position: 'relative' }}>
+        <div className="message-markdown" style={{ position: 'relative', zIndex: 1 }}> {/* <-- Ensure content is above texture */}
           {turn.role === 'assistant' && turn.webDisplayContent && (
             <div className="message-prefix">
               <Markdown remarkPlugins={[[remarkGfm, { singleTilde: false }], remarkMath, remarkSupersub]} components={markdownComponents}>

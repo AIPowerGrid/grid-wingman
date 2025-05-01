@@ -104,6 +104,23 @@ html[data-paper-texture="true"] #settings::before { /* Target Settings page Box 
   z-index: 0; /* Behind component content (requires content position:relative) */
 }
 
+/* Texture for individual chat message bubbles (conditional) */
+html[data-paper-texture="true"] .chat-message-bubble::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  width: 100%; height: 100%;
+  background-image: url('assets/images/paper-texture.png');
+  background-size: 512px; /* Match other textures */
+  background-repeat: repeat;
+  opacity: 0.5; /* Match other textures */
+  pointer-events: none; /* Crucial: Let clicks pass through to the message */
+  mix-blend-mode: multiply; /* Match other textures */
+  filter: contrast(1) brightness(1); /* Match other textures */
+  z-index: 0; /* Behind the message content */
+  border-radius: inherit; /* Inherit the bubble's border-radius */
+}
+
 html[data-paper-texture="true"] .css-1kowdgt::after {
   content: "";
   position: absolute;
