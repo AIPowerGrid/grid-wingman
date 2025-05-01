@@ -57,10 +57,10 @@ body {
 /* --- Global Paper Texture Styles --- */
 /* Apply texture conditionally based on html[data-paper-texture="true"] */
 
-/* Base texture for the body background */
-html[data-paper-texture="true"] body::before {
+/* Texture for the main chat body */
+html[data-paper-texture="true"] .css-1kowdgt::before {
   content: "";
-  position: fixed; /* Body overlay needs to be fixed */
+  position: absolute; /* Needs to be absolute relative to .css-1kowdgt */
   top: 0; left: 0; right: 0; bottom: 0;
   width: 100%; height: 100%;
   background-image: url('assets/images/paper-texture.png');
@@ -68,12 +68,11 @@ html[data-paper-texture="true"] body::before {
   background-repeat: repeat;
   opacity: 0.5;
   pointer-events: none;
-  mix-blend-mode: multiply;
-  filter: contrast(1) brightness(1);
-  z-index: 100;
+  mix-blend-mode: multiply; /* Keep multiply for texture effect */
+  filter: contrast(1) brightness(1); /* Match drawer body style */
+  z-index: 0; /* Behind component content */
 }
 
-/* Texture for specific component overlays */
 html[data-paper-texture="true"] .settings-drawer-body::before { /* Target DrawerBody */
   content: "";
   position: absolute; /* Use absolute positioning relative to the component */
@@ -85,9 +84,44 @@ html[data-paper-texture="true"] .settings-drawer-body::before { /* Target Drawer
   opacity: 0.5;
   pointer-events: none;
   mix-blend-mode: multiply;
-  filter: contrast(1) brightness(1);
+  filter: contrast(1) brightness(1); /* This is the desired style */
   z-index: 0; /* Behind component content (requires content position:relative) */
   border-radius: inherit; /* Inherit border-radius from parent */
+}
+
+html[data-paper-texture="true"] #settings::before { /* Target Settings page Box */
+  content: "";
+  position: absolute; /* Use absolute positioning relative to the component */
+  top: 0; left: 0; right: 0; bottom: 0;
+  width: 100%; height: 100%;
+  background-image: url('assets/images/paper-texture.png');
+  background-size: 512px;
+  background-repeat: repeat;
+  opacity: 0.5;
+  pointer-events: none; /* Match drawer body style */
+  mix-blend-mode: multiply;
+  filter: contrast(1) brightness(1);
+  z-index: 0; /* Behind component content (requires content position:relative) */
+}
+
+html[data-paper-texture="true"] .css-1kowdgt::after {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  width: 100%; height: 100%;
+  background-color: rgba(255, 255, 255, 0.1); /* Semi-transparent white mixer */
+  pointer-events: none;
+  z-index: 0; /* Same level as texture, behind content */
+}
+/* White overlay for the Settings page Box (conditional) */
+html[data-paper-texture="true"] #settings::after {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  width: 100%; height: 100%;
+  background-color: rgba(255, 255, 255, 0.1); /* Semi-transparent white mixer */
+  pointer-events: none;
+  z-index: 1400; /* Same level as texture, behind content */
 }
 
 #root {

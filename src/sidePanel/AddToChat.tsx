@@ -1,6 +1,6 @@
 import { GoArrowSwitch } from "react-icons/go";
 import {
-  Button, Menu, MenuButton, MenuItem, MenuList, Center
+  IconButton, Menu, MenuButton, MenuItem, MenuList, Center
 } from '@chakra-ui/react';
 
 import { useConfig } from './ConfigContext';
@@ -12,21 +12,20 @@ export const AddToChat = () => {
     <Menu>
       <MenuButton
         aria-label="Add to chat"
-        as={Button}
-        background="var(--bg)"
-        border="1px solid var(--text)"
+        as={IconButton}
+        // background="var(--bg)"
+        // border="1px solid var(--text)"
         borderRadius={16}
         color="var(--text)"
         fontSize="sm"
         fontWeight={800}
-        m={0}
         ml={2}
-        size="md"
-        variant="outlined"
+        size="sm"
+        variant="ghost"
         zIndex={2}
         p={0}
-        height="2rem"
-        minWidth="auto" // Allow button to shrink if needed
+        transform="translateY(2px)" /* Adjust this pixel value to shift down */
+        minWidth="2.5rem" // Allow button to shrink if needed
       >
         <Center px={2}> {/* Added padding here for better spacing */}
           {!config?.chatMode && (

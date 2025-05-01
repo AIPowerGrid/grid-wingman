@@ -1,15 +1,15 @@
 /* eslint-disable max-len */
 import React, {
- createContext, useContext, useEffect, useState
-} from 'react';
-
-// Make sure Config and ConfigContextType are correctly imported
-import { Config, ConfigContextType } from '../types/config';
-
-import { setTheme, themes } from './Themes'; // Import themes and setTheme
-
-// Add this import statement at the top of the file
-import storage from '../background/storageUtil';
+  createContext, useContext, useEffect, useState
+ } from 'react';
+ 
+ // Make sure Config and ConfigContextType are correctly imported
+ import { Config, ConfigContextType } from '../types/config';
+ 
+ import { setTheme, themes } from './Themes'; // Import themes and setTheme
+ 
+ // Add this import statement at the top of the file
+ import storage from '../background/storageUtil';
 
 export const ConfigContext = createContext<ConfigContextType>({} as ConfigContextType);
 
@@ -67,6 +67,7 @@ const defaultConfig: Config = {
     error: '#af1b1b',
     warning: '#388e3c',
     success: '#7eaa6e',
+    name: 'paper',
   },
   personas,
   generateTitle: true,

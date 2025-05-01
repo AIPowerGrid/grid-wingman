@@ -30,7 +30,8 @@ export const Settings = () => {
   return (
     <Box
       id="settings"
-      position="absolute"
+      position="relative"
+      zIndex={1} // Ensure it stacks above the texture
       top={0}
       width="100%"
       height="100%" // Ensure it covers the full height
@@ -44,12 +45,6 @@ export const Settings = () => {
       px="1.5rem" // Horizontal padding like the drawer's VStack
       pt="56px" // Keep padding-top to account for the fixed Header height
       pb={4} // Bottom padding
-      sx={{
-        position: 'relative', // Still needed for z-index stacking context
-        // Texture is now applied globally via CSS in index.html targeting #settings
-        // Ensure direct children are above the texture
-        '> *': { position: 'relative', zIndex: 1 },
-      }}
     >
       {/* Accordion container */}
       <Accordion
@@ -86,11 +81,16 @@ export const Settings = () => {
              boxShadow: floatingShadow, // Add the shadow
              filter: controlFilter, // Add the filter
              _hover: {
+               bg: controlBg, // Keep control background on hover (like drawer)
                filter: hoverFilter,
                borderColor: 'var(--active)',
              },
              _focus: {
                 boxShadow: 'none', // Remove default focus ring if desired
+             },
+             _active: { // Add active style to match drawer button click
+                bg: 'var(--active)',
+                filter: 'brightness(0.95)',
              },
              // Ensure title (SettingTitle) aligns correctly
              '> div': { // Target the inner div holding the title/widget

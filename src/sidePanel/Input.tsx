@@ -3,7 +3,7 @@ import React, {
 } from 'react';
 import ResizeTextarea from 'react-textarea-autosize';
 import { Box, Textarea, IconButton, Tooltip, useToast } from '@chakra-ui/react';
-import { FaMicrophone, FaStopCircle } from 'react-icons/fa'; // Import mic icons
+import { FaMicrophoneAlt, FaRegStopCircle } from 'react-icons/fa'; // Import mic icons
 import { useConfig } from './ConfigContext';
 
 export const AutoResizeTextarea = React.forwardRef((props, ref) => (
@@ -124,10 +124,12 @@ useEffect(() => {
             handleListen();
           }}
           aria-label={isListening ? "Stop Listening" : "Start Listening"}
-          icon={isListening ? <FaStopCircle /> : <FaMicrophone />}
+          icon={isListening ? <FaRegStopCircle /> : <FaMicrophoneAlt />}
           variant="ghost"
           size="sm"
           mr={2}
+          pb={0}
+          pt={0}
           color={isListening ? "red.500" : "currentColor"}
           isDisabled={isLoading || !(window.SpeechRecognition || window.webkitSpeechRecognition)}
           _hover={{ bg: 'rgba(128, 128, 128, 0.1)' }}

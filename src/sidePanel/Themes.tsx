@@ -343,7 +343,7 @@ export const Themes = () => {
   return (
     <AccordionItem border="2px solid var(--text)" borderRadius={16} mb={4} mt={0}>
       <AccordionButton _hover={{ backgroundColor: 'transparent' }} paddingBottom={1} paddingRight={2}>
-        <SettingTitle icon="🎨" padding={0} text="Themes" />
+        <SettingTitle icon="🎨" text="Themes" />
       </AccordionButton>
       {/* Use Flex column for the entire panel content */}
       <AccordionPanel pb={4}>
