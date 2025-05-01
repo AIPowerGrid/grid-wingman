@@ -276,7 +276,7 @@ const SettingsDrawer = ({
                   borderRadius="md"
                   mx="auto"
                 >
-                  Cognito <Box as="sub" sx={{filter: 'contrast(200%)' }}>v2.4</Box>
+                  Cognito <Box as="sub" sx={{filter: 'contrast(200%)' }}>v2.5</Box>
                 </Heading>
               </Link>
 
