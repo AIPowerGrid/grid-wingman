@@ -118,7 +118,13 @@ useEffect(() => {
 
   return (    
   <Box ml={2} position="relative" width="100%" display="flex" alignItems="center">
-      <Tooltip label={isListening ? "Stop Listening" : "Start Listening"} placement="top" hasArrow>
+      <Tooltip
+        label={isListening ? "Stop Listening" : "Start Listening"}
+        placement="top"
+        hasArrow
+        bg="var(--bg)"      // Added style
+        color="var(--text)" // Added style
+      >
         <IconButton
           onClick={(e) => {
             e.stopPropagation();

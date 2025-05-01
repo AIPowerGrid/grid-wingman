@@ -491,7 +491,13 @@ const Cognito = () => {
           {!settingsMode && !historyMode && turns.length === 0 && !config?.chatMode && (
             // Adjust positioning and layout if needed for icons
             <Box bottom="4rem" left="2rem" position="absolute" display="flex" flexDirection="column" gap={2}>
-                  <Tooltip label="Add Web Search Results to LLM Context" placement="right" hasArrow>
+                  <Tooltip
+                    label="Add Web Search Results to LLM Context"
+                    placement="right"
+                    hasArrow
+                    bg="var(--bg)"      // Added style
+                    color="var(--text)" // Added style
+                  >
                 {/* Use IconButton */}
                     <IconButton
                   aria-label="Add Web Search Results to LLM Context" // Important for accessibility
@@ -506,7 +512,13 @@ const Cognito = () => {
                   _hover={{ bg: 'rgba(128, 128, 128, 0.2)' }} // Optional: subtle hover effect
                     />
                   </Tooltip>
-                  <Tooltip label="Add Current Web Page to LLM Context" placement="right" hasArrow>
+                  <Tooltip
+                    label="Add Current Web Page to LLM Context"
+                    placement="right"
+                    hasArrow
+                    bg="var(--bg)"      // Added style
+                    color="var(--text)" // Added style
+                  >
                 {/* Use IconButton */}
                     <IconButton
                       aria-label="Add Current Web Page to LLM Context"
@@ -575,7 +587,7 @@ const Cognito = () => {
             style={{ opacity: settingsMode ? 0 : 1 }}
             zIndex={2}
           >
-            <Input p={0} isLoading={isLoading} message={message} setMessage={setMessage} onSend={onSend} />
+            <Input isLoading={isLoading} message={message} setMessage={setMessage} onSend={onSend} />
             <AddToChat />
             <Send isLoading={isLoading} onSend={() => onSend(message)} />
           </Box>

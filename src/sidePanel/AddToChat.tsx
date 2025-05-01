@@ -1,6 +1,6 @@
 import { GoArrowSwitch } from "react-icons/go";
 import {
-  IconButton, Menu, MenuButton, MenuItem, MenuList, Center
+  IconButton, Menu, MenuButton, MenuItem, MenuList, Center, Tooltip
 } from '@chakra-ui/react';
 
 import { useConfig } from './ConfigContext';
@@ -10,24 +10,32 @@ export const AddToChat = () => {
 
   return (
     <Menu>
-      <MenuButton
-        aria-label="Add to chat"
-        as={IconButton}
-        borderRadius="md" // Changed to md
+      <Tooltip
+        label="Switch Chat Mode"
+        placement="top"
+        hasArrow
+        bg="var(--bg)"
         color="var(--text)"
-        fontSize="sm"
-        fontWeight={800}
-        ml={2}
-        size="sm"
-        variant="ghost"
-        _hover={{ bg: "rgba(0, 0, 0, 0.1)" }} // Added hover effect
-        zIndex={2}
       >
-          {!config?.chatMode && (
-            < GoArrowSwitch  color="var(--text)" fontSize="1.25rem" />
-          )}
-          {config?.chatMode && config.chatMode.toUpperCase()}
-      </MenuButton>
+        <MenuButton
+          aria-label="Switch Chat Mode" // Updated aria-label
+          as={IconButton}
+          borderRadius="md" // Changed to md
+          color="var(--text)"
+          fontSize="sm"
+          fontWeight={800}
+          ml={2}
+          size="sm"
+          variant="ghost"
+          _hover={{ bg: "rgba(0, 0, 0, 0.1)" }} // Added hover effect
+          zIndex={2}
+        >
+            {!config?.chatMode && (
+              < GoArrowSwitch  color="var(--text)" fontSize="1.25rem" />
+            )}
+            {config?.chatMode && config.chatMode.toUpperCase()}
+        </MenuButton>
+      </Tooltip>
       <MenuList
         background="var(--active)"
         border="1px solid var(--text)" // Apply border once here
