@@ -13,27 +13,20 @@ export const AddToChat = () => {
       <MenuButton
         aria-label="Add to chat"
         as={IconButton}
-        // background="var(--bg)"
-        // border="1px solid var(--text)"
-        borderRadius={16}
+        borderRadius="md" // Changed to md
         color="var(--text)"
         fontSize="sm"
         fontWeight={800}
         ml={2}
         size="sm"
         variant="ghost"
+        _hover={{ bg: "rgba(0, 0, 0, 0.1)" }} // Added hover effect
         zIndex={2}
-        p={0}
-        transform="translateY(2px)" /* Adjust this pixel value to shift down */
-        minWidth="2.5rem" // Allow button to shrink if needed
       >
-        <Center px={2}> {/* Added padding here for better spacing */}
           {!config?.chatMode && (
             < GoArrowSwitch  color="var(--text)" fontSize="1.25rem" />
           )}
-          {/* Conditionally render chatMode text */}
           {config?.chatMode && config.chatMode.toUpperCase()}
-        </Center>
       </MenuButton>
       <MenuList
         background="var(--active)"
