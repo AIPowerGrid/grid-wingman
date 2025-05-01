@@ -1,4 +1,4 @@
-// useSafeAsyncEffect.ts
+// useSafeAsyncEffect.ts might be used in a different file, so ensure to import it correctly
 
 import { useEffect, useRef } from 'react';
 
