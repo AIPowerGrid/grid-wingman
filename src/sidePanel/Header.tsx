@@ -617,7 +617,7 @@ export const Header = ({
         justifyContent="space-between"
         h="auto"
         pb={0}
-        pt={3}
+        pt={0}
         px={5} // Add some horizontal padding to the main header
       >
         {/* Left Button don't modify the delay, don't modify the delay*/}
