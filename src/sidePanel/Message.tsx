@@ -3,9 +3,8 @@ import {
   ClassAttributes, HTMLAttributes, ReactNode, useState
 } from 'react';
 import Markdown from 'react-markdown';
-import { FiCopy } from 'react-icons/fi';
-import AutosizeTextarea from 'react-textarea-autosize'; // Import the autosize component
-import { CheckIcon, CloseIcon } from '@chakra-ui/icons';
+import { FiCopy, FiCheck, FiX } from 'react-icons/fi'; // Import FiCheck and FiX
+import AutosizeTextarea from 'react-textarea-autosize';
 import {
   Textarea,
   HStack,
@@ -423,7 +422,7 @@ export const EditableMessage: React.FC<MessageProps> = ({
           <HStack justify="flex-end" spacing={2}>
             <IconButton
               aria-label="Save edit"
-              icon={<CheckIcon />}
+              icon={<FiCheck />} // Use FiCheck
               size="sm"
               colorScheme="green" // Use Chakra color schemes
               variant="solid"
@@ -432,7 +431,7 @@ export const EditableMessage: React.FC<MessageProps> = ({
             />
             <IconButton
               aria-label="Cancel edit"
-              icon={<CloseIcon />}
+              icon={<FiX />} // Use FiX
               size="sm"
               colorScheme="red" // Use Chakra color schemes
               variant="outline"

@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import { DeleteIcon } from '@chakra-ui/icons';
 import {
  Box,IconButton, Text 
 } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
+import { FiTrash2 } from 'react-icons/fi'; // Import the new icon
 import localforage from 'localforage';
 
 const dateToString = date => new Date(date).toLocaleDateString('sv-SE');
@@ -159,7 +159,7 @@ export const ChatHistory = ({ loadChat, onDeleteAll }: ChatHistoryProps) => {
                     aria-label="Reset"
                     as={motion.div}
                     borderRadius={16}
-                    icon={<DeleteIcon color="var(--text)" fontSize="xl" />}
+                    icon={<FiTrash2 size="18px" color="var(--text)" />} // Use FiTrash2 here
                     variant="outlined"
                     whileHover={{ rotate: '15deg', cursor: 'pointer' }}
                     onClick={() => deleteMessage(message.id)}
