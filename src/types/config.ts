@@ -17,6 +17,7 @@ export interface Model {
   host?: 'groq' | 'ollama' | 'gemini' | 'lmStudio' | 'openai' | 'openrouter' | 'custom' | string;
   active?: boolean;
   context_length?: number;
+  name: string;
   // Add other model-specific properties if needed
 }
 

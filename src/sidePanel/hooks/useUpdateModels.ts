@@ -1,9 +1,19 @@
-import { useCallback, useState, useRef } from 'react';
+import { useCallback, useRef } from 'react';
 import { useConfig } from '../ConfigContext';
 import { GEMINI_URL, GROQ_URL, OPENAI_URL, OPENROUTER_URL } from '../constants';
-import type { Model } from 'src/types/config';
+import type { Config, Model } from 'src/types/config';
 import { normalizeApiEndpoint } from 'src/background/util';
 
+// Host Constants
+const HOST_OLLAMA = 'ollama';
+const HOST_GEMINI = 'gemini';
+const HOST_LMSTUDIO = 'lmStudio';
+const HOST_GROQ = 'groq';
+const HOST_OPENAI = 'openai';
+const HOST_OPENROUTER = 'openrouter';
+const HOST_CUSTOM = 'custom';
+
+// --- fetchDataSilently remains the same ---
 const fetchDataSilently = async (url: string, ModelSettingsPanel = {}) => {
   try {
     const res = await fetch(url, ModelSettingsPanel);
@@ -19,8 +29,20 @@ const fetchDataSilently = async (url: string, ModelSettingsPanel = {}) => {
   }
 };
 
+// --- Service Configuration Interface ---
+interface ServiceConfig {
+  host: string;
+  isEnabled: (config: Config) => boolean;
+  getUrl: (config: Config) => string | null;
+  getFetchOptions?: (config: Config) => RequestInit | undefined;
+  parseFn: (data: any, host: string) => Model[];
+  onFetchFail?: (config: Config, updateConfig: (updates: Partial<Config>) => void) => void;
+}
+
+
 export const useUpdateModels = () => {
-  const [chatTitle, setChatTitle] = useState('');
+  // Removed unused chatTitle state
+  // const [chatTitle, setChatTitle] = useState('');
   const { config, updateConfig } = useConfig();
 
   // Helper to update models in config
@@ -46,9 +68,73 @@ export const useUpdateModels = () => {
       });
     }
   }, [config, updateConfig]);
-  
+
   const FETCH_INTERVAL =  30 * 1000; // 30s
   const lastFetchRef = useRef(0);
+
+  // --- Service Configurations ---
+  const serviceConfigs: ServiceConfig[] = [
+    {
+      host: HOST_OLLAMA,
+      isEnabled: (cfg) => !!cfg.ollamaUrl && cfg.ollamaConnected,
+      getUrl: (cfg) => `${cfg.ollamaUrl}/api/tags`,
+      parseFn: (data, host) => (data?.models as Model[] ?? []).map(m => ({ ...m, id: m.id ?? m.name, host })), // Use name if id missing
+      onFetchFail: (_, updateCfg) => updateCfg({ ollamaConnected: false, ollamaUrl: '' }),
+    },
+    {
+      host: HOST_GEMINI,
+      isEnabled: (cfg) => !!cfg.geminiApiKey,
+      getUrl: () => GEMINI_URL,
+      getFetchOptions: (cfg) => ({ headers: { Authorization: `Bearer ${cfg.geminiApiKey}` } }),
+      parseFn: (data, host) => (data?.data as Model[] ?? []).filter(m => m.id.startsWith('models/gemini')).map(m => ({ ...m, id: m.id, host })),
+    },
+    {
+      host: HOST_LMSTUDIO,
+      isEnabled: (cfg) => !!cfg.lmStudioUrl && cfg.lmStudioConnected,
+      getUrl: (cfg) => `${cfg.lmStudioUrl}/v1/models`,
+      parseFn: (data, host) => (data?.data as Model[] ?? []).map(m => ({ ...m, id: m.id, host })),
+      onFetchFail: (_, updateCfg) => updateCfg({ lmStudioConnected: false, lmStudioUrl: '' }),
+    },
+    {
+      host: HOST_GROQ,
+      isEnabled: (cfg) => !!cfg.groqApiKey,
+      getUrl: () => GROQ_URL,
+      getFetchOptions: (cfg) => ({ headers: { Authorization: `Bearer ${cfg.groqApiKey}` } }),
+      parseFn: (data, host) => (data?.data as Model[] ?? []).map(m => ({ ...m, id: m.id, host })),
+    },
+    {
+      host: HOST_OPENAI,
+      isEnabled: (cfg) => !!cfg.openAiApiKey,
+      getUrl: () => OPENAI_URL,
+      getFetchOptions: (cfg) => ({ headers: { Authorization: `Bearer ${cfg.openAiApiKey}` } }),
+      parseFn: (data, host) => (data?.data as Model[] ?? []).filter(m => m.id.startsWith('gpt-')).map(m => ({ ...m, id: m.id, host })),
+    },
+    {
+      host: HOST_OPENROUTER,
+      isEnabled: (cfg) => !!cfg.openRouterApiKey,
+      getUrl: () => OPENROUTER_URL,
+      getFetchOptions: (cfg) => ({ headers: { Authorization: `Bearer ${cfg.openRouterApiKey}` } }),
+      parseFn: (data, host) => (data?.data as Model[] ?? []).map(m => ({ ...m, id: m.id, context_length: m.context_length, host })),
+    },
+    {
+      host: HOST_CUSTOM,
+      isEnabled: (cfg) => !!cfg.customEndpoint, // Only need endpoint URL to try fetching
+      getUrl: (cfg) => {
+        const normalizedUrl = normalizeApiEndpoint(cfg.customEndpoint);
+        return `${normalizedUrl}/v1/models`;
+      },
+      getFetchOptions: (cfg) => ({ headers: { Authorization: `Bearer ${cfg.customApiKey}` } }),
+      parseFn: (data, host) => {
+        // Handle both { data: [...] } and [...] structures
+        const modelsArray = Array.isArray(data) ? data : data?.data;
+        if (modelsArray && Array.isArray(modelsArray)) {
+          return (modelsArray as Model[]).map(m => ({ ...m, id: m.id, host }));
+        }
+        return [];
+      },
+      // Optional: Add onFetchFail if you want to update a 'customConnected' flag
+    },
+  ];
 
   const fetchAllModels = useCallback(async () => {
     const now = Date.now();
@@ -58,123 +144,49 @@ export const useUpdateModels = () => {
     }
     lastFetchRef.current = now;
 
-    if (config?.ollamaUrl && config?.ollamaConnected) {
-      console.log('[useUpdateModels] Fetching Ollama models...');
-      const ollamaModels = await fetchDataSilently(`${config.ollamaUrl}/api/tags`);
-      if (!ollamaModels) {
-        updateConfig({ ollamaConnected: false, ollamaUrl: '' });
-        // Clear existing ollama models on fetch failure
-        updateModels([], 'ollama');
+    if (!config) {
+      console.warn('[useUpdateModels] Config not available, skipping fetch.');
+      return;
+    }
+
+    console.log('[useUpdateModels] Starting model fetch for all configured services...');
+
+    const fetchPromises = serviceConfigs.map(async (service) => {
+      if (!service.isEnabled(config)) {
+        // Clear models if service is not enabled/configured
+        updateModels([], service.host);
+        return;
+      }
+
+      const url = service.getUrl(config);
+      if (!url) {
+        console.warn(`[useUpdateModels] Could not determine URL for host: ${service.host}`);
+        updateModels([], service.host); // Clear models if URL is invalid
+        return;
+      }
+
+      const fetchOptions = service.getFetchOptions ? service.getFetchOptions(config) : {};
+      const data = await fetchDataSilently(url, fetchOptions);
+
+      if (data) {
+        const parsedModels = service.parseFn(data, service.host);
+        updateModels(parsedModels, service.host);
       } else {
-        const parsedModels = (ollamaModels?.models as Model[] ?? []).map(m => ({
-          ...m, id: m.id, host: 'ollama'
-        }));
-        updateModels(parsedModels, 'ollama');
-      }
-    } else {
-      updateModels([], 'ollama');
-    }
-
-    // Gemini
-    if (config?.geminiApiKey) {
-      console.log('[useUpdateModels] Fetching Gemini models...');
-      const geminiModels = await fetchDataSilently(GEMINI_URL, { headers: { Authorization: `Bearer ${config.geminiApiKey}` } });
-      if (geminiModels) {
-        const parsedModels = (geminiModels?.data as Model[] ?? []).filter(m => m.id.startsWith('models/gemini')).map(m => ({
-          ...m, id: m.id, host: 'gemini'
-        }));
-        updateModels(parsedModels, 'gemini');
-      }
-    } else {updateModels([], 'gemini');
-    }
-
-    // LM Studio
-
-    if (config?.lmStudioUrl && config?.lmStudioConnected) {
-      console.log('[useUpdateModels] Fetching LM Studio models...');
-      const lmStudioModels = await fetchDataSilently(`${config.lmStudioUrl}/v1/models`);
-      if (!lmStudioModels) {
-        updateConfig({ lmStudioConnected: false, lmStudioUrl: '' });
-        // Clear existing lmStudio models on fetch failure
-        updateModels([], 'lmStudio');
-      } else {
-        const parsedModels = (lmStudioModels?.data as Model[] ?? []).map(m => ({
-          ...m, id: m.id, host: 'lmStudio'
-        }));
-        updateModels(parsedModels, 'lmStudio');
-      }
-    } else {
-      updateModels([], 'lmStudio');
-    }
-
-    // Groq
-    if (config?.groqApiKey) {
-      console.log('[useUpdateModels] Fetching Groq models...');
-      const groqModels = await fetchDataSilently(GROQ_URL, { headers: { Authorization: `Bearer ${config.groqApiKey}` } });
-      if (groqModels) {
-        const parsedModels = (groqModels?.data as Model[] ?? []).map(m => ({
-          ...m, id: m.id, host: 'groq'
-        }));
-        updateModels(parsedModels, 'groq');
-      }
-    } else {      
-      updateModels([], 'groq');
-    }
-    // OpenAI
-    if (config?.openAiApiKey) {
-      console.log('[useUpdateModels] Fetching OpenAI models...');
-      const openAiModels = await fetchDataSilently(OPENAI_URL, { headers: { Authorization: `Bearer ${config.openAiApiKey}` } });
-      if (openAiModels) {
-        const parsedModels = (openAiModels?.data as Model[] ?? []).filter(m => m.id.startsWith('gpt-')).map(m => ({
-          ...m, id: m.id, host: 'openai'
-        }));
-        updateModels(parsedModels, 'openai');
-      }
-    } else {
-      updateModels([], 'openai');
-    }
-
-    // OpenRouter
-    if (config?.openRouterApiKey) {
-      console.log('[useUpdateModels] Fetching OpenRouter models...');
-      const openRouterModels = await fetchDataSilently(OPENROUTER_URL, { headers: { Authorization: `Bearer ${config.openRouterApiKey}` } });
-      if (openRouterModels) {
-        const parsedModels = (openRouterModels?.data as Model[] ?? []).map(m => ({
-          ...m, id: m.id, context_length: m.context_length, host: 'openrouter'
-        }));
-        updateModels(parsedModels, 'openrouter');
-      }
-    } else {
-      updateModels([], 'openrouter');
-    }
-
-    // Custom Endpoint
-    if (config?.customEndpoint) { // Check only for the endpoint URL existence
-      const normalizedUrl = normalizeApiEndpoint(config?.customEndpoint);
-      console.log('[useUpdateModels] Fetching Custom Endpoint models...');
-      const customModels = await fetchDataSilently(
-        `${normalizedUrl}/v1/models`,
-        { headers: { Authorization: `Bearer ${config.customApiKey}` } }
-      );
-      const modelsArray = Array.isArray(customModels)
-        ? customModels
-        : customModels?.data;
-      if (modelsArray && Array.isArray(modelsArray)) {
-        const parsedModels = (modelsArray as Model[]).map(m => ({
-          ...m, id: m.id, host: 'custom'
-        }));
-        updateModels(parsedModels,'custom');
-      } else {
-        // Fetch failed, clear existing custom models and mark as disconnected
         console.log('[useUpdateModels] Failed to fetch from Custom Endpoint. Clearing models.');
-        updateModels([], 'custom');
-        // Optionally, update a 'customConnected' flag if you have one:
-        // updateConfig({ customConnected: false });
+        updateModels([], service.host); // Clear models on fetch failure
+        if (service.onFetchFail) {
+          service.onFetchFail(config, updateConfig);
+        }
       }
-    } else {
-      updateModels([], 'custom');
-    }
-  }, [config, updateModels, updateConfig]);
+    });
 
-  return { chatTitle, setChatTitle, fetchAllModels };
+    // Execute all fetches (consider Promise.allSettled for more granular error handling if needed)
+    await Promise.all(fetchPromises);
+
+    console.log('[useUpdateModels] Model fetch cycle complete.');
+
+  }, [config, updateModels, updateConfig, serviceConfigs]); // Added serviceConfigs to dependencies
+
+  // Removed chatTitle and setChatTitle from return
+  return { fetchAllModels };
 };
