@@ -11,7 +11,7 @@ export const Send = ({ isLoading, onSend }: { isLoading: boolean, onSend: () => 
       isLoading ? (
         <Spinner color="var(--text)" speed="2s" />
       ) : (
-        <TbSend color="var(--text)" fontSize="20px" /> // Adjusted size slightly for consistency
+        <TbSend color="var(--text)" fontSize="16px" /> // Adjusted size slightly for consistency
       )
     }
     ml={2}
