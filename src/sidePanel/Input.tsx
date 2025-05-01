@@ -136,7 +136,7 @@ useEffect(() => {
           size="sm"
           borderRadius="md" // Added for consistency
           mr={2}
-          color={isListening ? "red.500" : "currentColor"}
+          color={isListening ? "red.500" : "var(--text)"} // Change color based on listening state
           isDisabled={isLoading || !(window.SpeechRecognition || window.webkitSpeechRecognition)}
           _hover={{ bg: 'rgba(0, 0, 0, 0.1)' }} // Unified hover effect
         />
