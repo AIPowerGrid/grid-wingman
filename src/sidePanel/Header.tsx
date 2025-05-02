@@ -610,7 +610,7 @@ export const Header = ({
       borderColor="var(--text)"
       position="sticky"
       top={0}
-      zIndex={1}
+      zIndex={10}
     >
       <Flex
         alignItems="center"
