@@ -92,6 +92,9 @@ For detailed usage instructions, persona guides, and troubleshooting, please ref
 
 *   Bug fixes and improvements.
 *   Evaluate and integrate pull requests.
+*   Better local TTS/STT by API.
+*   Search with API for postgres/Google/wikipedia/kiwix(zim-reader)
+*   Replace 'deep research' with local/basic API services (even free tier)
 *   [Future Consideration] Comparison mode (exploring feasibility).
 *   [Future Consideration] Strict CSP implementation (exploring feasibility).
 
