@@ -12,6 +12,7 @@ const dateToString = date => new Date(date).toLocaleDateString('sv-SE');
 
 export interface MessageTurn {
   role: 'user' | 'assistant';
+  status: 'complete' | 'streaming' | 'error';
   rawContent: string;         // The actual text from user or LLM
   webDisplayContent?: string; // Stores the "**SUB:**..." or "**ORG:**..." part for assistant messages
   timestamp: number;          // Timestamp for this specific turn (useful for keys)

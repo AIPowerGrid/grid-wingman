@@ -244,7 +244,7 @@ export const Messages: React.FC<MessagesProps> = ({
                 transition="opacity 0.2s"
                 alignSelf="flex-end"
                 alignItems="center"
-                pb={1}
+                pb={3}
               >
                 {/* Only show copy button if not editing */}
                 {editingIndex !== i && (

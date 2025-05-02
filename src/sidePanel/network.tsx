@@ -22,7 +22,7 @@ export const processQueryWithAI = async (
   config: Config,
   currentModel: Model,
   authHeader?: Record<string, string>,
-  contextMessages: ApiMessage[] = []
+  contextMessages: ApiMessage[] = [],
 ): Promise<string> => {
   try {
    // Ensure currentModel and host exist before trying to get the URL

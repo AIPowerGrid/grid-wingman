@@ -87,7 +87,8 @@ export interface Config {
     success: string;
     warning: string;
     name: string;
-  };
+  }; // Add the TTS settings object here
+  computeLevel: 'low' | 'medium' | 'high' | string;
   paperTexture?: boolean;
   panelOpen: boolean;
   tts?: TtsSettings; // Add the TTS settings object here

@@ -9,6 +9,7 @@ import {
 } from '@chakra-ui/react';
 import localforage from 'localforage';
 import { TbWorldSearch, TbBrowserPlus } from "react-icons/tb"; // <-- Import icons
+import { BiBrain } from "react-icons/bi";
 
 import { useChatTitle } from './hooks/useChatTitle';
 import useSendMessage from './hooks/useSendMessage';
@@ -156,7 +157,7 @@ const MessageTemplate = ({ children, onClick }: { children: React.ReactNode, onC
     justifyContent="center"
     fontSize="md"
     fontWeight={800}
-    p={1}
+    p={0.5}
     placeItems="center"
     position="relative"
     textAlign={'center'}
@@ -291,7 +292,7 @@ const Cognito = () => {
     setPageContent(''); // Reset this state too
     setWebContent('');
     setLoading(false);
-    updateConfig({ chatMode: undefined });
+    updateConfig({ chatMode: undefined, computeLevel: 'low' }); // Reset computeLevel here
     setMessage('');
     setChatTitle('');
     setChatId(generateChatId());
@@ -491,6 +492,32 @@ const Cognito = () => {
           {!settingsMode && !historyMode && turns.length === 0 && !config?.chatMode && (
             // Adjust positioning and layout if needed for icons
             <Box bottom="4rem" left="2rem" position="absolute" display="flex" flexDirection="column" gap={2}>
+                    <Tooltip
+                    label={`Compute Level: ${config.computeLevel?.toUpperCase()}. Click to change.`}
+                    placement="right"
+                    hasArrow
+                    bg="var(--bg)"      // Added style
+                    color="var(--text)" // Added style
+                  >
+                {/* Use IconButton */}
+                    <IconButton
+                      aria-label="Cycle compute level"
+                      icon={<BiBrain size="24px" />} // Increased size
+                      color={
+                        config.computeLevel === 'high' ? 'red.500' :
+                        config.computeLevel === 'medium' ? 'orange.500' :
+                        'var(--text)' // Default color for low
+                      }
+                      onClick={() => {
+                        const currentLevel = config.computeLevel;
+                        const nextLevel = currentLevel === 'low' ? 'medium' : currentLevel === 'medium' ? 'high' : 'low';
+                        updateConfig({ computeLevel: nextLevel });
+                      }}
+                      variant="ghost"
+                      size="lg" // Match other icon button sizes
+                      _hover={{ bg: 'rgba(128, 128, 128, 0.2)' }}
+                  />
+                  </Tooltip>
                   <Tooltip
                     label="Add Web Search Results to LLM Context"
                     placement="right"
@@ -537,7 +564,7 @@ const Cognito = () => {
               )}
           {!settingsMode && !historyMode && config?.chatMode === "page" && (
                  <Box
-              bottom="4.5rem"
+              bottom="3.5rem"
               left="0rem"
               right="0rem"
               position="fixed" 
@@ -548,15 +575,15 @@ const Cognito = () => {
               height="3rem"
               zIndex={2}
               opacity={isHovering ? 1 : 0} // Fade in/out
-              transform={isHovering ? "translateY(0)" : "translateY(10px)"} // Slide up/down
+              transform={isHovering ? "translateY(0)" : "translateY(-10px)"} // Slide up/down
               transition="all 0.2s ease-in-out" // Smooth animation
                     onMouseEnter={() => setIsHovering(true)}
                     onMouseLeave={() => setIsHovering(false)}
-                      sx={{
-                background: 'transparent',
-                padding: '0rem',
-                backdropFilter: 'blur(10px)',
-              }}
+                       sx={{
+                 background: 'transparent',
+                 padding: '0rem',
+                 backdropFilter: 'blur(10px)',
+               }}
             >
              <HStack spacing={6} maxW="100%" overflowX="auto" px={4}> {/* Added padding */}
               <MessageTemplate onClick={() => onSend('Provide your summary.')}>
