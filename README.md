@@ -23,12 +23,38 @@ Built on [sidellama](https://github.com/gyopak/sidellama).
         *   ...and any other platform that exposes an OpenAI-compatible API!
 
 *   **Diverse Personas:** Seven pre-built personas designed to cater to specific needs (see below).
-
 *   **Web Search Integration:** Enhanced access to information for context-aware AI interactions.
 *   **Page context reading** Transcripts reading included for Bloomberg, youtube, or other providers who put the transcripts in their html.
 *   **Enhanced Summarization** More granular control over summary length and detail over personas.
-*   **TTS** Currently, there is only basic TTS from the browser, so if you want some natural voices, you should use Edge or you have integrated TTS API from elsewhere. https://github.com/ken107/piper-browser-extension here is a very good chrome extension which can add local TTS service directly to chrome, so you can find the downloaded models in the select dropdown in setting. And I find some https://github.com/remsky/Kokoro-FastAPI https://github.com/Lex-au/Orpheus-FastAPI, maybe we can integrate with them too. I have put a .tsx like that in the files anyway. I will look into this further. I hope someone can add this if possible, because so far it's good enough for me. But still it's better to have some more choices without breaking anything.
+*   **TTS** Currently, there is only basic TTS from the browser, so if you want some natural voices, you should use Edge or you have integrated TTS API from elsewhere. https://github.com/ken107/piper-browser-extension Here is an excellent Chrome extension that can add a local TTS service directly to Chrome, so you can find the downloaded models in the select dropdown in settings. And I found some https://github.com/remsky/Kokoro-FastAPI https://github.com/Lex-au/Orpheus-FastAPI, maybe we can integrate with them too. I have put a .tsx like that in the files anyway. I will look into this further. I hope someone can add this if possible, because so far it's good enough for me. But still, it's better to have some more choices without breaking anything.
+*   **Computation Levels** New function, https://github.com/AlexBefest/highCompute.py, I use this idea and some of his code. Thanks. **WARN: STILL TESTING - Please use your local LLM, it will trigger resource exhaustion. Even though I add one second decay to every prompt to avoid concurrent prompts. And from the [readme](https://github.com/AlexBefest/highCompute.py) it might be good for coding, but the result is meh for paperwork, I guess.** check my test 'making 3k in one day' [low](https://github.com/user-attachments/assets/ea26cf72-393b-4027-a26a-058086b1dd71) check [medium](https://github.com/user-attachments/assets/9ebfd187-4f3f-4370-846e-3c7c3c5e5c19)
 
+## Computation Levels: Tailor AI Power to Your Task (Beta)
+
+Cognito now offers adjustable Computation Levels, allowing you to fine-tune the AI's processing power to match the complexity of your query. This groundbreaking feature lets you choose between **Low, Medium, and High** compute modes, each strategically designed for different task types. By decomposing complex problems into smaller, manageable parts, Cognito can achieve more accurate and nuanced results.
+
+*   **Low:** Direct query to the LLM for a quick response. Ideal for simple questions and standard chat.
+*   **Medium:** Single-level task decomposition for moderately complex queries, breaking down the task into subtasks and synthesizing the results.
+*   **High:** Two-level task decomposition (stages → steps) for highly complex, multi-component tasks. This mode allows for in-depth planning and problem-solving.
+
+**How It Works:**
+
+*   **Low:** `User Query → LLM (single call) → Response`
+*   **Medium:** `User Query → LLM (decomposition) → Subtasks → LLM (solve subtasks) → Synthesis → Final Answer`
+*   **High:** `User Query → LLM (Level 1 decomposition) → Stages → LLM (Level 2 decomposition) → Steps → LLM (solve steps) → Synthesis → Stage Results → Synthesis → Final Answer`
+
+**Flexible Adjustment:** You can seamlessly switch between Compute Levels within a single conversation to optimize performance and resource usage.
+
+**Important Considerations (Beta Phase):**
+
+*   **Experimental Feature:** The Computation Levels feature is currently in **beta**. We encourage experimentation and feedback!
+*   **Token Usage:** Higher Compute Levels significantly increase token consumption. **High Compute can use 100-150x more tokens than Low Compute for the same query.**
+*   **Cost Implications:** If you're using a paid LLM API (e.g., OpenAI), be mindful of the potential cost increase with Medium and High Compute. Monitor your API usage closely.
+*   **Processing Time:** Expect longer processing times with Medium and High Compute as the AI performs multiple decomposition and synthesis steps.
+*   **Potential Instability:** As a beta feature, unexpected behavior may occur. Please report any issues you encounter.
+
+By carefully selecting the appropriate Computation Level, you can unlock the full potential of Cognito while managing your resources effectively. We believe this feature will provide a significant boost in the quality of AI-driven problem-solving.
+   
 ## Available Personas
 
 Cognito offers the following personas to tailor the AI's behavior to your specific needs:
