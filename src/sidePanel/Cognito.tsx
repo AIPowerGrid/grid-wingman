@@ -493,7 +493,7 @@ const Cognito = () => {
             // Adjust positioning and layout if needed for icons
             <Box bottom="4rem" left="2rem" position="absolute" display="flex" flexDirection="column" gap={2}>
                     <Tooltip
-                    label={`Compute Level: ${config.computeLevel?.toUpperCase()}. Click to change.`}
+                    label={`Compute Level: ${config.computeLevel?.toUpperCase()}. Click to change. [Warning]: beta feature and resource costly.`}
                     placement="right"
                     hasArrow
                     bg="var(--bg)"      // Added style
