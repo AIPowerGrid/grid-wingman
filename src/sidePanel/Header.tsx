@@ -121,7 +121,7 @@ const Badge = ({ children }) => (
     px={3}
     py={0}
     fontFamily={"'Poppins', sans-serif"}
-    fontStyle={"italic"}
+    fontStyle={"normal"}
     fontSize="md"
     fontWeight="medium"
     display="inline-block"
@@ -268,7 +268,7 @@ const SettingsDrawer = ({
                   fontWeight="semibold"
                   color="var(--text)"
                   bg="var(--active)"
-                  fontFamily="'Poppins', sans-serif"
+                  fontFamily="'Orbitron', sans-serif"
                   letterSpacing="tight"
                   display="inline-block"
                   px={3}
@@ -276,7 +276,7 @@ const SettingsDrawer = ({
                   borderRadius="md"
                   mx="auto"
                 >
-                  Cognito <Box as="sub" sx={{filter: 'contrast(200%)' }}>V2.6</Box>
+                  COGNITO <Box as="sub" fontStyle='italic' sx={{filter: 'contrast(200%)'}}>v2.6</Box>
                 </Heading>
               </Link>
 
@@ -672,7 +672,7 @@ export const Header = ({
           {settingsMode && (
             // Keep this Flex simple, centering is handled by the parent
             <Flex align="center" justify="center" width="auto">
-              <Text fontSize="md" fontWeight="semibold" color="var(--text)" fontStyle="italic" whiteSpace="nowrap">
+              <Text fontSize="md" fontWeight="semibold" color="var(--text)" fontStyle="normal" whiteSpace="nowrap">
                 The Game Is Afoot{' '}
                 <Box
                   as={WiMoonWaxingCrescent1}
@@ -688,7 +688,7 @@ export const Header = ({
           {historyMode && (
             // Keep this Flex simple, centering is handled by the parent
             <Flex align="center" justify="center" width="auto">
-              <Text fontSize="md" fontWeight="semibold" color="var(--text)" fontStyle="italic" whiteSpace="nowrap">
+              <Text fontFamily="Bruno Ace SC" fontSize="md" fontWeight="semibold" color="var(--text)" fontStyle="normal" whiteSpace="nowrap">
                 Chat History
               </Text>
               {/* Moved delete button to the right section for consistency */}
