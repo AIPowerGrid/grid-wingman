@@ -91,7 +91,7 @@ html[data-paper-texture="true"] .settings-drawer-body::before { /* Target Drawer
 
 html[data-paper-texture="true"] #settings::before { /* Target Settings page Box */
   content: "";
-  position: absolute; /* Use absolute positioning relative to the component */
+  position: fixed; /* Use absolute positioning relative to the component */
   top: 0; left: 0; right: 0; bottom: 0;
   width: 100%; height: 100%;
   background-image: url('assets/images/paper-texture.png');
@@ -128,12 +128,13 @@ html[data-paper-texture="true"] .css-1kowdgt::after {
   width: 100%; height: 100%;
   background-color: rgba(255, 255, 255, 0.1); /* Semi-transparent white mixer */
   pointer-events: none;
+  background-repeat: repeat;
   z-index: 0; /* Same level as texture, behind content */
 }
 /* White overlay for the Settings page Box (conditional) */
 html[data-paper-texture="true"] #settings::after {
   content: "";
-  position: absolute;
+  position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
   width: 100%; height: 100%;
   background-color: rgba(255, 255, 255, 0.1); /* Semi-transparent white mixer */
