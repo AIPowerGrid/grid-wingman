@@ -47,6 +47,7 @@ export const useUpdateModels = () => {
 
   // Helper to update models in config
   const updateModels = useCallback((newModels: Model[], host: string) => {
+    console.log(`[updateModels] Called for host: ${host} with ${newModels.length} new models.`); // Add log
     const haveModelsChanged = (newModels: Model[], existingModels: Model[] = []) => {
       if (newModels.length !== existingModels.length) return true;
       const sortById = (a: Model, b: Model) => a.id.localeCompare(b.id);
@@ -56,9 +57,11 @@ export const useUpdateModels = () => {
     };
 
     const existingModels = (config?.models ?? []).filter(m => m.host !== host);
+    console.log(`[updateModels] Existing models after filtering host ${host}:`, existingModels.length); // Add log
     const combinedModels = [...existingModels, ...newModels];
 
     if (haveModelsChanged(combinedModels, config?.models)) {
+      console.log(`[updateModels] Models changed for host ${host}. Updating config.`); // Add log
       const isSelectedAvailable = config?.selectedModel &&
         combinedModels.some(m => m.id === config?.selectedModel);
 
@@ -67,6 +70,8 @@ export const useUpdateModels = () => {
         selectedModel: isSelectedAvailable ? config?.selectedModel : combinedModels[0]?.id
       });
     }
+    // Optional: Add else block for logging if needed:
+    // else { console.log(`[updateModels] Models for host ${host} did not change. Skipping update.`); }
   }, [config, updateConfig]);
 
   const FETCH_INTERVAL =  30 * 1000; // 30s
@@ -80,6 +85,11 @@ export const useUpdateModels = () => {
       getUrl: (cfg) => `${cfg.ollamaUrl}/api/tags`,
       parseFn: (data, host) => (data?.models as Model[] ?? []).map(m => ({ ...m, id: m.id ?? m.name, host })), // Use name if id missing
       onFetchFail: (_, updateCfg) => updateCfg({ ollamaConnected: false, ollamaUrl: '' }),
+      // Refined: Only update connected status on temporary failure
+      // onFetchFail: (_, updateCfg) => {
+      //   console.log(`[useUpdateModels] Ollama fetch failed, setting ollamaConnected: false`);
+      //   updateCfg({ ollamaConnected: false });
+      // },
     },
     {
       host: HOST_GEMINI,
@@ -93,7 +103,11 @@ export const useUpdateModels = () => {
       isEnabled: (cfg) => !!cfg.lmStudioUrl && cfg.lmStudioConnected,
       getUrl: (cfg) => `${cfg.lmStudioUrl}/v1/models`,
       parseFn: (data, host) => (data?.data as Model[] ?? []).map(m => ({ ...m, id: m.id, host })),
-      onFetchFail: (_, updateCfg) => updateCfg({ lmStudioConnected: false, lmStudioUrl: '' }),
+      // Refined: Only update connected status on temporary failure
+      onFetchFail: (_, updateCfg) => {
+        console.log(`[useUpdateModels] LM Studio fetch failed, setting lmStudioConnected: false`);
+        updateCfg({ lmStudioConnected: false });
+      },
     },
     {
       host: HOST_GROQ,
@@ -172,11 +186,12 @@ export const useUpdateModels = () => {
         const parsedModels = service.parseFn(data, service.host);
         updateModels(parsedModels, service.host);
       } else {
-        console.log('[useUpdateModels] Failed to fetch from Custom Endpoint. Clearing models.');
+        // console.log('[useUpdateModels] Failed to fetch from Custom Endpoint. Clearing models.'); // Make log generic or remove
+        console.log(`[useUpdateModels] Fetch failed for host: ${service.host}. Clearing models.`);
         updateModels([], service.host); // Clear models on fetch failure
         if (service.onFetchFail) {
           service.onFetchFail(config, updateConfig);
-        }
+        } // Add logging inside onFetchFail callbacks if further debugging needed
       }
     });
 
@@ -185,7 +200,7 @@ export const useUpdateModels = () => {
 
     console.log('[useUpdateModels] Model fetch cycle complete.');
 
-  }, [config, updateModels, updateConfig, serviceConfigs]); // Added serviceConfigs to dependencies
+  }, [config, updateModels, updateConfig, FETCH_INTERVAL]); // Removed serviceConfigs from dependencies
 
   // Removed chatTitle and setChatTitle from return
   return { fetchAllModels };

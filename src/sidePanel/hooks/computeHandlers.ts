@@ -21,6 +21,7 @@ export const handleHighCompute = async (
   const l1Prompt = `You are a planning agent. Given the original task: "${message}", break it down into the main sequential stages required to accomplish it. Output *only* a numbered list of stages. Example:\n1. First stage\n2. Second stage`;
   const l1DecompositionResult = await processQueryWithAI(l1Prompt, config, currentModel, authHeader, [], controlTemp);
   const stages = l1DecompositionResult.split('\n').map(s => s.trim()).filter(s => s.match(/^\d+\./));
+  console.log("HighCompute - Raw L1 Decomposition Result:", l1DecompositionResult); // CONSOLE LOG ADDED
   onUpdate(`Monitoring: Generated Stages:\n${stages.join('\n') || '[None]'}`, false); // MONITORING ADDED
 
   if (!stages || stages.length === 0) {
@@ -37,6 +38,7 @@ export const handleHighCompute = async (
     const l2Prompt = `You are a planning agent. Given the stage: "${stage}", break it down into the specific sequential steps needed to complete it. Output *only* a numbered list of steps. If no further breakdown is needed, output "No breakdown needed."`;
     await new Promise(resolve => setTimeout(resolve, SUB_QUERY_DELAY_MS));
     const l2DecompositionResult = await processQueryWithAI(l2Prompt, config, currentModel, authHeader, [], controlTemp);
+    console.log(`HighCompute - Raw L2 Decomposition Result (Stage ${i + 1}):`, l2DecompositionResult); // CONSOLE LOG ADDED
     const steps = l2DecompositionResult.split('\n').map(s => s.trim()).filter(s => s.match(/^\d+\./));
     onUpdate(`Monitoring: Generated Steps for Stage ${i + 1}:\n${steps.join('\n') || '[None, or direct solve]'}`, false); // MONITORING ADDED
 
@@ -46,6 +48,7 @@ export const handleHighCompute = async (
       const stageSolvePrompt = `Complete the following stage based on the original task "${message}": "${stage}"`;
       await new Promise(resolve => setTimeout(resolve, SUB_QUERY_DELAY_MS));
       currentStageResult = await processQueryWithAI(stageSolvePrompt, config, currentModel, authHeader);
+      console.log(`HighCompute - Raw Direct Solve Result (Stage ${i + 1}):`, currentStageResult); // CONSOLE LOG ADDED
       onUpdate(`Monitoring: Direct Solve Result for Stage ${i + 1}:\n${currentStageResult}`, false); // MONITORING ADDED
     } else {
       const stepResults: string[] = [];
@@ -63,9 +66,11 @@ export const handleHighCompute = async (
 
         await new Promise(resolve => setTimeout(resolve, SUB_QUERY_DELAY_MS));
         const batchResults = await processQueryWithAI(batchPrompt, config, currentModel, authHeader);
+        console.log(`HighCompute - Raw Batch Results (Stage ${i + 1}, Batch ${batchNumber}):`, batchResults); // CONSOLE LOG ADDED
         onUpdate(`Monitoring: Raw Batch Results for Stage ${i + 1}, Batch ${batchNumber}:\n${batchResults}`, false); // MONITORING ADDED
 
         const parsedBatchResults = batchResults.split('\n').map(s => s.trim()).filter(s => s.match(/^\d+\./)).map(s => s.replace(/^\d+\.\s*/, ''));
+        console.log(`HighCompute - Parsed Batch Results (Stage ${i + 1}, Batch ${batchNumber}):`, parsedBatchResults); // CONSOLE LOG ADDED
         onUpdate(`Monitoring: Parsed Batch Results for Stage ${i + 1}, Batch ${batchNumber}:\n${parsedBatchResults.join('\n') || '[None]'}`, false); // MONITORING ADDED
 
         for (let k = 0; k < parsedBatchResults.length; k++) {
@@ -80,6 +85,7 @@ export const handleHighCompute = async (
       await new Promise(resolve => setTimeout(resolve, SUB_QUERY_DELAY_MS));
       const stageSynthPrompt = `Synthesize the results of the following steps for stage "${stage}" into a coherent paragraph:\n\n${stepResults.map((r, idx) => `Step ${idx + 1} Result:\n${r}`).join('\n\n')}`;
       currentStageResult = await processQueryWithAI(stageSynthPrompt, config, currentModel, authHeader, [], controlTemp);
+      console.log(`HighCompute - Raw Stage Synthesis Result (Stage ${i + 1}):`, currentStageResult); // CONSOLE LOG ADDED
       onUpdate(`Monitoring: Synthesized Result for Stage ${i + 1}:\n${currentStageResult}`, false); // MONITORING ADDED
     }
     stageResults.push(currentStageResult);
@@ -92,8 +98,10 @@ export const handleHighCompute = async (
   // Modify the prompt to ask for a summary *based on* the stages, rather than just replacing them.
   const finalSynthPrompt = `Based on the results of the following stages, provide a final comprehensive answer for the original task "${message}":\n\n${stageResults.map((r, idx) => `Stage ${idx + 1} (${stages[idx]}):\n${r}`).join('\n\n')}`;
   onUpdate(`Monitoring: Final Synthesis Prompt:\n${finalSynthPrompt}`, false); // MONITORING ADDED
+  console.log("HighCompute - Final Synthesis Prompt:", finalSynthPrompt); // CONSOLE LOG ADDED
   await new Promise(resolve => setTimeout(resolve, SUB_QUERY_DELAY_MS)); // Delay
   const finalSynthesizedAnswer = await processQueryWithAI(finalSynthPrompt, config, currentModel, authHeader, [], controlTemp);
+  console.log("HighCompute - Raw Final Synthesis Result:", finalSynthesizedAnswer); // CONSOLE LOG ADDED
   // Construct a detailed final output including stage summaries
   const detailedFinalOutput = `**High Compute Breakdown:**\n\n` +
                               stageResults.map((r, idx) => `**Stage ${idx + 1}: ${stages[idx]}**\n${r}`).join('\n\n---\n\n') +
@@ -119,6 +127,7 @@ export const handleMediumCompute = async (
   const decompPrompt = `You are a planning agent. Given the task: "${message}", break it down into logical subtasks needed to accomplish it. Output *only* a numbered list of subtasks.`;
   const decompositionResult = await processQueryWithAI(decompPrompt, config, currentModel, authHeader, [], controlTemp);
   const subtasks = decompositionResult.split('\n').map(s => s.trim()).filter(s => s.match(/^\d+\./));
+  console.log("MediumCompute - Raw Decomposition Result:", decompositionResult); // CONSOLE LOG ADDED
   onUpdate(`Monitoring: Generated Subtasks:\n${subtasks.join('\n') || '[None]'}`, false); // MONITORING ADDED
 
   if (!subtasks || subtasks.length === 0) {
@@ -144,10 +153,12 @@ export const handleMediumCompute = async (
 
     await new Promise(resolve => setTimeout(resolve, SUB_QUERY_DELAY_MS));
     const batchResults = await processQueryWithAI(batchPrompt, config, currentModel, authHeader);
+    console.log(`MediumCompute - Raw Batch Results (Batch ${batchNumber}):`, batchResults); // CONSOLE LOG ADDED
     onUpdate(`Monitoring: Raw Batch Results for Batch ${batchNumber}:\n${batchResults}`, false); // MONITORING ADDED
 
     // Parse the batch results
     const parsedBatchResults = batchResults.split('\n').map(s => s.trim()).filter(s => s.match(/^\d+\./)).map(s => s.replace(/^\d+\.\s*/, '')); // Extract results, removing numbering
+    console.log(`MediumCompute - Parsed Batch Results (Batch ${batchNumber}):`, parsedBatchResults); // CONSOLE LOG ADDED
     onUpdate(`Monitoring: Parsed Batch Results for Batch ${batchNumber}:\n${parsedBatchResults.join('\n') || '[None]'}`, false); // MONITORING ADDED
 
     // Add the results to the subtaskResults array
@@ -160,8 +171,10 @@ export const handleMediumCompute = async (
   onUpdate("Synthesizing final answer...", false);
   await new Promise(resolve => setTimeout(resolve, SUB_QUERY_DELAY_MS));
   const finalSynthPrompt = `Synthesize the results of the following subtasks into a final comprehensive answer for the original task "${message}":\n\n${subtaskResults.map((r, idx) => `Subtask ${idx + 1} Result:\n${r}`).join('\n\n')}`;
+  console.log("MediumCompute - Final Synthesis Prompt:", finalSynthPrompt); // CONSOLE LOG ADDED
   onUpdate(`Monitoring: Final Synthesis Prompt:\n${finalSynthPrompt}`, false); // MONITORING ADDED
   const finalSynthesizedAnswer = await processQueryWithAI(finalSynthPrompt, config, currentModel, authHeader, [], controlTemp);
+  console.log("MediumCompute - Raw Final Synthesis Result:", finalSynthesizedAnswer); // CONSOLE LOG ADDED
 
   const detailedFinalOutput = `**Medium Compute Breakdown:**\n\n` +
                               subtaskResults.map((r, idx) => `**Subtask ${idx + 1}: ${subtasks[idx]}**\n${r}`).join('\n\n---\n\n') +
