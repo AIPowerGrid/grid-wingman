@@ -120,7 +120,7 @@ const Badge = ({ children }) => (
     borderRadius="md"
     px={3}
     py={0}
-    fontFamily={"'Poppins', sans-serif"}
+    fontFamily={"'poppins', sans-serif"}
     fontStyle={"normal"}
     fontSize="md"
     fontWeight="medium"
@@ -276,7 +276,7 @@ const SettingsDrawer = ({
                   borderRadius="md"
                   mx="auto"
                 >
-                  COGNITO <Box as="sub" fontStyle='italic' sx={{filter: 'contrast(200%)'}}>v2.6</Box>
+                  COGNITO <Box as="sub" fontStyle='italic' sx={{filter: 'contrast(200%)', fontSize: '0.5em'}}>v2.7</Box>
                 </Heading>
               </Link>
 
@@ -672,8 +672,8 @@ export const Header = ({
           {settingsMode && (
             // Keep this Flex simple, centering is handled by the parent
             <Flex align="center" justify="center" width="auto">
-              <Text fontSize="md" fontWeight="semibold" color="var(--text)" fontStyle="normal" whiteSpace="nowrap">
-                The Game Is Afoot{' '}
+              <Text fontSize="md" fontFamily="Allura" fontWeight="semibold" color="var(--text)" fontStyle="normal" whiteSpace="nowrap">
+                The game is afoot{' '}
                 <Box
                   as={WiMoonWaxingCrescent1}
                   display="inline-block"
