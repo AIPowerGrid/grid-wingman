@@ -1,7 +1,3 @@
-// src/types/config.ts
-
-import { Value } from "sass";
-
 export interface Persona {
   Ein: string;
   Jan: string;
@@ -17,7 +13,7 @@ export interface Model {
   host?: 'groq' | 'ollama' | 'gemini' | 'lmStudio' | 'openai' | 'openrouter' | 'custom' | string;
   active?: boolean;
   context_length?: number;
-  name: string;
+  name?: string; // Make name optional
   // Add other model-specific properties if needed
 }
 
@@ -72,21 +68,21 @@ export interface Config {
   chatMode?: 'web' | 'page' | 'chat' | string;
   theme?: string;
   customTheme?: {
-    active: string;
-    bg: string;
-    text: string;
-    bold: string;
-    italic: string;
-    link: string;
-    codeBg: string;
-    codeFg: string;
-    preBg: string;
-    preFg: string;
-    tableBorder: string;
-    error: string;
-    success: string;
-    warning: string;
-    name: string;
+    active?: string;
+    bg?: string;
+    text?: string;
+    bold?: string;
+    italic?: string;
+    link?: string;
+    codeBg?: string;
+    codeFg?: string;
+    preBg?: string;
+    preFg?: string;
+    tableBorder?: string;
+    error?: string;
+    success?: string;
+    warning?: string;
+    name?: string;
   }; // Add the TTS settings object here
   computeLevel: 'low' | 'medium' | 'high' | string;
   paperTexture?: boolean;
