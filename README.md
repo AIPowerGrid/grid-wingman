@@ -103,6 +103,8 @@ For detailed usage instructions, persona guides, and troubleshooting, please ref
 
 Contributions are welcome!
 
+https://github.com/stanford-oval/WikiChat
+
 ## License
 
 MIT License - see the [LICENSE](LICENSE) file for details.
