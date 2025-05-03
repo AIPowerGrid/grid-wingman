@@ -83,7 +83,6 @@ export const TtsSettings = () => {
         <SettingTitle
           text="Text-to-Speech"
           icon="🎤" // Use a microphone emoji or any other icon
-          padding={0}
         />
       </AccordionButton>
       {/* Adjust panel padding */}

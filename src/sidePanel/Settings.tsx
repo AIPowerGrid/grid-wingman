@@ -1,16 +1,13 @@
 // src/sidePanel/Settings.tsx
 import { Accordion, Box } from '@chakra-ui/react';
-import React from 'react'; // Import React for useEffect
-
-import { Automation } from './Automation';
 import { useConfig } from './ConfigContext';
 import { Connect } from './Connect';
 import { PageContext } from './PageContext';
 import { ModelSettingsPanel } from './ModelSettingsPanel';
 import { Persona } from './Persona';
-import { themes, setTheme, Themes } from './Themes'; // Import themes and setTheme
+import { Themes } from './Themes';
 import { TtsSettings } from './TtsSettings';
-import { WebSearch } from './WebSearch';
+import { WebSearch } from './WebSearch'; // Remove unused imports
 
 
 export const Settings = () => {
@@ -117,7 +114,6 @@ export const Settings = () => {
         <TtsSettings />
         <PageContext />
         <WebSearch />
-        <Automation />
       </Accordion>
     </Box>
   );

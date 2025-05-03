@@ -326,7 +326,7 @@ export const Themes = () => {
     const currentThemeName = config?.theme || 'paper';
     const isCustom = currentThemeName === 'custom';
     const themeDefinition = isCustom
-      ? { name: 'custom', ...(config?.customTheme || themes.find(t => t.name === 'custom')) }
+      ? { name: 'custom', ...(config?.customTheme || themes.find((t) => t.name === 'custom')) }
       : themes.find((t) => t.name === currentThemeName) || themes.find((t) => t.name === 'paper'); // Fallback
 
     if (themeDefinition) {
@@ -337,7 +337,7 @@ export const Themes = () => {
     if (config?.fontSize) {
       document.documentElement.style.setProperty('--global-font-size', `${config.fontSize}px`);
     }
-  // Add fontSize dependency
+    // Add fontSize dependency
   }, [config?.theme, config?.customTheme, config?.paperTexture, config?.fontSize]);
 
   return (
@@ -392,7 +392,7 @@ export const Themes = () => {
                 const currentThemeName = config?.theme || 'paper';
                 const isCustom = currentThemeName === 'custom';
                 const currentTheme = isCustom
-                  ? { name: 'custom', ...(config?.customTheme || themes.find(t => t.name === 'custom')) }
+                  ? { name: 'custom', ...(config?.customTheme || themes.find((t) => t.name === 'custom')) }
                   : themes.find((t) => t.name === currentThemeName) || themes.find((t) => t.name === 'paper');
 
                 if (currentTheme) {
@@ -435,7 +435,7 @@ export const Themes = () => {
                 ))}
               <CustomThemePicker updateConfig={updateConfig} config={config} />
             </Flex>
-        </Box>
+          </Box>
         </Flex>
       </AccordionPanel>
     </AccordionItem>
