@@ -95,6 +95,7 @@ For detailed usage instructions, persona guides, and troubleshooting, please ref
 *   Better local TTS/STT by API.
 *   Search with API for postgres/Google/wikipedia/kiwix(zim-reader)
 *   Replace 'deep research' with local/basic API services (even free tier)
+*   "Memory" for the chat history with RAG and search.
 *   [Future Consideration] Comparison mode (exploring feasibility).
 *   [Future Consideration] Strict CSP implementation (exploring feasibility).
 
