@@ -97,8 +97,7 @@ For detailed usage instructions, persona guides, and troubleshooting, please ref
 *   Search with API for postgres/Google/wikipedia/kiwix(zim-reader)
 *   Replace 'deep research' with local/basic API services (even free tier)
 *   "Memory" for the chat history with RAG and search.
-*   [Future Consideration] Comparison mode (exploring feasibility).
-*   [Future Consideration] Strict CSP implementation (exploring feasibility).
+*   Comparison mode (RAG or hybrid search can do this).
 
 ## Contributing
 
