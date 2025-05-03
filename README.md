@@ -92,16 +92,18 @@ For detailed usage instructions, persona guides, and troubleshooting, please ref
 
 *   Bug fixes and improvements.
 *   Evaluate and integrate pull requests.
+*   Simple tool use to enhance the current web search to reduce the cost of running LLM and get a better result.
 *   Better local TTS/STT by API.
 *   Search with API for postgres/Google/wikipedia/kiwix(zim-reader)
 *   Replace 'deep research' with local/basic API services (even free tier)
 *   "Memory" for the chat history with RAG and search.
-*   [Future Consideration] Comparison mode (exploring feasibility).
-*   [Future Consideration] Strict CSP implementation (exploring feasibility).
+*   Comparison mode (RAG or hybrid search can do this).
 
 ## Contributing
 
 Contributions are welcome!
+
+https://github.com/stanford-oval/WikiChat
 
 ## License
 
