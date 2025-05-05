@@ -5,7 +5,18 @@
 Cognito is your FREE, all-in-one AI companion, now available directly from the Chrome Extension Store! This powerful extension brings the capabilities of Large Language Models (LLMs) to your browser, allowing you to summarize web pages, interact directly with page content, conduct context-aware web searches, read out the responses, and more. Choose between cloud-based services like OpenAI and Gemini or run models locally with Ollama and LM Studio. **Install Cognito today and enjoy AI in your browser!**
 
 Built on [sidellama](https://github.com/gyopak/sidellama).
+## Roadmap
 
+*   Bug fixes and improvements.
+*   Evaluate and integrate pull requests.
+*   ~Migrate to Shadcn/ui from Chakra-UI V2,~ and React 19.
+*   Search with API for wikipedia/kiwix(zim-reader)
+*   Search with API for Google
+*   Simple tool use to enhance the current web search to reduce the cost of running LLM and get a better result.
+*   Better local TTS/STT by API.
+*   Replace 'deep research' with local/basic API services (even free tier)
+*   "Memory" for the chat history with RAG and search.
+*   Comparison mode (RAG or hybrid search can do this).
 ## Screenshot
 
 ![](docs/screenshot.png)
@@ -88,18 +99,6 @@ See the [documentation](DOCS.md) for a complete overview of each persona's capab
 
 For detailed usage instructions, persona guides, and troubleshooting, please refer to the [documentation page](DOCS.md).
 
-## Roadmap
-
-*   Bug fixes and improvements.
-*   Evaluate and integrate pull requests.
-*   ~Migrate to Shadcn/ui from Chakra-UI V2,~ and React 19.
-*   Search with API for wikipedia/kiwix(zim-reader)
-*   Search with API for Google
-*   Simple tool use to enhance the current web search to reduce the cost of running LLM and get a better result.
-*   Better local TTS/STT by API.
-*   Replace 'deep research' with local/basic API services (even free tier)
-*   "Memory" for the chat history with RAG and search.
-*   Comparison mode (RAG or hybrid search can do this).
 
 ## Contributing
 
