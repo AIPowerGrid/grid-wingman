@@ -92,7 +92,7 @@ For detailed usage instructions, persona guides, and troubleshooting, please ref
 
 *   Bug fixes and improvements.
 *   Evaluate and integrate pull requests.
-*   Migrate to Shadcn/ui from Chakra-UI V2, and React 19.
+*   ~Migrate to Shadcn/ui from Chakra-UI V2,~ and React 19.
 *   Search with API for wikipedia/kiwix(zim-reader)
 *   Search with API for Google
 *   Simple tool use to enhance the current web search to reduce the cost of running LLM and get a better result.
