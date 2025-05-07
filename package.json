@@ -1,7 +1,7 @@
 {
   "name": "cognito",
   "version": "2.7.1",
-  "description": "Cognito is a Chrome extension that allows you to communicate with your browser.",
+  "description": "Cognito is a Chrome LLM extension that allows you to communicate with your browser.",
   "main": "index.js",
   "scripts": {
     "start": "npm run clear && webpack -w --config config/webpack.config.js",
@@ -13,8 +13,10 @@
   },
   "keywords": [
     "sidepanel",
-    "side",
-    "panel",
+    "AI",
+    "LLM",
+    "local",
+    "assistant",
     "chrome",
     "extension"
   ],
