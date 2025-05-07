@@ -53,7 +53,6 @@ interface ConfigContextType {
   updateConfig: (newConfig: Partial<Config>) => void;
 }
 
-// --- Mocks remain the same ---
 
 // --- WelcomeModal remains the same ---
 const WelcomeModal = ({ isOpen, onClose, setSettingsMode }) => (
