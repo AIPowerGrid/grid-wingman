@@ -404,7 +404,7 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
                 
                 {/* Model Section (remains the same) */}
                 <div>
-                  <label htmlFor="model-input" className="block text-[var(--text)] opacity-80 text-md font-medium uppercase">
+                  <label htmlFor="model-input" className="block text-[var(--text)] opacity-80 text-lg font-medium uppercase">
                     Model
                   </label>
                   <div className="relative">
