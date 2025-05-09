@@ -1,3 +1,4 @@
+![title.png]
 # Cognito: Your All-in-One AI Companion for Browser LLMs
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
