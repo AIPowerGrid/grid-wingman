@@ -36,8 +36,10 @@ const config = {
     extensions: ['.js', '.ts', '.jsx', '.tsx', '.css', '.scss'],
     alias: {
       lib: Lib,
+      '@': Root,
       background: Background,
       sidePanel: SidePanel,
+      '@/utils': join(Background, 'util.ts'), 
       content: Content,
       assets: Public,
       options: Options,
@@ -96,9 +98,8 @@ const buildConfig = browser => ({
   output: {
     path: join(Dist, browser),
     filename: '[name].js',
-    publicPath: process.env.EXTENSION_PUBLIC_PATH
+    publicPath: process.env.EXTENSION_PUBLIC_PATH || '/' // Fallback to '/' if env var is not set
   }
 });
 
 module.exports = buildConfig(process.env.BROWSER || 'chrome');
-

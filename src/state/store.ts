@@ -1,16 +1,16 @@
 import {
-  AnyAction,
   combineReducers,
   configureStore,
   createSerializableStateInvariantMiddleware,
   Dispatch,
   Middleware,
-  Slice
+  Slice,
+  UnknownAction // Changed from AnyAction for RTK 2.0
 } from '@reduxjs/toolkit';
 import { logger } from 'redux-logger';
-import thunkMiddleware from 'redux-thunk';
+import { thunk } from 'redux-thunk'; // Changed for redux-thunk v3
 import {
- alias, applyMiddleware, Store, wrapStore 
+ alias, applyMiddleware, Store, createWrapStore // Changed for webext-redux v3
 } from 'webext-redux';
 
 import * as contentSlice from 'src/state/slices/content';
@@ -21,20 +21,34 @@ type BuildStoreOptions = {
     reducers?: {
         [key in string]: Slice
     };
-    portName?: string;
+    channelName?: string; // Changed from portName for webext-redux v3
 };
 
 const backgroundAliases = { ...sidePanelSlice.aliases, ...contentSlice.aliases };
 
 const middleware: Middleware[] = [
   alias(backgroundAliases) as Middleware,
-  thunkMiddleware as unknown as Middleware<object, unknown, Dispatch<AnyAction>>,
-  createSerializableStateInvariantMiddleware() as Middleware<object, unknown, Dispatch<AnyAction>>,
-  logger as Middleware<object, unknown, Dispatch<AnyAction>>
+  thunk as Middleware, // Use named import
+  createSerializableStateInvariantMiddleware(),
+  logger as Middleware
 ];
 
-const buildStoreWithDefaults = ({ portName }: BuildStoreOptions = {}) => {
-  const reducer = combineReducers<State, AnyAction>({
+// Middleware for createStoreProxy (needs all explicit middleware)
+const middlewareForProxy: Middleware[] = [
+  alias(backgroundAliases) as Middleware,
+  thunk as Middleware,
+  createSerializableStateInvariantMiddleware(),
+  logger as Middleware,
+];
+
+// Middleware to be added to getDefaultMiddleware for configureStore
+const additionalMiddlewareForConfigureStore: Middleware[] = [
+  alias(backgroundAliases) as Middleware,
+  logger as Middleware,
+];
+
+const buildStoreWithDefaults = ({ channelName }: BuildStoreOptions = {}) => { // Changed from portName
+  const reducer = combineReducers<State, UnknownAction>({ // Changed from AnyAction
     sidePanel: sidePanelSlice.reducer,
     content: contentSlice.reducer
   });
@@ -42,11 +56,13 @@ const buildStoreWithDefaults = ({ portName }: BuildStoreOptions = {}) => {
   const store = configureStore({
     devTools: true,
     reducer,
-    middleware
+    middleware: (getDefaultMiddleware) => // Changed to callback for RTK 2.0
+      getDefaultMiddleware().concat(additionalMiddlewareForConfigureStore),
   });
 
-  if (portName) {
-    wrapStore(store, { portName });
+  if (channelName) { // Changed from portName
+    const specificWrapStore = createWrapStore({ channelName });
+    specificWrapStore(store);
   }
 
   return store;
@@ -54,17 +70,10 @@ const buildStoreWithDefaults = ({ portName }: BuildStoreOptions = {}) => {
 
 export default buildStoreWithDefaults;
 
-export const createStoreProxy = (portName: string) => {
-  const store = new Store<State, AnyAction>({ portName });
+export const createStoreProxy = (channelName: string) => { // Changed from portName
+  const store = new Store<State, UnknownAction>({ channelName }); // Changed from portName and AnyAction
 
-  applyMiddleware(store, ...middleware);
-
-  // Fix for unresolved bug in webext-redux: https://github.com/tshaddix/webext-redux/issues/286
-  Object.assign(store, {
-    dispatch: store.dispatch.bind(store),
-    getState: store.getState.bind(store),
-    subscribe: store.subscribe.bind(store)
-  });
+  applyMiddleware(store, ...middlewareForProxy); // Use dedicated middleware array
 
   return store;
 };

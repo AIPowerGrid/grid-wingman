@@ -1,0 +1,429 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --radius: 0.625rem;
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+  /* New variables for Markdown code styling */
+  --markdown-inline-code-foreground: oklch(0.145 0 0); /* Default: same as --foreground */
+  --markdown-code-background: oklch(0.95 0 0); /* Default: a very light gray, slightly darker than --muted */
+  --markdown-pre-foreground: oklch(0.985 0 0);  /* Default: --background (for inverted block) */
+  --markdown-pre-background: oklch(0.145 0 0); /* Default: --foreground (for inverted block) */
+  --markdown-thead-background: var(--secondary);
+  --markdown-thead-foreground: var(--secondary-foreground);
+  --markdown-link: var(--primary); /* Added definition */
+  --markdown-strong: var(--foreground); /* Added definition */
+  --markdown-em: var(--foreground); /* Added definition */
+  }
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.145 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.145 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.985 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.396 0.141 25.723);
+  --destructive-foreground: oklch(0.637 0.237 25.331);
+  --border: oklch(0.269 0 0);
+  --input: oklch(0.269 0 0);
+  --ring: oklch(0.439 0 0);
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(0.269 0 0);
+  --sidebar-ring: oklch(0.439 0 0);
+    /* New variables for Markdown code styling in dark mode */
+  --markdown-inline-code-foreground: oklch(0.985 0 0); /* Default: same as --foreground */
+  --markdown-code-background: oklch(0.25 0 0);  /* Default: a dark gray, slightly lighter than --muted */
+  --markdown-pre-foreground: oklch(0.145 0 0);  /* Default: --background (for inverted block) */
+  --markdown-pre-background: oklch(0.985 0 0); /* Default: --foreground (for inverted block) */
+  --markdown-thead-background: var(--secondary);
+  --markdown-thead-foreground: var(--secondary-foreground);
+  --markdown-link: var(--primary); /* Added definition */
+  --markdown-strong: var(--foreground); /* Added definition */
+  --markdown-em: var(--foreground); /* Added definition */
+  }
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html,
+  body {
+    @apply bg-background text-foreground;
+    @apply no-scrollbar;
+
+  }
+}
+
+@utility no-scrollbar {
+  @apply [scrollbar-width:none] [&::-webkit-scrollbar]:hidden;
+}
+
+/* Native scrollbar styling for #messages is no longer needed (or effective)
+   if using the Shadcn ScrollArea component for the #messages container,
+   as ScrollArea renders its own custom scrollbar.
+*/
+
+
+
+
+@utility scrollbar-hidden {
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* For Webkit-based browsers (Chrome, Safari and Opera) */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* For IE, Edge and Firefox */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+
+:root {
+--markdown-h1: var(--foreground);
+--markdown-h2: var(--foreground);
+--markdown-h3: var(--foreground);
+--markdown-table-border: var(--border);
+}
+
+code, pre {
+    font-family: monospace;
+}
+
+
+.markdown-body h1 {
+color: var(--markdown-h1);
+font-size: 1.5rem;
+font-weight: 800;
+margin: 1rem 0 1rem;
+border-bottom: 2px solid var(--markdown-h1);
+padding-bottom: 0.5rem;
+}
+
+.markdown-body h2 {
+color: var(--markdown-h2);
+font-size: 1.25rem;
+font-weight: 700;
+margin: 1rem 0 0.75rem;
+border-bottom: 1px solid var(--markdown-h2);
+padding-bottom: 0.4rem;
+}
+
+.markdown-body h3 {
+color: var(--markdown-h3);
+font-size: 1.1rem;
+font-weight: 600;
+margin: 0.75rem 0 0.5rem;
+border-bottom: 1px dashed var(--markdown-h3);
+padding-bottom: 0.3rem;
+}
+
+.markdown-body strong {
+color: var(--markdown-strong);
+font-weight: 700;
+font-family: 'Poppins', sans-serif;
+}
+
+.markdown-body em {
+color: var(--markdown-em);
+font-style: italic;
+}
+
+.markdown-body a {
+color: var(--markdown-link);
+text-decoration: underline;
+padding: 2px 7px;
+border-radius: 6px;
+}
+
+.markdown-body ul,
+.markdown-body ol {
+padding-left: 2rem; /* Increased indentation */
+padding-top: 0.5rem;
+padding-bottom: 0.5rem;
+}
+
+.markdown-body ul {
+list-style-type: disc;
+}
+
+.markdown-body ol {
+list-style-type: decimal;
+}
+
+.markdown-body p {
+padding-top: 0;
+padding-bottom: 0.2rem;
+word-break: break-word;
+overflow-wrap: break-word;
+white-space: pre-wrap;
+}
+
+.markdown-body pre {
+  overflow-x: auto;
+  padding: 1rem;
+  margin: 0 0;
+  background: var(--markdown-pre-background);
+  color: var(--markdown-pre-foreground);
+  border-radius: 4px;
+  max-width: 100%;
+  font-family: monospace;
+  white-space: pre-wrap;
+  word-wrap: break-all;
+  display: block;
+  text-indent: 0;
+
+}pre > code {
+    display: block;
+    text-indent: 0;
+    color: inherit;
+    white-space: inherit;
+}
+
+/* Customizing scrollbar within elements (override by the previous setting */
+/* Because of the narrow area of sidebar */
+.markdown-body pre, textarea.autosize-textarea::-webkit-scrollbar {
+    width: auto; /* Adjust as needed */
+    height: auto;
+}
+
+.markdown-body pre, textarea.autosize-textarea::-webkit-scrollbar-thumb {
+    background-color: var(--border);
+    border-radius: 0px;
+}
+
+.markdown-body pre, textarea.autosize-textarea::-webkit-scrollbar-track {
+    background-color: transparent;
+}
+
+.markdown-body pre, textarea.autosize-textarea {
+    scrollbar-width: thin;
+}
+
+/* The name is autosize-textarea, right? */
+
+.markdown-body code {
+color: var(--markdown-inline-code-foreground);
+background: var(--markdown-code-background);
+padding: 0.2rem 0.4rem;
+border-radius: 4px;
+font-family: monospace;
+text-indent: 0;
+}
+
+/* Table styles */
+.markdown-body table {
+border: 2px solid var(--markdown-table-border);
+border-collapse: collapse;
+width: 100%;
+margin: 1rem 0;
+}
+
+.markdown-body thead {
+background: var(--markdown-thead-background);
+border-bottom: 2px solid var(--markdown-table-border);
+color: var(--markdown-thead-foreground);
+}
+
+.markdown-body th,
+.markdown-body td {
+padding: 0.5rem;
+border: 1px solid var(--markdown-table-border);
+}
+
+.markdown-body tr:hover {
+background: rgba(0,0,0,0.05);
+}
+
+/* Blockquote */
+.markdown-body blockquote {
+border-left: 4px solid var(--markdown-h2);
+margin: 1em 0;
+padding: 0.5em 1em;
+background: rgba(0,0,0,0.03);
+color: var(--markdown-h2);
+}
+
+/* Horizontal rule */
+.markdown-body hr {
+border: none;
+border-top: 1px solid var(--markdown-h2);
+margin: 1.5em 0;
+}
+
+/* Subscript and superscript */
+.markdown-body sub,
+.markdown-body sup {
+font-size: 0.8em;
+line-height: 0;
+position: relative;
+vertical-align: baseline;
+}
+
+.markdown-body sup {
+top: -0.5em;
+}
+
+.markdown-body sub {
+bottom: -0.2em;
+}
+
+
+
+/* Responsive tweaks */
+@media (max-width: 600px) {
+.markdown-body pre {
+  max-width: 98vw;
+  font-size: 0.95em;
+}
+.markdown-body table {
+  font-size: 0.95em;
+}
+}
+
+
+
+/* --- Global Paper Texture Styles --- */
+/* Apply texture conditionally based on html[data-paper-texture="true"] */
+
+
+
+html[data-paper-texture="true"] #radix-\0000ab r2\0000bb ::before { /* Target DrawerBody, escaped for CSS validity */
+  content: "";
+  position: fixed; /* Use absolute positioning relative to the component */
+  width: 100%; height: 100%;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-image: url('~assets/images/paper-texture.png');
+  background-size: auto;
+  background-repeat: repeat;
+  opacity: 0.3;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+  filter: contrast(1) brightness(1);
+  z-index: 0; /* Behind component content (requires content position:relative) */
+  border-radius: inherit; /* Inherit border-radius from parent */
+}
+
+
+
+/* Texture for individual chat message bubbles (conditional) */
+html[data-paper-texture="true"] #root::before {
+  content: "";
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  width: 100%; height: 100%; /* Ensure this selector is correct for your #root element context */
+  background-image: url('~assets/images/paper-texture.png');
+  background-size: 512px; /* Match other textures */
+  background-repeat: repeat;
+  opacity: 0.3; /* Match other textures */
+  pointer-events: none; /* Crucial: Let clicks pass through to the message */
+  mix-blend-mode: multiply; /* Match other textures */
+  filter: contrast(1) brightness(1); /* Match other textures */
+  z-index: 1; /* Behind the message content */
+  border-radius: inherit; /* Inherit the bubble's border-radius */
+}
+
+/* Math rendering (KaTeX) */
+.markdown-body .katex {
+  font-size: 1em;
+  color: var(--markdown-h2);
+  background: none;
+  border-radius: 0;
+  padding: 0;
+}

@@ -1,23 +1,20 @@
+// src/index.tsx
 import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
-import { ChakraProvider } from '@chakra-ui/react';
-import { extendTheme, type ThemeConfig } from '@chakra-ui/react';
 
 import { createStoreProxy } from 'src/state/store';
-import PortNames from 'src/types/PortNames';
+import ChannelNames from 'src/types/ChannelNames';
 
 import Cognito from './Cognito';
 import { ConfigProvider } from './ConfigContext';
 
-const store = createStoreProxy(PortNames.ContentPort);
+// Ensure this file includes Tailwind directives and necessary global styles
+import 'src/content/index.css';
+// Import cn utility (adjust path if necessary)
+import { cn } from '@/src/background/util'; // Using the path you provided
+
+const store = createStoreProxy(ChannelNames.ContentPort);
 const container = document.getElementById('root');
-
-const config: ThemeConfig = {
-  initialColorMode: 'light',
-  useSystemColorMode: false
-};
-
-const theme = extendTheme({ config });
 
 store.ready().then(() => {
   if (container == null) {
@@ -28,12 +25,9 @@ store.ready().then(() => {
 
   root.render(
     <Provider store={store}>
-      <ChakraProvider theme={theme}>
-        <ConfigProvider>
-          <Cognito />
-        </ConfigProvider>
-      </ChakraProvider>
+      <ConfigProvider>
+        <Cognito />
+      </ConfigProvider>
     </Provider>
   );
 });
-

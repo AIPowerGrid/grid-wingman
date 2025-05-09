@@ -1,5 +1,5 @@
 // src/sidePanel/Settings.tsx
-import { Accordion, Box } from '@chakra-ui/react';
+import { Accordion } from '@/components/ui/accordion'; // Import Shadcn Accordion
 import { useConfig } from './ConfigContext';
 import { Connect } from './Connect';
 import { PageContext } from './PageContext';
@@ -15,106 +15,51 @@ export const Settings = () => {
   const defaultIndex = (config?.models || [])?.length === 0 ? 1 : undefined;
   const isDark = config?.theme === 'dark';
 
-  // Define control styles (can be adjusted or moved to theme variables if preferred)
+  // Define common styles for accordion items, mirroring Header.tsx controls.
+  // These styles will be applied within child components like Themes.tsx, Connect.tsx, etc.
+  const subtleBorderClass = 'border-[var(--text)]/10'; // 1px semi-transparent border
   const controlBg = isDark
-    ? 'rgba(255, 255, 255, 0.04)'
-    : 'rgba(255, 250, 240, 0.6)';
-  const controlFilter = 'brightness(1.02) contrast(0.98)';
-  const subtleBorderColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
-  const floatingShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)';
-  const hoverFilter = `${controlFilter} brightness(0.98)`;
+    ? 'bg-[rgba(255,255,255,0.04)]' // Brighter solid color for dark theme
+    : 'bg-[rgba(255,250,240,0.6)]'; // Brighter solid color for light theme
+  const itemShadow = 'shadow-md'; // Consistent shadow, same as Header.tsx's floatingShadow
+  const itemRounded = 'rounded-xl'; // Consistent rounding
+
+  // --- Example of how these classes would be used in a child component (e.g., Themes.tsx) ---
+  //
+  // AccordionItem:
+  //   className={cn(controlBg, subtleBorderClass, itemRounded, itemShadow, "overflow-hidden")}
+  // AccordionTrigger:
+  //   className={cn("flex items-center justify-between w-full px-4 py-3 text-[var(--text)] font-medium hover:brightness-95 data-[state=open]:border-b data-[state=open]:border-[var(--text)]/5")}
+  // AccordionContent:
+  //   className={cn("px-4 pb-4 pt-2 text-[var(--text)]")}
+  // const floatingShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'; // This is Tailwind's 'shadow-md'
+  // const hoverFilter = `${controlFilter} brightness(0.98)`;
 
   return (
-    <Box
+    // Replace Box with div and apply Tailwind classes
+    <div
       id="settings"
-      position="relative"
-      zIndex={1} // Ensure it stacks above the texture
-      top={0}
-      width="100%"
-      height="100%" // Ensure it covers the full height
-      display="flex"
-      flexDir="column"
-      overflowY="scroll" // Allow scrolling for content
-      overflowX="hidden" // Use conditional background
-      bg="var(--bg)" // Set base background
-      color="var(--text)"
-      // Apply texture and consistent padding like the drawer
-      px="1.5rem" // Horizontal padding like the drawer's VStack
-      pt="56px" // Keep padding-top to account for the fixed Header height
-      pb={4} // Bottom padding
-    >
+      className="relative z-[1] top-0 w-full h-full flex-1 flex-col overflow-y-auto overflow-x-hidden bg-transparent text-foreground px-6 pb-10 pt-[56px] scrollbar-hidden"
+      >
       {/* Accordion container */}
+      {/* Apply styling via className and Tailwind. */}
+      {/* on the Accordion and potentially within each child component's AccordionItem */}
       <Accordion
-        defaultIndex={defaultIndex}
-        // Removed marginTop, maxWidth, ml, mr - handled by parent Box padding
-        width="100%" // Take full width within the padded Box
-        allowToggle
-        reduceMotion
-        // Apply styling consistent with drawer controls to Accordion items
-        sx={{
-          '.chakra-accordion__item': {
-            border: 'none', // Remove default accordion item borders
-            borderRadius: 'xl', // Make rounder
-            boxShadow: floatingShadow,
-            bg: controlBg,
-            // filter: controlFilter, // Remove filter to avoid creating stacking context
-            borderColor: subtleBorderColor,
-            borderWidth: '1px',
-            // overflow: 'hidden', // Temporarily remove to test panel height
-            mb: 4, // Add margin between accordion items
-            _last: { mb: 0 } // No margin for the last item
-          },
-          '.chakra-accordion__button': {
-             bg: controlBg, // Use the control background
-             color: 'var(--text)',
-             fontWeight: 'medium', // Match drawer button weight
-             fontSize: 'lg', // Match drawer button size (adjust if needed)
-             h: '36px', // Explicit height like drawer buttons
-             // py: 2, // Remove py if using h
-             px: 4, // Horizontal padding for button
-             borderColor: subtleBorderColor,
-             borderWidth: '1px',
-             borderRadius: 'xl', // Match drawer button roundness (applied here for consistency)
-             boxShadow: floatingShadow, // Add the shadow
-             filter: controlFilter, // Add the filter
-             _hover: {
-               bg: controlBg, // Keep control background on hover (like drawer)
-               filter: hoverFilter,
-               borderColor: 'var(--active)',
-             },
-             _focus: {
-                boxShadow: 'none', // Remove default focus ring if desired
-             },
-             _active: { // Add active style to match drawer button click
-                bg: 'var(--active)',
-                filter: 'brightness(0.95)',
-             },
-             // Ensure title (SettingTitle) aligns correctly
-             '> div': { // Target the inner div holding the title/widget
-                width: '100%',
-             }
-          },
-          '.chakra-accordion__panel': {
-            pt: 2, // Add some top padding (adjust value as needed)
-            pb: 4, // Panel bottom padding
-            px: 4, // Panel horizontal padding
-            bg: 'transparent', // Panel itself is transparent
-          },
-          '.chakra-accordion__icon': {
-             color: 'var(--text)', // Style the expand/collapse icon
-             ml: 2,
-          }
-        }}
+        type="single" // Or "multiple" if you want multiple items open
+        collapsible
+        className="w-full flex flex-col gap-4" // Removed pb-4 from Accordion, gap-4 handles inter-item spacing
+        // defaultValue={defaultIndex !== undefined ? "connections" : undefined} // Example: Set default open item by value if needed
       >
         {/* Render Accordion Items */}
-        <Themes />
+        <Themes /> {/* Uncommented */}
         <Connect />
-        <ModelSettingsPanel />
+        <ModelSettingsPanel /> {/* Uncommented */}
         <Persona />
-        <TtsSettings />
+        <TtsSettings /> {/* Uncommented */}
         <PageContext />
         <WebSearch />
+        <div className="pointer-events-none h-12" /> {/* prevent the missing bottom boarder */}
       </Accordion>
-    </Box>
+    </div>
   );
 };

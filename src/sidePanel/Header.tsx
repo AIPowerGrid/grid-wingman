@@ -1,34 +1,58 @@
-import {
-  Box,
-  Button,
-  Drawer,
-  DrawerBody,
-  DrawerContent,
-  DrawerOverlay,
-  Flex,
-  Heading,
-  IconButton,
-  Input,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalHeader as ChakraModalHeader,
-  ModalOverlay,
-  Select,
-  Text,
-  Tooltip,
-  useDisclosure,
-  Link,
-  VStack,
-  useColorModeValue,
-} from '@chakra-ui/react';
-import React from 'react';
+import { useState, useEffect } from 'react';
+import * as React from 'react';
 import { FiSettings, FiX, FiTrash2 } from 'react-icons/fi';
 import { IoMoonOutline, IoSunnyOutline } from 'react-icons/io5';
 import { WiMoonWaxingCrescent1 } from 'react-icons/wi';
 import { useConfig } from './ConfigContext';
 import { useUpdateModels } from './hooks/useUpdateModels';
-import { themes, setTheme } from './Themes';
+// Import themes array and Theme type from Themes.tsx
+// Alias Theme to AppTheme to avoid potential naming conflicts.
+import { themes as appThemes, type Theme as AppTheme } from './Themes'; // Corrected: themes was already imported in your original themes.tsx
+import { cn } from "@/src/background/util";
+
+// Shadcn/ui components
+import { Button } from "@/components/ui/button";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+  // SheetClose, // Not explicitly used if managing open state manually
+  // SheetTrigger, // Not explicitly used
+  SheetOverlay,
+  // SheetPortal // Might not be needed
+} from "@/components/ui/sheet";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  // DialogTrigger, // Not explicitly used
+  DialogOverlay,
+  // DialogPortal // Might not be needed
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/ui/avatar";
 
 // --- Interfaces (Model, Config, ConfigContextType) remain the same ---
 interface Model {
@@ -47,109 +71,165 @@ interface Config {
   fontSize?: number;
   generateTitle?: boolean;
   backgroundImage?: boolean;
+  paperTexture?: boolean;
 }
 interface ConfigContextType {
   config: Config;
   updateConfig: (newConfig: Partial<Config>) => void;
 }
 
-
-// --- WelcomeModal remains the same ---
-const WelcomeModal = ({ isOpen, onClose, setSettingsMode }) => (
-  <Modal
-    isOpen={isOpen}
-    scrollBehavior="inside"
-    size="sm"
-    isCentered
-    onClose={onClose}
-  >
-    <ModalOverlay bg="blackAlpha.600" />
-    <ModalContent
-      bg="var(--bg)"
-      color="var(--text)"
-      borderRadius="lg"
-      pb={4}
-      boxShadow="lg"
-      border="1px solid var(--text)"
+// --- WelcomeModal (remains the same) ---
+interface WelcomeModalProps {
+  isOpen: boolean;
+  onClose: (open: boolean) => void; // Matches Dialog's onOpenChange signature
+  setSettingsMode: (mode: boolean) => void;
+}
+const WelcomeModal: React.FC<WelcomeModalProps> = ({ isOpen, onClose, setSettingsMode }) => (
+  <Dialog open={isOpen} onOpenChange={onClose}>
+    <DialogOverlay className="bg-black/60" />
+    <DialogContent
+      className={cn(
+          "bg-[var(--bg)] text-[var(--text)] border-[var(--text)]",
+          "rounded-lg shadow-lg p-0 max-w-[240px] max-h-[140px]",
+          "[&>button]:hidden"
+      )}
+      onInteractOutside={(e) => e.preventDefault()}
     >
-      <ChakraModalHeader
-        textAlign="center"
-        fontWeight="bold"
-        borderBottom="1px solid var(--text)"
-        borderColor="rgba(0,0,0,0.1)"
-      >
-        👋 Welcome Detective 👋
-      </ChakraModalHeader>
-      <ModalBody pt={6}>
-        <Text
-          color="var(--text)"
-          fontSize="md"
-          fontWeight="medium"
-          textAlign="center"
-          mb={6}
-        >
-          The Game Is Afoot!<br />
-        </Text>
-        <Flex justifyContent="center">
-          <Button
-            bg="var(--active)"
-            color="var(--text)"
-            borderRadius="md"
-            leftIcon={<FiSettings />}
-            onClick={() => setSettingsMode(true)}
-            boxShadow="sm"
-            border="1px solid var(--text)"
-            _hover={{ filter: 'brightness(0.95)', boxShadow: 'md' }}
-            _active={{ filter: 'brightness(0.9)' }}
-          >
-            Open Settings
-          </Button>
-        </Flex>
-      </ModalBody>
-    </ModalContent>
-  </Modal>
+      <DialogHeader className="text-center font-bold p-2">
+        <DialogTitle className="text-base pt-2">👋 Welcome Detective 👋</DialogTitle>
+      </DialogHeader>
+      <DialogDescription asChild>
+        <div className="p-4 text-center">
+          <p className="text-[var(--text)] text-xl font-['Allura'] font-medium mb-4 -mt-7">
+            The game is afoot!<br />
+          </p>
+          <div className="flex justify-center">
+            <Button
+              variant="outline"
+              className={cn(
+                  "bg-[var(--active)] text-[var(--text)] border-[var(--text)]",
+                  "rounded-md shadow-sm px-1 py-1 h-auto",
+                  "text-sm",
+                  "hover:brightness-95 hover:shadow-md active:brightness-90"
+              )}
+              onClick={() => {
+                  setSettingsMode(true);
+              }}
+            >
+              <FiSettings className="mr-1 h-4 w-4" /> Connect
+            </Button>
+          </div>
+        </div>
+      </DialogDescription>
+    </DialogContent>
+  </Dialog>
 );
 
-// --- Badge remains the same ---
-const Badge = ({ children }) => (
-  <Box
-    bg="var(--bg)"
-    color="var(--text)"
-    border="1px solid var(--text)"
-    borderRadius="md"
-    px={3}
-    py={0}
-    fontFamily={"'poppins', sans-serif"}
-    fontStyle={"normal"}
-    fontSize="md"
-    fontWeight="medium"
-    display="inline-block"
-    whiteSpace="nowrap"
-    overflow="hidden"
-    textOverflow="ellipsis"
-    width="100%"
-    boxShadow="xs"
+// --- Badge (remains the same) ---
+const Badge = ({ children }: { children: React.ReactNode }) => (
+  <div
+    className={cn(
+      "inline-block whitespace-nowrap overflow-hidden text-ellipsis w-full max-w-xs",
+      "bg-[var(--bg)] text-[var(--text)] border border-[var(--text)]",
+      "rounded-md px-3 py-0.5",
+      "font-['poppins',_sans-serif] text-md font-medium",
+      "shadow-xs"
+    )}
   >
     {children}
-  </Box>
+  </div>
 );
 
-// --- Settings Drawer Implementation with adjustments ---
-const SettingsDrawer = ({
+// --- Persona Images Map (remains the same) ---
+const personaImages: {
+  Agatha: string;
+  Spike: string;
+  Warren: string;
+  Jet: string;
+  Jan: string;
+  Sherlock: string;
+  Ein: string;
+  Faye: string;
+  default: string;
+  // Add a string index signature to allow indexing with any string.
+  // This resolves TS7053 when accessing personaImages[currentPersona].
+  [key: string]: string | undefined;
+} = {  Agatha: 'assets/images/agatha.png',
+  Spike: 'assets/images/spike.png',
+  Warren: 'assets/images/warren.png',
+  Jet: 'assets/images/jet.png',
+  Jan: 'assets/images/jan.png',
+  Sherlock: 'assets/images/Cognito.png',
+  Ein: 'assets/images/ein.png',
+  Faye:'assets/images/faye.png',
+  default: 'assets/images/custom.png'
+};
+
+// ++ DEFINITION for Theme Button (can be here or in themes.tsx if preferred) ++
+// Renamed to SheetThemeButton for clarity of its primary use case here.
+const SheetThemeButton = ({ theme, updateConfig, size = "h-7 w-7" }: { theme: AppTheme; updateConfig: (newConfig: Partial<Config>) => void; size?: string }) => (
+  <Tooltip>
+    <TooltipTrigger>
+      <Button
+        variant="ghost"
+        className={cn(
+          size,
+          "rounded-full p-0",
+          "focus-visible:ring-1 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--bg)]",
+          "hover:opacity-80 transition-opacity"
+        )}
+        style={{
+          backgroundColor: theme.bg,
+          borderColor: theme.text,
+          borderWidth: '2px',
+          // Optional: subtle outer ring with active color for more definition
+          // boxShadow: `0 0 0 1px ${theme.active}`
+        }}
+        onClick={() => {
+          updateConfig({ theme: theme.name });
+        }}
+        aria-label={`Set ${theme.name} theme`}
+      />
+    </TooltipTrigger>
+    <TooltipContent side="top" className="bg-[var(--active)]/50 text-[var(--text)] border-[var(--text)]">
+      <p className="capitalize">{theme.name}</p>
+    </TooltipContent>
+  </Tooltip>
+);
+// -- END Theme Button Definition --
+
+
+// --- SettingsSheet ---
+interface SettingsSheetProps {
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
+  config: Config;
+  updateConfig: (newConfig: Partial<Config>) => void;
+  setSettingsMode: (mode: boolean) => void;
+  downloadText: () => void;
+  downloadJson: () => void;
+  downloadImage: () => void;
+  setHistoryMode: (mode: boolean) => void;
+}
+
+const SettingsSheet: React.FC<SettingsSheetProps> = ({
   isOpen,
-  onClose,
+  onOpenChange,
   config,
   updateConfig,
-  availableModelNames,
   setSettingsMode,
+  setHistoryMode,
   downloadText,
   downloadJson,
   downloadImage,
-  setHistoryMode,
 }) => {
   const [searchQuery, setSearchQuery] = React.useState('');
   const [inputFocused, setInputFocused] = React.useState(false);
   const { fetchAllModels } = useUpdateModels();
+  const sheetContentRef = React.useRef<HTMLDivElement>(null);
+
+  const currentPersona = config?.persona || 'default';
+  const personaImageSrc = personaImages[currentPersona] || personaImages.default;
 
   const filteredModels =
     config?.models?.filter(
@@ -158,432 +238,325 @@ const SettingsDrawer = ({
         model.host?.toLowerCase()?.includes(searchQuery.toLowerCase())
     ) || [];
 
-  // Theme toggle function
   const toggleTheme = () => {
     const currentThemeName = config?.theme || 'paper';
     const nextThemeName = currentThemeName === 'dark' ? 'paper' : 'dark';
-    const paperTextureEnabled = config?.paperTexture ?? true; // Get current texture state
-    const nextTheme = themes.find((t) => t.name === nextThemeName);
+    // Ensure appThemes is used here
+    const nextTheme = appThemes.find((t) => t.name === nextThemeName);
     if (nextTheme) {
-      updateConfig({ theme: nextThemeName }); // Only update theme name here
-      setTheme(nextTheme);
+      updateConfig({ theme: nextThemeName });
     }
   };
 
   const isDark = config?.theme === 'dark';
+  const subtleBorderClass = 'border-[var(--text)]/10';
+  const controlBg = isDark ? 'bg-[rgba(255,255,255,0.04)]' : 'bg-[rgba(255,250,240,0.6)]';
+  const inputHeight = 'h-9';
+  const sectionPaddingX = 'px-6';
+  const controlFilter = 'brightness-102 contrast-98';
+  const buttonHeight = 'h-9';
+  const controlSize = 'default';
 
-  // Define subtle border color
-  const subtleBorderColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+  const handleConfigClick = () => {
+    setSettingsMode(true);
+    onOpenChange(false);
+  };
 
-  // Define floating shadow
-  const floatingShadow =
-    '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'; // Chakra 'md' shadow
+  const handleHistoryClick = () => {
+    setHistoryMode(true);
+    onOpenChange(false);
+  };
 
-  // Define larger size for interactive elements
-  const controlSize = 'md'; // Use Chakra's large size for Select, Input, Button
+  const handleExportClick = (action: () => void) => {
+    action();
+    onOpenChange(false);
+  };
 
-  // Define horizontal padding for buttons (adjust as needed)
-  const buttonPaddingX = '1rem'; // Horizontal padding for buttons (internal to button)
-  const sectionPaddingX = '1.5rem'; // *** UPDATED: Horizontal padding for sections ***
+  // Filter out the 'custom' theme for preset buttons
+  const presetThemesForSheet = appThemes.filter(t => t.name !== 'custom' && t.name !== config?.customTheme?.name);
 
-  // Define a slightly brighter background for controls
-  // We use rgba to slightly lighten/darken the base --bg color
-  // Adjust the alpha (last value) or color values as needed
-  const controlBg = isDark
-    ? 'rgba(255, 255, 255, 0.04)' // Slightly lighter than pitch black for dark mode
-    : 'rgba(255, 250, 240, 0.6)'; // A slightly creamy/off-white for paper mode
-
-  // Define a subtle filter to apply to controls for a hint of texture/difference
-  const controlFilter = 'brightness(1.02) contrast(0.98)'; // Subtle brightness/contrast shift
 
   return (
-    <Drawer isOpen={isOpen} placement="left" size="sm" onClose={onClose}>
-      <DrawerOverlay bg="blackAlpha.500" />
-<DrawerContent // Add the class here for CSS targeting
-    className="settings-drawer-content"
-    bg="var(--bg)" // Main background
-    color="var(--text)"
-    boxShadow="xl"
-    borderRightWidth={0}
-    borderRadius={0}
-    sx={{
-        position: 'relative', // Still needed for z-index stacking
-        height: '100dvh',
-        maxHeight: '100dvh',
-        overflow: 'hidden', // Prevents the *entire* drawer from scrolling
-        // Texture is now applied globally via CSS in index.html targeting .settings-drawer-content
-        '> *': { position: 'relative', zIndex: 1 },
-    }}
->
-    {/* Add class for texture targeting */}
-    <DrawerBody
-        className="settings-drawer-body" // Add class here
-        p={0}
-        overflowY="auto"
-        display="flex"
-        flexDirection="column"
-        height="100%"
-        position="relative" // Needed for the ::before pseudo-element
-    >
-        {/* Main VStack for content */}
-        {/* flex={1} allows this VStack to grow and push the signature down */}
-        <VStack spacing={5} align="stretch" px={sectionPaddingX} py={4} flex={1}>
-            {/* New Header Area */}
-            <Box>
-              <Flex align="center" justify="space-between" mb={1}>
-                 {/* Theme Toggle */}
-                 <Tooltip
-                  label={
-                    isDark ? 'Switch to Light Theme' : 'Switch to Dark Theme'
-                  }
-                  placement="bottom"
-                  bg="var(--bg)"
-                  color="var(--text)"
-                >
-                  <IconButton
-                    aria-label={
-                      isDark ? 'Switch to light theme' : 'Switch to dark theme'
-                    }
-                    icon={
-                      isDark ? (
-                        <IoSunnyOutline size="20px" color="var(--text)" />
-                      ) : (
-                        <IoMoonOutline size="20px" color="var(--text)" />
-                      )
-                    }
-                    variant="ghost"
-                    onClick={toggleTheme}
-                    _hover={{ bg: 'rgba(0, 0, 0, 0.1)' }}
-                    borderRadius="md"
-                    size="sm"
-                  />
-                </Tooltip>
+    <Sheet open={isOpen} onOpenChange={onOpenChange}>
+        <SheetOverlay className="bg-black/50" />
+        <SheetContent
+           side="left"
+           className={cn(
+             "w-[320px] sm:w-[380px]",
+             "bg-[var(--bg)] text-[var(--text)]",
+             "p-0 border-r-0 shadow-xl flex flex-col h-full max-h-screen",
+             "[&>button]:hidden",
+             "settings-drawer-content",
+             "overflow-y-auto"
+            )}
+            style={{ height: '100dvh' }}
+            ref={sheetContentRef}
+            onOpenAutoFocus={(e) => {
+              e.preventDefault(); // Prevent the default auto-focusing behavior
+              sheetContentRef.current?.focus({ preventScroll: true }); // Focus the sheet content area itself
+            }}
+        >
+          <SheetHeader className="px-4 pt-3 pb-3">
+             <div className="flex items-center justify-between mb-2 relative z-10">
+               <Tooltip>
+                 <TooltipTrigger asChild>
+                   <Button
+                     variant="ghost"
+                     size="sm"
+                     aria-label={isDark ? 'Light' : 'Dark'}
+                     onClick={toggleTheme}
+                     className="text-[var(--text)] hover:bg-black/10 dark:hover:bg-white/10 rounded-md "
+                   >
+                     {isDark ? <IoSunnyOutline size="20px" /> : <IoMoonOutline size="20px" />}
+                   </Button>
+                 </TooltipTrigger>
+                 <TooltipContent side="bottom" className="bg-[var(--active)]/50 text-[var(--text)] border-[var(--text)]">
+                   {isDark ? 'Light' : 'Dark'}
+                 </TooltipContent>
+               </Tooltip>
+               <Tooltip>
+                 <TooltipTrigger asChild>
+                   <Button
+                     variant="ghost" size="sm" aria-label="Close Settings"
+                     className="text-[var(--text)] hover:bg-black/10 dark:hover:bg-white/10 rounded-md relative top-[1px]"
+                     onClick={() => onOpenChange(false)}
+                   >
+                     <FiX size="20px" />
+                   </Button>
+                 </TooltipTrigger>
+                 <TooltipContent side="bottom" className="bg-[var(--active)]/50 text-[var(--text)] border-[var(--text)]">
+                   Close Settings
+                 </TooltipContent>
+               </Tooltip>
+             </div>
+             <SheetTitle className="text-center font-['Orbitron',_sans-serif] tracking-tight -mt-10">
+               <a href="https://github.com/3-ark/Cognito" target="_blank" rel="noopener noreferrer" className="text-xl font-semibold text-[var(--text)] bg-[var(--active)] inline-block px-3 py-1 rounded-md no-underline">
+                 COGNITO <sub className="italic contrast-200 text-[0.5em]">v3.0</sub>
+               </a>
+             </SheetTitle>
+             <SheetDescription className="text-center text-xl font-bold text-[var(--text)] leading-tight mt-0">
+               Settings
+             </SheetDescription>
+          </SheetHeader>
+           <div className={cn("flex flex-col h-full overflow-y-auto settings-drawer-body", "no-scrollbar")}>
+              <div className={cn("flex flex-col space-y-5 flex-1", sectionPaddingX, "py-4",)}>
 
-                {/* Cognito Title */}
-              <Link href="https://github.com/3-ark/Cognito" isExternal>
-                <Heading
-                  as="h3"
-                  size="md"
-                  fontWeight="semibold"
-                  color="var(--text)"
-                  bg="var(--active)"
-                  fontFamily="'Orbitron', sans-serif"
-                  letterSpacing="tight"
-                  display="inline-block"
-                  px={3}
-                  py={1}
-                  borderRadius="md"
-                  mx="auto"
-                >
-                  COGNITO <Box as="sub" fontStyle='italic' sx={{filter: 'contrast(200%)', fontSize: '0.5em'}}>v2.7</Box>
-                </Heading>
-              </Link>
-
-                {/* Theme Toggle (Dark/Light) */}
-
-                {/* Close Button */}
-                <Tooltip
-                  label="Close Settings"
-                  placement="bottom"
-                  bg="var(--bg)"
-                  color="var(--text)"
-                >
-                  <IconButton
-                    aria-label="Close Drawer"
-                    icon={<FiX size="24px" color="var(--text)" />}
-                    variant="ghost"
-                    onClick={onClose}
-                    _hover={{ bg: 'rgba(0, 0, 0, 0.1)' }}
-                    borderRadius="md"
-                    size="sm"
-                  />
-                </Tooltip>
-              </Flex>
-              <Text
-                fontSize="3xl"
-                fontWeight="bold"
-                color="var(--text)"
-                lineHeight="1.1"
-                textAlign="center"
-                mt={2}
-              >
-                Settings
-              </Text>
-            </Box>
-
-            {/* Persona Section */}
-            <Box>
-              <Text
-                color="var(--text)"
-                opacity={0.8}
-                fontSize="lg"
-                fontWeight="medium"
-                mb={2}
-                textTransform="uppercase"
-              >
-                Persona
-              </Text>
-              <Select
-                size={controlSize}
-                value={config?.persona || ''}
-                onChange={(e) => updateConfig({ persona: e.target.value })}
-                bg={controlBg}
-                borderColor={subtleBorderColor}
-                borderWidth="1px"
-                h="36px"
-                color="var(--text)"
-                borderRadius="xl" // Make rounder
-                boxShadow={floatingShadow} // Keep shadow
-                filter={controlFilter} // *** ADDED Filter ***
-                _hover={{
-                  borderColor: 'var(--active)',
-                  filter: `${controlFilter} brightness(0.98)`, // Combine filters
-                }}
-                _focus={{
-                  borderColor: 'var(--active)',
-                  boxShadow: `0 0 0 1px var(--active), ${floatingShadow}`,
-                  bg: controlBg, // Keep control background on focus
-                  filter: controlFilter, // Keep filter on focus
-                }}
-                sx={{
-                  '> option': {
-                    background: 'var(--bg)', // Options use main background
-                    color: 'var(--text)',
-                  },
-                  '> option:hover': { filter: 'brightness(0.95)' },
-                }}
-              >
-                {Object.keys(config?.personas || {}).map((p) => (
-                  <option key={p} value={p}>
-                    {p}
-                  </option>
-                ))}
-              </Select>
-            </Box>
-
-            {/* Model Section */}
-            <Box>
-              <Text
-                color="var(--text)"
-                opacity={0.8}
-                fontSize="lg"
-                fontWeight="medium"
-                mb={2}
-                textTransform="uppercase"
-              >
-                Model
-              </Text>
-              <Box position="relative">
-                <Input
-                  size={controlSize}
-                  value={inputFocused ? searchQuery : config?.selectedModel || ''}
-                  placeholder={
-                    inputFocused
-                      ? 'Search models...'
-                      : config?.selectedModel || 'Select model...'
-                  }
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onFocus={() => {
-                    setSearchQuery('');
-                    setInputFocused(true);
-                    fetchAllModels();
-                  }}
-                  onBlur={() => setTimeout(() => setInputFocused(false), 200)}
-                  bg={controlBg} // *** UPDATED Background ***
-                  h="36px" // Make shorter
-                  borderColor={subtleBorderColor}
-                  borderWidth="1px"
-                  color="var(--text)"
-                  borderRadius="xl" // Make rounder
-                  boxShadow={floatingShadow} // Keep shadow
-                  filter={controlFilter} // *** ADDED Filter ***
-                  _hover={{ // Keep hover/focus styles
-                    borderColor: 'var(--active)',
-                    filter: `${controlFilter} brightness(0.98)`, // Combine filters
-                  }}
-                  _focus={{
-                    borderColor: 'var(--active)',
-                    boxShadow: `0 0 0 1px var(--active), ${floatingShadow}`,
-                    bg: controlBg, // Keep control background on focus
-                    filter: controlFilter, // Keep filter on focus
-                  }}
-                />
-                {/* Model Dropdown List (uses main bg for consistency) */}
-                {inputFocused && (
-                  <Box
-                    position="absolute"
-                    width="100%"
-                    mt={1}
-                    maxH="200px"
-                    overflowY="auto"
-                    bg="var(--bg)" // Keep dropdown list background standard
-                    borderWidth="1px"
-                    borderColor="var(--text)"
-                    borderRadius="md"
-                    boxShadow="md"
-                    zIndex={1} // Ensure dropdown is above texture pseudo-element
-                  >
-                    {filteredModels.length > 0 ? (
-                      filteredModels.map((model) => (
-                        <Box
-                          key={model.id}
-                          p={3}
-                          cursor="pointer"
-                          color="var(--text)"
-                          _hover={{ bg: 'var(--active)' }}
-                          onMouseDown={() => {
-                            updateConfig({ selectedModel: model.id });
-                            setSearchQuery('');
-                            setInputFocused(false);
-                          }}
-                          fontSize="sm"
-                        >
-                          {model.host ? `(${model.host}) ${model.id}` : model.id}
-                          {model.context_length ? (
-                            <Text
-                              as="span"
-                              fontSize="xs"
-                              color="var(--text)"
-                              opacity={0.6}
-                              ml={2}
-                            >
-                              [ctx: {model.context_length}]
-                            </Text>
+                {/* ++ REVISED Persona Section ++ */}
+                <div>
+                  {/* Row for Label, Avatar (left) and Theme Buttons (right) */}
+                  <div className="flex items-center justify-between mb-2">
+                    {/* Left part: Label and Avatar */}
+                    <div className="flex items-center space-x-2">
+                      <label htmlFor="persona-select" className="text-[var(--text)] opacity-80 text-lg font-medium uppercase shrink-0">
+                        Persona
+                      </label>
+                      <Avatar className="h-7 w-7 border border-[var(--text)]"> {/* Adjusted size to h-7 w-7 */}
+                        <AvatarImage src={personaImageSrc} alt={currentPersona} />
+                        <AvatarFallback>{currentPersona.substring(0, 1).toUpperCase()}</AvatarFallback>
+                      </Avatar>
+                    </div>
+                  {/* Right part: Theme Buttons */}
+                    <div className="flex items-center space-x-1.5">
+                      {presetThemesForSheet.map(theme => (
+                        <SheetThemeButton
+                          key={theme.name}
+                          theme={theme}
+                          updateConfig={updateConfig}
+                          size="h-7 w-7" // Consistent size with Avatar
+                        />
+                      ))}
+                    </div>
+                  </div>
+                {/* Persona Select Dropdown (takes full width below the above row) */}
+                    <div className="w-full">
+                    <Select
+                      value={currentPersona}
+                      onValueChange={(value) => updateConfig({ persona: value })}
+                    >
+                      <SelectTrigger
+                        id="persona-select" // ID for the label's htmlFor
+                        className={cn(
+                          controlBg,
+                          subtleBorderClass,
+                          inputHeight,
+                          "text-[var(--text)] rounded-xl shadow-md w-full",
+                          "focus:border-[var(--active)] focus:ring-1 focus:ring-[var(--active)]",
+                          "hover:border-[var(--active)] hover:brightness-98",
+                          "data-[placeholder]:text-muted-foreground"
+                        )}
+                        style={{ filter: controlFilter }}
+                      >
+                        <SelectValue placeholder="Select Persona..." />
+                      </SelectTrigger>
+                      <SelectContent
+                          className="bg-[var(--bg)] text-[var(--text)] border-[var(--text)]"
+                      >
+                        {Object.keys(config?.personas || {}).map((p) => (
+                          <SelectItem key={p} value={p} className="hover:brightness-95 focus:bg-[var(--active)]">
+                            {p}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                {/* -- END REVISED Persona Section -- */}
+                
+                {/* Model Section (remains the same) */}
+                <div>
+                  <label htmlFor="model-input" className="block text-[var(--text)] opacity-80 text-md font-medium uppercase">
+                    Model
+                  </label>
+                  <div className="relative">
+                    <Input
+                       id="model-input"
+                       value={inputFocused ? searchQuery : config?.selectedModel || ''}
+                       placeholder={
+                         inputFocused
+                           ? 'Search models...'
+                           : config?.selectedModel || 'Select model...'
+                       }
+                       onChange={(e) => setSearchQuery(e.target.value)}
+                       onFocus={() => {
+                         setSearchQuery('');
+                         setInputFocused(true);
+                         fetchAllModels();
+                       }}
+                       onBlur={() => setTimeout(() => setInputFocused(false), 200)}
+                       className={cn(
+                         controlBg, subtleBorderClass, inputHeight,
+                         "text-[var(--text)] rounded-xl shadow-md",
+                         "focus:border-[var(--active)] focus:ring-1 focus:ring-[var(--active)]",
+                         "hover:border-[var(--active)] hover:brightness-98",
+                         "placeholder:text-muted-foreground"
+                       )}
+                       style={{ filter: controlFilter }}
+                    />
+                    {inputFocused && (
+                       <ScrollArea
+                         className={cn(
+                            "absolute w-full mt-1 max-h-[200px] overflow-y-auto",
+                            "bg-[var(--bg)] border-[var(--text)] rounded-md shadow-md z-10",
+                            "no-scrollbar"
+                         )}
+                       >
+                          <div className="p-1">
+                          {filteredModels.length > 0 ? (
+                            filteredModels.map((model) => (
+                              <div
+                                key={model.id}
+                                className={cn(
+                                    "p-3 cursor-pointer text-[var(--text)] text-sm rounded",
+                                    "hover:bg-[var(--active)]"
+                                )}
+                                onMouseDown={() => {
+                                  updateConfig({ selectedModel: model.id });
+                                  setSearchQuery('');
+                                  setInputFocused(false);
+                                }}
+                              >
+                                {model.host ? `(${model.host}) ${model.id}` : model.id}
+                                {model.context_length ? (
+                                  <span
+                                    className="text-xs text-[var(--text)] opacity-60 ml-2"
+                                  >
+                                    [ctx: {model.context_length}]
+                                  </span>
+                                ) : (
+                                  ''
+                                )}
+                              </div>
+                            ))
                           ) : (
-                            ''
+                             <div className="p-2 text-[var(--text)] opacity-60 text-sm">
+                              No models found
+                            </div>
                           )}
-                        </Box>
-                      ))
-                    ) : (
-                      <Box p={3} color="var(--text)" opacity={0.6} fontSize="sm">
-                        No models found
-                      </Box>
+                          </div>
+                       </ScrollArea>
                     )}
-                  </Box>
-                )}
-              </Box>
-            </Box>
+                  </div>
+                </div>
 
-            {/* Action Links Section (Config & History) */}
-            <VStack spacing={3} align="stretch">
-              <Button
-                size={controlSize}
-                onClick={() => {
-                  setSettingsMode(true);
-                  onClose();
-                }}
-                variant="outline"
-                h="36px" // Make shorter
-                borderColor={subtleBorderColor}
-                color="var(--text)"
-                bg={controlBg} // *** UPDATED Background ***
-                boxShadow={floatingShadow}
-                filter={controlFilter} // *** ADDED Filter ***
-                _hover={{
-                  borderColor: 'var(--active)',
-                  bg: controlBg, // Keep control background on hover
-                  filter: `${controlFilter} brightness(0.98)`, // Combine filters
-                }}
-                _active={{
-                  bg: 'var(--active)', // Use active color for click feedback
-                  filter: 'brightness(0.95)', // Standard active filter
-                }}
-                justifyContent="flex-start"
-                fontWeight="medium"
-                w="full"
-                borderRadius="xl" // Make rounder
-                // px={buttonPaddingX} // Removed, height controls padding better
-              >
-                Configuration
-              </Button>
-              <Button
-                size={controlSize}
-                onClick={() => {
-                  setHistoryMode(true);
-                  onClose();
-                }}
-                variant="outline"
-                h="36px" // Make shorter
-                borderColor={subtleBorderColor}
-                color="var(--text)"
-                bg={controlBg} // *** UPDATED Background ***
-                boxShadow={floatingShadow}
-                filter={controlFilter} // *** ADDED Filter ***
-                _hover={{
-                  borderColor: 'var(--active)',
-                  bg: controlBg, // Keep control background on hover
-                  filter: `${controlFilter} brightness(0.98)`, // Combine filters
-                }}
-                _active={{
-                  bg: 'var(--active)', // Use active color for click feedback
-                  filter: 'brightness(0.95)', // Standard active filter
-                 }}
-                justifyContent="flex-start"
-                fontWeight="medium"
-                w="full"
-                borderRadius="xl" // Make rounder
-                // px={buttonPaddingX} // Removed, height controls padding better
-              >
-                Chat History
-              </Button>
-            </VStack>
+                 {/* Action Links Section (remains the same) */}
+                 <div className="space-y-3">
+                    <Button
+                      variant="outline" size={controlSize} onClick={handleConfigClick}
+                      className={cn(
+                        controlBg, subtleBorderClass, buttonHeight,
+                        "text-[var(--text)] rounded-xl shadow-md w-full justify-start font-medium",
+                        "hover:border-[var(--active)] hover:brightness-98 active:bg-[var(--active)] active:brightness-95",
+                        "focus:ring-1 focus:ring-[var(--active)]"
+                      )}
+                      style={{ filter: controlFilter }}
+                    >
+                      Configuration
+                    </Button>
+                    <Button
+                       variant="outline" size={controlSize} onClick={handleHistoryClick}
+                       className={cn(
+                         controlBg, subtleBorderClass, buttonHeight,
+                         "text-[var(--text)] rounded-xl shadow-md w-full justify-start font-medium",
+                         "hover:border-[var(--active)] hover:brightness-98 active:bg-[var(--active)] active:brightness-95",
+                         "focus:ring-1 focus:ring-[var(--active)]"
+                       )}
+                       style={{ filter: controlFilter }}
+                    >
+                      Chat History
+                    </Button>
+                 </div>
 
-            {/* Export Section */}
-            <VStack spacing={3} align="stretch">
-              <Text color="var(--text)" opacity={0.8} fontSize="lg" fontWeight="medium" mb={-1} textTransform="uppercase">
-              Export Now
-              </Text>
-              {[
-                { label: "Text", action: () => { onClose(); downloadText(); } },
-                { label: "JSON", action: () => { onClose(); downloadJson(); } },
-                { label: "Image", action: () => { downloadImage(); onClose(); } },
-              ].map(item => (
-                <Button
-                  size={controlSize}
-                  key={item.label}
-                  onClick={item.action}
-                  variant="outline"
-                  h="36px" // Make shorter
-                  borderColor={subtleBorderColor}
-                  color="var(--text)"
-                  bg={controlBg} // *** UPDATED Background ***
-                  boxShadow={floatingShadow}
-                  filter={controlFilter} // *** ADDED Filter ***
-                  _hover={{
-                    borderColor: 'var(--active)',
-                    bg: controlBg, // Keep control background on hover
-                    filter: `${controlFilter} brightness(0.98)`, // Combine filters
-                  }}
-                  _active={{
-                    bg: 'var(--active)', // Use active color for click feedback
-                    filter: 'brightness(0.95)', // Standard active filter
-                  }}
-                  justifyContent="flex-start" fontWeight="medium" w="full" borderRadius="xl" // Make rounder
-                  // px={buttonPaddingX} // Removed, height controls padding better
-                >
-                  {item.label}
-                </Button>
-              ))}
-            </VStack>
-
-            {/* Signature - Pushed towards bottom */}
-            <Box
-                mt="auto" // Pushes to bottom within the VStack
-                textAlign="center"
-                color="var(--text)" opacity={0.7} fontSize="xs" fontWeight="normal"
-            >
-                Made with ❤️ by @3-Arc
-            </Box>
-        </VStack>
-    </DrawerBody>
-</DrawerContent>
-    </Drawer>
+                 {/* Export Section (remains the same) */}
+                 <div className="space-y-3">
+                   <p className="text-[var(--text)] opacity-80 text-lg font-medium mb-2 uppercase">
+                     Export Now
+                   </p>
+                   {[
+                     { label: "Text", action: downloadText },
+                     { label: "JSON", action: downloadJson },
+                     { label: "Image", action: downloadImage },
+                   ].map(item => (
+                     <Button
+                       key={item.label} variant="outline" size={controlSize}
+                       onClick={() => handleExportClick(item.action)}
+                       className={cn(
+                         controlBg, subtleBorderClass, buttonHeight,
+                         "text-[var(--text)] rounded-xl shadow-md w-full justify-start font-medium",
+                         "hover:border-[var(--active)] hover:brightness-98 active:bg-[var(--active)] active:brightness-95",
+                         "focus:ring-1 focus:ring-[var(--active)]"
+                       )}
+                       style={{ filter: controlFilter }}
+                     >
+                       {item.label}
+                     </Button>
+                   ))}
+                 </div>
+              </div>
+              <div className={cn("mt-auto text-center text-[var(--text)] opacity-70 text-xs font-normal pb-4", sectionPaddingX)}>
+                  Made with ❤️ by @3-Arc
+              </div>
+           </div>
+        </SheetContent>
+    </Sheet>
   );
 };
 
 
-// --- Header Component (Main Export) - No changes needed here ---
-export const Header = ({
+// --- Header Component (Main Export) ---
+// Reverted to remove the incorrect avatar and theme button additions in the main header's right section.
+interface HeaderProps {
+  chatTitle?: string | null;
+  settingsMode: boolean;
+  setSettingsMode: (mode: boolean) => void;
+  historyMode: boolean;
+  setHistoryMode: (mode: boolean) => void;
+  deleteAll: () => void;
+  reset: () => void;
+  downloadImage: () => void;
+  downloadJson: () => void;
+  downloadText: () => void;
+}
+export const Header: React.FC<HeaderProps> = ({
   chatTitle,
   settingsMode,
   setSettingsMode,
@@ -595,159 +568,145 @@ export const Header = ({
   downloadJson,
   downloadText,
 }) => {
-  const { config, updateConfig } = useConfig();
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const availableModelNames = config?.models?.map(({ id }) => id);
+  const { config, updateConfig } = useConfig(); // updateConfig is available if needed by Header itself
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   const visibleTitle = chatTitle && !settingsMode && !historyMode;
 
+  const handleSheetOpenChange = (open: boolean) => {
+    setIsSheetOpen(open);
+  };
+
+  const showBackButton = settingsMode || historyMode;
+  const leftButtonLabel = showBackButton ? 'Back to Chat' : 'Open Settings';
+  const leftButtonIcon = showBackButton ? <FiX size="22px" /> : <FiSettings size="22px" />;
+  
+  const handleLeftButtonClick = () => {
+    if (showBackButton) {
+      setSettingsMode(false);
+      setHistoryMode(false);
+    } else {
+      setIsSheetOpen(true);
+    }
+  };
+
   return (
-    <Box
-      bg="var(--active)"
-      p={0}
-      borderBottomWidth="1px"
-      borderColor="var(--text)"
-      position="sticky"
-      top={0}
-      zIndex={10}
-    >
-      <Flex
-        alignItems="center"
-        justifyContent="space-between"
-        h="auto"
-        pb={0}
-        pt={0.5}
-        px={5} // Add some horizontal padding to the main header
+    <TooltipProvider delayDuration={500}>
+      <div
+        className={cn(  
+          "bg-[var(--active)] border-b border-[var(--text)]",
+          "sticky top-0 z-10 p-0"
+        )}
       >
-        {/* Left Button don't modify the delay, don't modify the delay*/}
-        <Tooltip label={settingsMode || historyMode ? "Back to Chat" : "Open Settings"} placement="bottom" bg="var(--bg)" color="var(--text)" openDelay={1000000} closeDelay={1000000}>
-          <IconButton
-            aria-label={settingsMode || historyMode ? "Close" : "Settings"}
-            icon={settingsMode || historyMode ? <FiX size="20px" color="var(--text)" /> : <FiSettings size="20px" color="var(--text)" />}
-            variant="ghost"
-            _hover={{ bg: "rgba(0, 0, 0, 0.1)" }}
-            borderRadius="md"
-            size="sm"
-            // Removed ml/mr, rely on main Flex padding and center Flex margin
-            onClick={() => {
-              if (settingsMode || historyMode) {
-                setSettingsMode(false);
-                setHistoryMode(false);
-              } else {
-                onOpen();
-              }
-            }}
-          />
-        </Tooltip>
-
-        {/* Center Section (Title/Mode Display) */}
-        <Flex
-          flexGrow={1} // Takes up available space
-          justifyContent="center" // Centers its content
-          alignItems="center"
-          overflow="hidden" // Prevents content from overflowing
-          mx={3} // Add some margin to space it from buttons
-        >
-          {/* --- Moved Content Inside --- */}
-          {visibleTitle && (
-            <Text
-              fontSize="md"
-              fontWeight="semibold"
-              color="var(--text)"
-              fontStyle="italic"
-              whiteSpace="nowrap"
-              overflow="hidden"
-              textOverflow="ellipsis"
-              textAlign="center" // Explicitly center text just in case
-            >
-              {chatTitle}
-            </Text>
-          )}
-          {!visibleTitle && !historyMode && !settingsMode && (
-            <Badge>
-              {config?.persona || 'Default'} @ {config?.selectedModel || 'None'}
-            </Badge>
-          )}
-          {settingsMode && (
-            // Keep this Flex simple, centering is handled by the parent
-            <Flex align="center" justify="center" width="auto">
-              <Text fontSize="md" fontFamily="Allura" fontWeight="semibold" color="var(--text)" fontStyle="normal" whiteSpace="nowrap">
-                The game is afoot{' '}
-                <Box
-                  as={WiMoonWaxingCrescent1}
-                  display="inline-block"
-                  verticalAlign="middle"
-                  color="#f5eee4"
-                  fontSize="20px"
-                  ml={2} // Add some space before the icon
-                />
-              </Text>
-            </Flex>
-          )}
-          {historyMode && (
-            // Keep this Flex simple, centering is handled by the parent
-            <Flex align="center" justify="center" width="auto">
-              <Text fontFamily="Bruno Ace SC" fontSize="md" fontWeight="semibold" color="var(--text)" fontStyle="normal" whiteSpace="nowrap">
-                Chat History
-              </Text>
-              {/* Moved delete button to the right section for consistency */}
-            </Flex>
-          )}
-          {/* --- End Moved Content --- */}
-        </Flex>
-
-        {/* Right Button(s) */}
-        <Box minWidth="30px"> {/* Add a Box to reserve space even if button isn't shown */}
-          {!settingsMode && !historyMode && (
-            <Tooltip label="Reset Chat" placement="bottom" bg="var(--bg)" color="var(--text)">
-              <IconButton
-                aria-label="Reset"
-                icon={<FiTrash2 size="18px" color="var(--text)" />}
+        <div className="flex items-center justify-between h-auto py-0.5 px-5">
+          {/* Left Button */}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                aria-label={leftButtonLabel}
                 variant="ghost"
-                _hover={{ bg: "rgba(0, 0, 0, 0.1)" }}
-                borderRadius="md"
                 size="sm"
-                onClick={reset}
-                // Removed mr, rely on main Flex padding
-              />
-            </Tooltip>
-          )}
-          {historyMode && ( // Show delete all only in history mode here
-             <Tooltip label="Delete All History" placement="bottom" bg="var(--bg)" color="var(--text)">
-                <IconButton
-                  aria-label="Delete all"
-                  icon={<FiTrash2 size="18px" color="var(--text)" />}
-                  variant="ghost"
-                  _hover={{ bg: "rgba(255, 0, 0, 0.1)" }}
-                  borderRadius="md"
-                  size="sm"
-                  onClick={deleteAll}
-                />
-              </Tooltip>
-          )}
-        </Box>
+                className="text-[var(--text)] hover:bg-black/10 dark:hover:bg-white/10 rounded-md"
+                onClick={handleLeftButtonClick}
+              >
+                {leftButtonIcon}
+              </Button>
+            </TooltipTrigger>
+            {!showBackButton && (
+                <TooltipContent side="bottom" className="bg-[var(--bg)] text-[var(--text)] border-[var(--text)]">
+                  {leftButtonLabel}
+                </TooltipContent>
+            )}
+          </Tooltip>
 
+          {/* Center Section */}
+          <div className="flex-grow flex justify-center items-center overflow-hidden mx-3">
+            {visibleTitle && (
+              <p className="text-lg font-semibold text-[var(--text)] italic whitespace-nowrap overflow-hidden text-ellipsis text-center">
+                {chatTitle}
+              </p>
+            )}
+            {!visibleTitle && !historyMode && !settingsMode && (
+              <Badge>
+                {config?.persona || 'Default'} @ {config?.selectedModel || 'None'}
+              </Badge>
+            )}
+            {settingsMode && (
+              <div className="flex items-center justify-center">
+                 <p className="relative top-1 text-lg font-['Allura'] font-semibold text-[var(--text)] whitespace-nowrap">
+                   The game is afoot{' '}
+                   <WiMoonWaxingCrescent1 className="inline-block align-middle text-[#f5eee4] text-[20px] ml-2" />
+                 </p>
+              </div>
+            )}
+            {historyMode && (
+              <div className="flex items-center justify-center">
+                <p className="font-['Bruno_Ace_SC'] text-lg font-semibold text-[var(--text)] whitespace-nowrap">
+                  Chat History
+                </p>
+              </div>
+            )}
+          </div>
 
-      </Flex>
+          {/* Right Button(s) - Original structure */}
+          <div className="min-w-[40px] flex justify-end">
+             {!settingsMode && !historyMode && (
+               <Tooltip>
+                 <TooltipTrigger asChild>
+                   <Button
+                     aria-label="Reset Chat"
+                     variant="ghost"
+                     size="sm" // Kept as sm, or 'icon' if you prefer square
+                     className="text-[var(--text)] hover:bg-black/10 dark:hover:bg-white/10 rounded-md"
+                     onClick={reset}
+                   >
+                     <FiTrash2 size="18px" />
+                   </Button>
+                 </TooltipTrigger>
+                 <TooltipContent side="bottom" className="bg-[var(--bg)] text-[var(--text)] border-[var(--text)]">
+                   Reset Chat
+                 </TooltipContent>
+               </Tooltip>
+             )}
+             {historyMode && (
+                <Tooltip>
+                  <TooltipTrigger>
+                    <Button
+                      aria-label="Delete All History"
+                      variant="ghost"
+                      size="sm" // Kept as sm, or 'icon'
+                      className="text-[var(--text)] hover:bg-red-500/10 dark:hover:bg-red-500/20 rounded-md"
+                      onClick={deleteAll}
+                    >
+                      <FiTrash2 size="18px" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom" className="bg-[var(--active)]/50 text-[var(--text)] border-[var(--text)]">
+                    Delete All
+                  </TooltipContent>
+                </Tooltip>
+             )}
+          </div>
+        </div>
 
-      {/* Welcome Modal */}
-      {(!config?.models || config?.models.length === 0) && !settingsMode && !historyMode && (
-        <WelcomeModal isOpen={true} setSettingsMode={setSettingsMode} onClose={() => {}} />
-      )}
+        {/* Welcome Modal (Dialog) */}
+        {(!config?.models || config.models.length === 0) && !settingsMode && !historyMode && (
+           <WelcomeModal isOpen={true} setSettingsMode={setSettingsMode} onClose={() => {}} />
+        )}
 
-      {/* Settings Drawer */}
-      <SettingsDrawer
-        isOpen={isOpen}
-        onClose={onClose}
-        config={config}
-        updateConfig={updateConfig}
-        availableModelNames={availableModelNames}
-        setSettingsMode={setSettingsMode}
-        setHistoryMode={setHistoryMode}
-        downloadText={downloadText}
-        downloadJson={downloadJson}
-        downloadImage={downloadImage}
-      />
-    </Box>
+        {/* Settings Sheet */}
+        <SettingsSheet
+          isOpen={isSheetOpen}
+          onOpenChange={handleSheetOpenChange}
+          config={config}
+          updateConfig={updateConfig} // Pass updateConfig here
+          setSettingsMode={setSettingsMode}
+          setHistoryMode={setHistoryMode}
+          downloadText={downloadText}
+          downloadJson={downloadJson}
+          downloadImage={downloadImage}
+        />
+      </div>
+    </TooltipProvider>
   );
 };

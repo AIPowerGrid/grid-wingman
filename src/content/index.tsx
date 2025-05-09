@@ -1,19 +1,19 @@
 import { contentLoaded } from 'src/state/slices/content';
 import { createStoreProxy } from 'src/state/store';
-import PortNames from '../types/PortNames';
+import ChannelNames from '../types/ChannelNames';
 
 (async () => {
   try {
     if (
       window.location.protocol === 'chrome:' ||
-      window.location.protocol === 'chrome-extension:' ||
-      window.location.href.includes('chrome.google.com')
+      window.location.protocol === 'chrome-extension:'
+      // || window.location.href.includes('chrome.google.com')
     ) {
       console.debug('Skipping restricted URL:', window.location.protocol);
       return;
     }
 
-    const store = createStoreProxy(PortNames.ContentPort);
+    const store = createStoreProxy(ChannelNames.ContentPort);
 
     try {
       await store.ready();

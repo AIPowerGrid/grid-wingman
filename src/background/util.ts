@@ -1,3 +1,6 @@
+import { clsx, type ClassValue } from "clsx"
+import { twMerge } from "tailwind-merge"
+
 export async function getCurrentTab() {
   const queryOptions = { active: true, lastFocusedWindow: true };
   const [tab] = await chrome.tabs.query(queryOptions);
@@ -64,3 +67,8 @@ export const normalizeApiEndpoint = (endpoint?: string): string => {
     return '';
   }
 };
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
+}
+

@@ -1,10 +1,10 @@
 import { getCurrentTab, injectContentScript } from 'src/background/util';
 import buildStoreWithDefaults from 'src/state/store';
 import storage from 'src/background/storageUtil';
-import PortNames from '../types/PortNames';
+import ChannelNames from '../types/ChannelNames';
 
 // Initialize store but don't start background processes
-buildStoreWithDefaults({ portName: PortNames.ContentPort });
+buildStoreWithDefaults({ channelName: ChannelNames.ContentPort });
 
 // Configure panel behavior - only open on action click
 chrome.sidePanel
@@ -13,7 +13,7 @@ chrome.sidePanel
 
 // Handle panel connections
 chrome.runtime.onConnect.addListener(port => {
-  if (port.name !== PortNames.SidePanelPort) return;
+  if (port.name !== ChannelNames.SidePanelPort) return;
   
   let tabListenersActive = false;
 

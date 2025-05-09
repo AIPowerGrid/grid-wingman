@@ -1,112 +1,141 @@
 import { useState } from 'react';
 import toast from 'react-hot-toast';
-import { FaEye, FaEyeSlash } from 'react-icons/fa'; // Import React Icons
-import {
-  Box,
-  Button,
-  IconButton,
-  Input,
-} from '@chakra-ui/react';
-
+import { FaEye, FaEyeSlash, FaCheck } from 'react-icons/fa'; // Added FaCheck
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { useConfig } from './ConfigContext';
-import { GROQ_URL } from './constants';
+import { GROQ_URL } from './constants'; // Assuming this is defined
+import { cn } from "@/src/background/util";
 
 export const ConnectGroq = () => {
   const { config, updateConfig } = useConfig();
-  const [apiKey, setApiKey] = useState(config?.groqApiKey);
-  const [visibleApiKeys, setVisibleApiKeys] = useState(false);
+  const [apiKey, setApiKey] = useState(config?.groqApiKey || ''); // Ensure default is empty string
+  const [visibleApiKey, setVisibleApiKey] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const isDark = config?.theme === 'dark';
+  const controlBg = isDark ? 'bg-[rgba(255,255,255,0.04)]' : 'bg-[rgba(255,250,240,0.6)]';
+  const subtleBorderClass = 'border-[var(--text)]/10';
+  const inputHeightClass = 'h-8';
+  const buttonHeightClass = 'h-8';
+
   const onConnect = () => {
-    fetch(GROQ_URL, { headers: { Authorization: `Bearer ${apiKey}` } })
-      .then(res => res.json())
+    if (!apiKey) {
+      toast.error("API key is required for Groq.");
+      return;
+    }
+    setIsLoading(true);
+    toast.dismiss();
+    toast.loading('Connecting to Groq...');
+
+    // A common way to test an API key is to list models or a similar lightweight request
+    fetch(`${GROQ_URL}`, { headers: { Authorization: `Bearer ${apiKey}` } })
+      .then(res => {
+        if (!res.ok) {
+          return res.json().then(errData => {
+            throw new Error(errData?.error?.message || `Connection failed: ${res.status} ${res.statusText}`);
+          }).catch(() => {
+            throw new Error(`Connection failed: ${res.status} ${res.statusText}`);
+          });
+        }
+        return res.json();
+      })
       .then(data => {
-        if (data?.error) {
-          toast.error(`${data?.error?.message}`)
-          updateConfig({ groqError: data?.error?.message, groqConnected: false });
-        } else {
-          toast.success('connected to groq');
+        // Check for a 'data' array which is common for model listings
+        if (Array.isArray(data.data) && data.data.length > 0) {
           updateConfig({
             groqApiKey: apiKey,
             groqConnected: true,
             groqError: undefined,
-            models: [
-              ...(config?.models || []),
-              { id: 'groq', host: 'groq', active: true } // Add this model entry
-            ],
-            selectedModel: 'groq'
+            // Example: add a generic Groq model entry or parse from data.data
+            models: (config?.models || []).filter(m => !m.id.startsWith('groq_')).concat(
+              data.data.map((model: any) => ({ id: `groq_${model.id}`, name: model.id, host: 'groq', active: true }))
+            ),
+            // selectedModel: `groq_${data.data[0].id}` // Optionally select the first model
           });
+          toast.dismiss();
+          toast.success('Connected to Groq');
+        } else if (data?.error) {
+          updateConfig({ groqError: data.error.message, groqConnected: false });
+          toast.dismiss();
+          toast.error(data.error.message);
+        } else {
+           updateConfig({ groqError: "Unexpected response or no models found.", groqConnected: false });
+          toast.dismiss();
+          toast.error('Unexpected response or no models found from Groq.');
         }
       })
       .catch(err => {
-        toast.error(err.message);
+        toast.dismiss();
+        toast.error(err.message || "Failed to connect to Groq");
+        updateConfig({ groqError: err.message, groqConnected: false });
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
   };
 
-  const disabled = config?.groqApiKey === apiKey;
+  // Button should be enabled if API key is present and not currently loading
+  const connectButtonDisabled = !apiKey || isLoading;
   const isConnected = config?.groqConnected;
 
   return (
-    <Box display="flex" mb={4} ml={4} mr={4}>
-      <Input
-        _focus={{
-          borderColor: 'var(--text)',
-          boxShadow: 'none !important'
-        }}
-        _hover={{
-          borderColor: !disabled && 'var(--text)',
-          boxShadow: !disabled && 'none !important'
-        }}
-        autoComplete="off"
-        border="2px"
-        borderColor="var(--text)"
-        borderRadius={16}
-        color="var(--text)"
-        fontSize="md"
-        fontStyle="bold"
-        fontWeight={600}
-        id="user-input"
-        mr={4}
-        placeholder="GROQ_API_KEY"
-        size="sm"
-        type={!visibleApiKeys ? 'password' : undefined}
-        value={apiKey}
-        variant="outline"
-        onChange={e => setApiKey(e.target.value)}
-      />
+    <div className="flex items-center space-x-3">
+      <div className="relative flex-grow">
+        <Input
+          id="groq-api-key"
+          autoComplete="off"
+          placeholder="GROQ_API_KEY"
+          type={visibleApiKey ? 'text' : 'password'}
+          value={apiKey}
+          onChange={e => setApiKey(e.target.value)}
+          className={cn(
+            "w-full", // Ensure it takes full width of its container
+            inputHeightClass, controlBg, subtleBorderClass,
+            "text-[var(--text)] rounded-md shadow-sm text-sm px-2.5",
+            "focus:border-[var(--active)] focus:ring-1 focus:ring-[var(--active)] focus:ring-offset-0",
+            "hover:border-[var(--active)]",
+            {"pr-8": true} // Add padding-right if eye icon is inside
+          )}
+          disabled={isLoading}
+        />
+        <Button
+            variant="ghost"
+            size="sm"
+            className={cn(
+                "absolute inset-y-0 right-0 flex items-center justify-center",
+                buttonHeightClass, "w-8 text-[var(--text)]/70 hover:text-[var(--text)]"
+            )}
+            onClick={() => setVisibleApiKey(!visibleApiKey)}
+            aria-label={visibleApiKey ? "Hide API key" : "Show API key"}
+            disabled={isLoading}
+        >
+            {visibleApiKey ? <FaEyeSlash className="h-4 w-4" /> : <FaEye className="h-4 w-4" />}
+        </Button>
+      </div>
+
       {!isConnected && (
         <Button
-          _hover={{
-            background: 'var(--active)',
-            border: '2px solid var(--text)'
-          }}
-          background="var(--active)"
-          border="2px solid var(--text)"
-          borderRadius={16}
-          color="var(--text)"
-          disabled={disabled}
-          size="sm"
           onClick={onConnect}
+          className={cn(
+            buttonHeightClass, "px-3 text-sm font-medium whitespace-nowrap",
+            "bg-[var(--active)] text-[var(--bg)] hover:bg-[var(--active)]/90 rounded-md shadow-sm",
+            "focus-visible:ring-1 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--bg)]"
+          )}
+          disabled={connectButtonDisabled}
         >
-          connect
+          {isLoading ? "..." : "Save"} {/* Changed to Save as it persists the key */}
         </Button>
       )}
       {isConnected && (
-        <IconButton
-          _hover={{
-            background: 'var(--active)',
-            border: '2px solid var(--text)'
-          }}
-          aria-label="Done"
-          background="var(--active)"
-          border="2px solid var(--text)"
-          color="var(--text)"
-          fontSize="19px"
-          icon={visibleApiKeys ? <FaEyeSlash /> : <FaEye />} // Use React Icons
-          size="sm"
-          variant="solid"
-          isRound
-          onClick={() => setVisibleApiKeys(!visibleApiKeys)}
-        />
+        <Button
+          variant="ghost" size="sm" aria-label="Connected to Groq"
+          className={cn(buttonHeightClass, "w-8 rounded-md text-[var(--success)]")}
+          // onClick={onConnect} // Optionally allow re-saving/re-testing
+        >
+          <FaCheck className="h-5 w-5" />
+        </Button>
       )}
-    </Box>
+    </div>
   );
 };

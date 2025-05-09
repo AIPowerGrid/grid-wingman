@@ -17,26 +17,30 @@
     "isolatedModules": true,
     "noEmit": false,
     "outDir": "./dist/",
-    "noImplicitAny": false,
-    "target": "es5",
+    "noImplicitAny": true,
+    "target": "ES2020",
     "jsx": "react-jsx",
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
-    "moduleResolution": "Node",
+    "moduleResolution": "node",
+    "sourceMap": true,        
     "paths": {
       "src/*": ["src/*"],
+      "@/*": ["./*"], 
+      "@/utils": ["src/background/util"], // Add specific alias for utils
+
     }
-  },
-  "resolve": {
-    "extensions": [".ts", ".js"],
   },
 
   "include": [
     "src",
-    "config"
+    "config",
+    "components" // Add the components directory here
   ],
-  "ignore": [
+  "exclude": [ // Corrected from 'ignore'
     "test",
     "jest.config.js",
+    "node_modules",
+    "dist"
   ]
 }

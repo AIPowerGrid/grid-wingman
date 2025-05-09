@@ -1,4 +1,4 @@
-// useSafeAsyncEffect.ts might be used in a different file, so ensure to import it correctly
+// useSafeAsyncEffect.ts
 
 import { useEffect, useRef } from 'react';
 
@@ -17,14 +17,3 @@ export function useSafeAsyncEffect(effect: (isCancelled: () => boolean) => void 
   }, deps);
 }
 
-
-// usage
-
-// useSafeAsyncEffect(async (isCancelled) => {
-//  const [tab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
-//  if (isCancelled()) return;
-  
-//  if (tab?.id && tab.url) {
-//    setCurrentTabInfo({ id: tab.id, url: tab.url });
-//  }
-//}, []);

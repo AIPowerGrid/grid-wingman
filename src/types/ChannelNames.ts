@@ -1,6 +1,6 @@
-enum PortNames {
+enum ChannelNames {
   ContentPort = 'content',
   SidePanelPort = 'sidePanel',
 }
 
-export default PortNames;
+export default ChannelNames;

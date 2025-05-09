@@ -1,418 +1,468 @@
-import {
- ForwardedRef, forwardRef, useEffect, useState
-} from 'react';
+// src/sidePanel/Personas.tsx
+import { ForwardedRef, useEffect, useState, ChangeEvent, Dispatch, SetStateAction } from 'react';
 import ResizeTextarea from 'react-textarea-autosize';
 import {
-  AccordionButton,
   AccordionItem,
-  AccordionPanel,
-  Box,
-  Button,
-  IconButton,
-  Input,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
+  AccordionContent,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
+import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  // DialogClose, // Not explicitly used as buttons handle close
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
   Select,
-  Textarea,
-  useDisclosure
-} from '@chakra-ui/react';
-// Import icons from react-icons
-import { IoAdd, IoTrashOutline } from 'react-icons/io5'; // Example using Ionicons 5
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { IoAdd, IoTrashOutline } from 'react-icons/io5';
 
 import { useConfig } from './ConfigContext';
 import { SettingTitle } from './SettingsTitle';
+import { cn } from "@/src/background/util";
 
-// --- AutoResizeTextarea component remains the same ---
-const AutoResizeTextarea = forwardRef((props, ref) => (
-  <Textarea
-    ref={ref as ForwardedRef<HTMLTextAreaElement>}
-    as={ResizeTextarea}
-    maxRows={8}
-    minH="unset"
-    minRows={3}
-    overflow="scroll"
-    resize="none"
-    w="100%"
-    {...props}
-  />
-));
+// Styling constants
+const commonSubtleBorderClass = 'border-[var(--text)]/10';
+const commonControlBg = (isDark: boolean) => isDark ? 'bg-[rgba(255,255,255,0.04)]' : 'bg-[rgba(255,250,240,0.6)]';
+const commonItemShadow = 'shadow-md';
+const commonItemRounded = 'rounded-xl';
+const commonInputHeight = 'h-9';
+
+// --- AutoResizeTextarea component ---
+const AutoResizeTextarea = (
+  {
+    ref,
+    ...props
+  }
+) => {
+  const { isDark, onTextAreaFocus, isEffectivelyReadOnly, className, ...rest } = props;
+  const currentControlBg = commonControlBg(isDark ?? false);
+
+  return (
+    <ResizeTextarea
+      ref={ref}
+      minRows={3}
+      maxRows={8}
+      readOnly={isEffectivelyReadOnly} // HTML readOnly attribute
+      onFocus={(e) => {
+        if (props.onFocus) props.onFocus(e); // Pass through original onFocus
+        if (onTextAreaFocus) onTextAreaFocus(); // Custom handler to activate editing
+      }}
+      className={cn(
+        "flex w-full min-h-[80px] px-3 py-2 text-sm ring-offset-[var(--bg)] placeholder:text-[var(--muted-foreground)]",
+        currentControlBg,
+        commonItemRounded,
+        commonItemShadow,
+        "text-[var(--text)]",
+        commonSubtleBorderClass, // Default border
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2", // Standard Shadcn focus ring
+
+        // Conditional styles based on readOnly state
+        isEffectivelyReadOnly
+          ? "opacity-75 cursor-default" // Muted look when read-only
+          : "hover:border-[var(--active)] focus:border-[var(--active)]", // Interactive borders when editable
+
+        "disabled:cursor-not-allowed disabled:opacity-50",
+        className // Allow overriding or extending classes
+      )}
+      {...rest}
+    />
+  );
+};
 AutoResizeTextarea.displayName = 'AutoResizeTextarea';
 
-// --- SaveButtons component remains the same ---
-import PropTypes from 'prop-types';
-
+// --- SaveButtons component ---
 const SaveButtons = ({
- hasChange, buttonColor, onSave, onSaveAs, onCancel
+  hasChange,
+  onSave,
+  onSaveAs,
+  onCancel,
+}: {
+  hasChange: boolean;
+  onSave: () => void;
+  onSaveAs: () => void;
+  onCancel: () => void;
 }) => {
-  const commonButtonStyles = {
-    _hover: { background: 'var(--active)', border: `2px solid ${buttonColor}` },
-    background: 'var(--active)',
-    border: `2px solid ${buttonColor}`,
-    borderRadius: 16,
-    color: buttonColor,
-    size: 'sm',
-    mr: 2
-  };
+  if (!hasChange) return null;
 
   return (
-    <Box display="flex" mt={2}>
-      {hasChange && (
-        <>
-          <Button {...commonButtonStyles} disabled={!hasChange} onClick={onSave}>
-            save
-          </Button>
-          <Button {...commonButtonStyles} disabled={!hasChange} onClick={onSaveAs}>
-            save as..
-          </Button>
-          <Button
-            _hover={{ background: 'var(--active)', border: '2px solid var(--text)' }}
-            background="var(--bg)"
-            border="2px solid var(--text)"
-            borderRadius={16}
-            color="var(--text)"
-            mr={2}
-            size="sm"
-            onClick={onCancel}
-          >
-            cancel
-          </Button>
-        </>
-      )}
-    </Box>
+    <div className="flex mt-4 space-x-2 justify-end w-full">
+      <Button
+        variant="default"
+        size="sm"
+        className={cn(
+          commonItemRounded,
+          "bg-[var(--active)] text-[var(--text)] border border-[var(--text)] hover:brightness-110",
+          "focus-visible:ring-1 focus-visible:ring-[var(--active)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--bg)]"
+        )}
+        onClick={onSave}
+      >
+        Save
+      </Button>
+      <Button
+        variant="default"
+        size="sm"
+        className={cn(
+          commonItemRounded,
+          "bg-[var(--active)] text-[var(--text)] border border-[var(--text)] hover:brightness-110",
+          "focus-visible:ring-1 focus-visible:ring-[var(--active)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--bg)]"
+        )}
+        onClick={onSaveAs}
+      >
+        Save As...
+      </Button>
+      <Button
+        variant="outline"
+        size="sm"
+        className={cn(
+          commonItemRounded,
+          "text-[var(--text)] border-[var(--text)]/50",
+          "hover:bg-[var(--text)]/10 hover:border-[var(--text)]/70",
+          "focus-visible:ring-1 focus-visible:ring-[var(--active)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--bg)]"
+        )}
+        onClick={onCancel}
+      >
+        Cancel
+      </Button>
+    </div>
   );
 };
 
-// --- PersonaModal component remains the same ---
+// --- PersonaModal component ---
 const PersonaModal = ({
- isOpen, onClose, personaPrompt, personas, updateConfig
+  isOpen, onOpenChange, personaPrompt, personas, updateConfig, onModalClose, isDark
+}: {
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
+  personaPrompt: string;
+  personas: Record<string, string>;
+  updateConfig: (config: any) => void;
+  onModalClose: () => void;
+  isDark: boolean;
 }) => {
   const [name, setName] = useState('');
-  const buttonColor = name ? 'var(--text)' : 'gray';
+  const controlBgClass = commonControlBg(isDark);
 
   const handleCreate = () => {
-    if (!name) return;
-
+    if (!name.trim()) return;
     updateConfig({
-      personas: { ...personas, [name]: personaPrompt },
-      persona: name
+      personas: { ...personas, [name.trim()]: personaPrompt },
+      persona: name.trim()
     });
-
     setName('');
-    onClose();
+    onModalClose();
   };
 
   return (
-    <Modal isOpen={isOpen} size="xs" isCentered onClose={onClose}>
-      <ModalOverlay />
-      <ModalContent background="var(--active)" borderRadius={16}>
-        <ModalHeader color="var(--text)" padding={2} paddingLeft={6}>
-          Create New Persona
-        </ModalHeader>
-        <ModalCloseButton />
-        <ModalBody padding={4}>
+    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+      <DialogContent
+        className={cn(
+          "sm:max-w-[425px]",
+          "bg-[var(--bg)]", // Use main background for opacity
+          "border", commonSubtleBorderClass,
+          commonItemRounded,
+          commonItemShadow,
+          "text-[var(--text)]"
+        )}
+        onCloseAutoFocus={(e) => e.preventDefault()}
+      >
+        <DialogHeader>
+          <DialogTitle className="text-[var(--text)]">Create New Persona</DialogTitle>
+        </DialogHeader>
+        <div className="grid gap-4 py-4">
+          <Label htmlFor="persona-name" className="text-base font-medium text-foreground sr-only">
+            Persona Name
+          </Label>
           <Input
-            _focus={{ borderColor: 'var(--text)', boxShadow: 'none !important' }}
-            _hover={{ borderColor: 'var(--text)', boxShadow: 'none !important' }}
-            background="var(--bg)"
-            border="2px"
-            borderColor="var(--text)"
-            borderRadius={16}
-            color="var(--text)"
-            fontSize="md"
-            fontStyle="bold"
-            fontWeight={600}
-            mr={4}
-            placeholder="name"
-            size="md"
+            id="persona-name"
+            placeholder="Enter persona name"
             value={name}
-            variant="outline"
             onChange={e => setName(e.target.value)}
+            className={cn(
+              controlBgClass, commonSubtleBorderClass, commonInputHeight,
+              "text-[var(--text)]", commonItemRounded, commonItemShadow, "w-full px-3",
+              "focus:border-[var(--active)] focus:ring-1 focus:ring-[var(--active)]",
+              "hover:border-[var(--active)] hover:brightness-98"
+            )}
           />
-        </ModalBody>
-        <ModalFooter justifyContent="center" pt={0}>
-          <Button
-            _hover={{ background: 'var(--bg)', border: `2px solid ${buttonColor}` }}
-            background="var(--bg)"
-            border={`2px solid ${buttonColor}`}
-            borderRadius={16}
-            color={buttonColor}
-            disabled={!name}
-            mr={2}
-            size="sm"
-            onClick={handleCreate}
-          >
-            Create
-          </Button>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
+        </div>
+        <DialogFooter className="sm:justify-end">
+          <Button type="button" variant="outline" size="sm"
+            className={cn(commonItemRounded, "text-[var(--text)] border-[var(--text)]/50", "hover:bg-[var(--text)]/10 hover:border-[var(--text)]/70")}
+            onClick={onModalClose}
+          > Cancel </Button>
+          <Button type="button" variant="default" size="sm"
+            className={cn(commonItemRounded, "bg-[var(--active)] text-[var(--active-foreground)]", "disabled:opacity-60")}
+            disabled={!name.trim()} onClick={handleCreate}
+          > Create </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
 
-// --- DeleteModal component remains the same ---
+// --- DeleteModal component ---
 const DeleteModal = ({
- isOpen, onClose, persona, personas, updateConfig
+  isOpen, onOpenChange, persona, personas, updateConfig, onModalClose
+}: {
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
+  persona: string;
+  personas: Record<string, string>;
+  updateConfig: (config: any) => void;
+  onModalClose: () => void;
 }) => {
   const handleDelete = () => {
     const newPersonas = { ...personas };
-
     delete newPersonas[persona];
+    const remainingPersonas = Object.keys(newPersonas);
     updateConfig({
       personas: newPersonas,
-      persona: Object.keys(newPersonas)[0] || 'Ein' // Ensure a fallback persona exists
+      persona: remainingPersonas.length > 0 ? remainingPersonas[0] : 'Ein'
     });
-
-    onClose();
+    onModalClose();
   };
 
   return (
-    <Modal isOpen={isOpen} size="xs" isCentered onClose={onClose}>
-      <ModalOverlay />
-      <ModalContent background="var(--active)" borderRadius={16}>
-        <ModalHeader padding={2} paddingLeft={6}>
-          Delete
-          {' '}
-          {persona}
-        </ModalHeader>
-        <ModalCloseButton />
-        <ModalBody padding={2} />
-        <ModalFooter justifyContent="center" pt={0}>
-          <Button
-            _hover={{ background: 'var(--bg)', border: '2px solid var(--text)' }}
-            background="var(--bg)"
-            border="2px solid var(--text)"
-            borderRadius={16}
-            color="var(--text)"
-            mr={2}
-            size="sm"
-            onClick={handleDelete}
-          >
-            Delete
-          </Button>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
+    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+      <DialogContent
+        className={cn(
+          "sm:max-w-[425px]",
+          "bg-[var(--bg)]", // Use main background for opacity
+          "border", commonSubtleBorderClass,
+          commonItemRounded, commonItemShadow,
+          "text-[var(--text)]"
+        )}
+      >
+        <DialogHeader>
+          <DialogTitle className="text-[var(--text)]">Delete "{persona}"</DialogTitle>
+          <DialogDescription className="text-[var(--text)]/80 pt-2">
+            Are you sure you want to delete this persona? This action cannot be undone.
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter className="sm:justify-end pt-4">
+           <Button type="button" variant="outline" size="sm"
+            className={cn(commonItemRounded, "text-[var(--text)] border-[var(--text)]/50", "hover:bg-[var(--text)]/10 hover:border-[var(--text)]/70")}
+            onClick={onModalClose}
+          > Cancel </Button>
+          <Button type="button" variant="destructive" size="sm"
+            className={cn(commonItemRounded)} onClick={handleDelete}
+          > Delete </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
 
-// --- PersonaSelect component remains the same ---
+// --- PersonaSelect component ---
 const PersonaSelect = ({
- personas, persona, updateConfig
-}) => (
-  <Select
-    _focus={{ borderColor: 'var(--text)', boxShadow: 'none !important' }}
-    _hover={{ borderColor: 'var(--text)', boxShadow: 'none !important' }}
-    sx={{
-     '> option': {
-      background: 'var(--bg)',
-      color: 'var(--text)',
-      '--option-bg-contrast': 'color-mix(in srgb, var(--text) 20%, var(--bg))'
-     },
-    }}
-    border="2px"
-    borderColor="var(--text)"
-    borderRadius={16}
-    color="var(--text)"
-    defaultValue="default"
-    fontSize="md"
-    fontStyle="bold"
-    fontWeight={600}
-    maxWidth="50%"
-    mb={2}
-    ml={1}
-    size="sm"
-    value={persona}
-    onChange={e => updateConfig({ persona: e.target.value })}
-  >
-    {Object.keys(personas).map(p => (
-      <option key={p} value={p}>{p}</option>
-    ))}
-  </Select>
-);
+  personas, persona, updateConfig, isDark
+}: {
+  personas: Record<string, string>;
+  persona: string;
+  updateConfig: (config: any) => void;
+  isDark: boolean;
+}) => {
+  const controlBgClass = commonControlBg(isDark);
+  return (
+    <Select
+      value={persona}
+      onValueChange={(value) => updateConfig({ persona: value })}
+    >
+      <SelectTrigger
+        className={cn(
+          controlBgClass, commonSubtleBorderClass, commonInputHeight,
+          "text-[var(--text)]", commonItemRounded, commonItemShadow, "w-[180px]",
+          "focus:border-[var(--active)] focus:ring-1 focus:ring-[var(--active)]",
+          "hover:border-[var(--active)] hover:brightness-98",
+          "data-[placeholder]:text-muted-foreground"
+        )}
+      >
+        <SelectValue placeholder="Select persona" />
+      </SelectTrigger>
+      <SelectContent
+        className={cn(
+          "bg-[var(--bg)] text-[var(--text)] border", // Use main background for opacity
+          commonSubtleBorderClass,
+          "rounded-md shadow-lg"
+        )}
+      >
+        {Object.keys(personas).map((p) => (
+          <SelectItem
+            key={p} value={p}
+            className={cn("hover:brightness-95 focus:bg-[var(--active)] focus:text-[var(--active-foreground)]", "text-[var(--text)]")}
+          > {p} </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
+};
 
-// --- PersonaTextarea component remains the same ---
-const PersonaTextarea = ({ personaPrompt, setPersonaPrompt }) => (
+// --- PersonaTextareaWrapper ---
+const PersonaTextareaWrapper = ({
+  personaPrompt, setPersonaPrompt, isDark, isEditing, setIsEditing
+}: {
+  personaPrompt: string;
+  setPersonaPrompt: (value: string) => void;
+  isDark: boolean;
+  isEditing: boolean;
+  setIsEditing: Dispatch<SetStateAction<boolean>>;
+}) => (
   <AutoResizeTextarea
-
-    // @ts-expect-error Props are spread to the underlying Textarea component.
-
-    _focus={{ borderColor: 'var(--text)', boxShadow: 'none !important' }}
-    _hover={{ borderColor: 'var(--text)', boxShadow: 'none !important' }}
-    background="var(--text)"
-    border="2px"
-    borderColor="var(--text)"
-    borderRadius={16}
-    boxShadow="none !important"
-    color="var(--bg)"
-    fontSize="md"
-    fontStyle="bold"
-    fontWeight={600}
+    isDark={isDark}
     value={personaPrompt}
-    onChange={e => setPersonaPrompt(e.target.value)}
+    onChange={(e: ChangeEvent<HTMLTextAreaElement>) => {
+        if (!isEditing) setIsEditing(true); // Auto-enable editing on change
+        setPersonaPrompt(e.target.value);
+    }}
+    onTextAreaFocus={() => {
+        if (!isEditing) setIsEditing(true); // Enable editing on focus
+    }}
+    isEffectivelyReadOnly={!isEditing} // Pass the read-only state for styling/behavior
+    placeholder="Define the persona's characteristics and instructions here..."
   />
 );
 
-// --- SaveButtonsWrapper component remains the same ---
-const SaveButtonsWrapper = ({
- buttonColor, hasChange, defaultPrompt, setPersonaPrompt, updateConfig, personas, persona, onOpen, personaPrompt
-}) => (
-  <SaveButtons
-    buttonColor={buttonColor}
-    hasChange={hasChange}
-    onCancel={() => setPersonaPrompt(defaultPrompt)}
-    onSave={() => updateConfig({ personas: { ...personas, [persona]: personaPrompt } })}
-    onSaveAs={onOpen}
-  />
-);
-
-// --- PersonaModalWrapper component remains the same ---
-const PersonaModalWrapper = ({
- isOpen, personaPrompt, personas, updateConfig, onClose
-}) => (
-  <PersonaModal
-    isOpen={isOpen}
-    personaPrompt={personaPrompt}
-    personas={personas}
-    updateConfig={updateConfig}
-    onClose={onClose}
-  />
-);
-
-// --- DeleteModalWrapper component remains the same ---
-const DeleteModalWrapper = ({
- isDeleteOpen, persona, personas, updateConfig, onDeleteClose
-}) => (
-  <DeleteModal
-    isOpen={isDeleteOpen}
-    persona={persona}
-    personas={personas}
-    updateConfig={updateConfig}
-    onClose={onDeleteClose}
-  />
-);
-
-// --- Persona component (Main changes here) ---
-const Persona = () => {
-  const {
- isOpen, onOpen, onClose
-} = useDisclosure();
-  const {
- isOpen: isDeleteOpen, onOpen: onDeleteOpen, onClose: onDeleteClose
-} = useDisclosure();
-  // const [name, setName] = useState('');
+// --- Persona component (Main Accordion Item) ---
+export const Persona = () => {
   const { config, updateConfig } = useConfig();
-  const personas = config?.personas || {};
-  const persona = config?.persona || 'Ein'; // Ensure a default persona exists
+  const isDark = config?.theme === 'dark';
 
-  // Ensure defaultPrompt has a fallback if the selected persona doesn't exist or personas is empty
-  const defaultPrompt = personas?.[persona] || personas?.Ein || '';
-  const [personaPrompt, setPersonaPrompt] = useState(defaultPrompt);
-  const hasChange = personaPrompt !== defaultPrompt;
+  const [isPersonaModalOpen, setIsPersonaModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isEditingPersona, setIsEditingPersona] = useState(false); // Controls textarea editability
+
+  const personas = config?.personas || { Ein: "You are Ein, a helpful AI assistant." };
+  const currentPersonaName = config?.persona || 'Ein';
+
+  const defaultPromptForCurrentPersona = personas?.[currentPersonaName] ?? personas?.Ein ?? "You are Ein, a helpful AI assistant.";
+  const [personaPrompt, setPersonaPrompt] = useState(defaultPromptForCurrentPersona);
+
+  // Show Save/Cancel if textarea is being edited AND its content differs from the original
+  const hasChange = isEditingPersona && personaPrompt !== defaultPromptForCurrentPersona;
 
   useEffect(() => {
-    if (defaultPrompt !== personaPrompt) {
-      setPersonaPrompt(defaultPrompt);
-    }
-  }, [defaultPrompt]);
+    // When currentPersonaName or the personas object itself changes:
+    // 1. Update the textarea content to the new persona's prompt.
+    // 2. Reset the editing state so the textarea is initially read-only/muted.
+    const newDefaultPrompt = personas?.[currentPersonaName] ?? personas?.Ein ?? "";
+    setPersonaPrompt(newDefaultPrompt);
+    setIsEditingPersona(false);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPersonaName, JSON.stringify(personas)]); // Deep watch personas object
 
-  const buttonColor = hasChange ? 'var(--text)' : 'gray';
+  const handlePersonaModalOpenChange = (open: boolean) => {
+    setIsPersonaModalOpen(open);
+    if (!open) {
+      // Reset prompt to the current selected persona's default when closing create/saveAs modal
+      setPersonaPrompt(defaultPromptForCurrentPersona);
+      setIsEditingPersona(false);
+    }
+  };
+
+  const handleOpenPersonaModalForCreate = () => {
+    setPersonaPrompt(''); // Clear prompt for new persona
+    setIsEditingPersona(true); // Allow immediate editing in the modal's context (though modal has its own input)
+                               // For the main textarea, it will reset via useEffect when new persona is saved & selected.
+    setIsPersonaModalOpen(true);
+  };
+  
+  const handleOpenPersonaModalForSaveAs = () => {
+    // Current personaPrompt is used for "Save As"
+    setIsPersonaModalOpen(true);
+  };
+
+  const controlBgClass = commonControlBg(isDark);
 
   return (
     <AccordionItem
-      border="2px solid var(--text)"
-      borderBottomWidth="2px !important"
-      borderRadius={16}
-      mb={4}
+      value="persona"
+      className={cn(
+        controlBgClass, commonSubtleBorderClass, commonItemRounded, commonItemShadow,
+        "transition-all duration-150 ease-in-out",
+        "hover:border-[var(--active)] hover:brightness-105"
+      )}
     >
-      <AccordionButton _hover={{ backgroundColor: 'transparent' }} paddingBottom={1} paddingRight={2}>
-        <SettingTitle
-          icon="👤"
-          padding={0}
-          text="Persona"
-        />
-      </AccordionButton>
-      <AccordionPanel p={2} pt={2}>
-        <Box display="flex" flexWrap="wrap" alignItems="center"> {/* Added alignItems */}
-          <PersonaSelect persona={persona} personas={personas} updateConfig={updateConfig} />
-          {Object.keys(personas).length > 1 && (
-            <IconButton
-              aria-label="delete persona" // More descriptive aria-label
-              borderRadius={16}
-              // Use react-icons component here
-              icon={<IoTrashOutline />}
-              pb={2} 
-              variant="ghost" // Use ghost or unstyled for better control with react-icons
-              size="lg" // Adjust size as needed
-              ml={2} // Add some margin
-              onClick={onDeleteOpen}
+      <AccordionTrigger
+        className={cn(
+          "flex items-center justify-between w-full px-3 py-2 hover:no-underline",
+          "text-[var(--text)] font-medium", "hover:brightness-95",
+          "data-[state=open]:border-b data-[state=open]:border-[var(--text)]/5"
+        )}
+      >
+        <SettingTitle icon="🥷" text="Persona" />
+      </AccordionTrigger>
+      <AccordionContent className="px-3 pb-4 pt-2 text-[var(--text)]">
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center gap-2">
+            <PersonaSelect
+              persona={currentPersonaName}
+              personas={personas}
+              updateConfig={updateConfig}
+              isDark={isDark}
             />
-          )}
-          <IconButton
-            aria-label="add new persona" // More descriptive aria-label
-            borderRadius={16}
-            // Use react-icons component here
-            icon={<IoAdd />}
-            pb={2} // Align with other buttons
-            variant="ghost" // Use ghost or unstyled
-            size="lg" // Adjust size as needed
-            ml={2} // Add some margin
-            onClick={() => {
-              // Reset prompt for new persona creation
-              setPersonaPrompt('');
-              onOpen();
+            <Button variant="ghost" size="sm" aria-label="Add new persona"
+              className={cn("text-[var(--text)] hover:text-[var(--active)] hover:bg-[var(--text)]/10 p-1.5 rounded-md", "focus-visible:ring-1 focus-visible:ring-[var(--active)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--bg)]")}
+              onClick={handleOpenPersonaModalForCreate}
+            > <IoAdd className="h-5 w-5" /> </Button>
+            {Object.keys(personas).length > 1 && (
+              <Button variant="ghost" size="sm" aria-label="Delete current persona"
+                className={cn("text-[var(--text)] hover:text-[var(--error)] hover:bg-[var(--error)]/10 p-1.5 rounded-md", "focus-visible:ring-1 focus-visible:ring-[var(--error)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--bg)]")}
+                onClick={() => setIsDeleteModalOpen(true)}
+              > <IoTrashOutline className="h-5 w-5" /> </Button>
+            )}
+          </div>
+
+          <PersonaTextareaWrapper
+            personaPrompt={personaPrompt}
+            setPersonaPrompt={setPersonaPrompt}
+            isDark={isDark}
+            isEditing={isEditingPersona}
+            setIsEditing={setIsEditingPersona}
+          />
+
+          <SaveButtons
+            hasChange={hasChange}
+            onSave={() => {
+              updateConfig({ personas: { ...personas, [currentPersonaName]: personaPrompt } });
+              setIsEditingPersona(false); // Exit editing mode after save
+            }}
+            onSaveAs={handleOpenPersonaModalForSaveAs}
+            onCancel={() => {
+              setPersonaPrompt(defaultPromptForCurrentPersona);
+              setIsEditingPersona(false); // Exit editing mode on cancel
             }}
           />
-          <PersonaTextarea personaPrompt={personaPrompt} setPersonaPrompt={setPersonaPrompt} />
-          <SaveButtonsWrapper
-            buttonColor={buttonColor}
-            defaultPrompt={defaultPrompt}
-            hasChange={hasChange}
-            persona={persona}
-            personaPrompt={personaPrompt}
-            personas={personas}
-            setPersonaPrompt={setPersonaPrompt}
-            updateConfig={updateConfig}
-            onOpen={onOpen} // Pass onOpen for 'save as' functionality
-          />
-        </Box>
-      </AccordionPanel>
-      {/* Modals remain the same but ensure they receive correct props */}
-      <PersonaModalWrapper
-        isOpen={isOpen}
-        // Pass the current (potentially empty) prompt for the new persona
+        </div>
+      </AccordionContent>
+
+      <PersonaModal
+        isOpen={isPersonaModalOpen}
+        onOpenChange={handlePersonaModalOpenChange}
         personaPrompt={personaPrompt}
         personas={personas}
         updateConfig={updateConfig}
-        onClose={() => {
-            // Reset prompt back to the selected persona's default if modal is closed without saving
-            setPersonaPrompt(defaultPrompt);
-            onClose();
-        }}
+        onModalClose={() => setIsPersonaModalOpen(false)} // This will trigger onOpenChange(false)
+        isDark={isDark}
       />
-      <DeleteModalWrapper
-        isDeleteOpen={isDeleteOpen}
-        persona={persona} // Pass the currently selected persona to delete
+      <DeleteModal
+        isOpen={isDeleteModalOpen}
+        onOpenChange={setIsDeleteModalOpen} // Directly set state
+        persona={currentPersonaName}
         personas={personas}
         updateConfig={updateConfig}
-        onDeleteClose={onDeleteClose}
+        onModalClose={() => setIsDeleteModalOpen(false)}
       />
     </AccordionItem>
   );
 };
-
-// --- PropTypes remain the same ---
-SaveButtons.propTypes = {
-  hasChange: PropTypes.bool.isRequired,
-  buttonColor: PropTypes.string.isRequired,
-  onSave: PropTypes.func.isRequired,
-  onSaveAs: PropTypes.func.isRequired,
-  onCancel: PropTypes.func.isRequired
-};
-
-export { AutoResizeTextarea, Persona };
-

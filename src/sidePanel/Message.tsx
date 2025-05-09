@@ -1,27 +1,31 @@
-import '../content/index.scss'; // Import your markdown styles
-import {
-  ClassAttributes, HTMLAttributes, ReactNode, useState
-} from 'react';
+import '../content/index.css'; // Import your markdown styles
+import type { ComponentPropsWithoutRef, ReactElement, CSSProperties, FC } from 'react';
+import { Children, ClassAttributes, HTMLAttributes, ReactNode, useState } from 'react';
 import Markdown from 'react-markdown';
-import { FiCopy, FiCheck, FiX } from 'react-icons/fi'; // Import FiCheck and FiX
+import { FiCopy, FiCheck, FiX } from 'react-icons/fi';
 import AutosizeTextarea from 'react-textarea-autosize';
-import {
-  Textarea,
-  HStack,
-  VStack,
-  Button as ChakraButton, // Alias to avoid naming conflict if needed elsewhere
-} from '@chakra-ui/react';
 
+// Shadcn/ui imports
+import { Button } from "@/components/ui/button";
+// We will use AutosizeTextarea and style it with Tailwind classes,
+// rather than ShadcnTextarea, to preserve the autosize functionality.
+import { cn } from "@/src/background/util"; // Your utility for conditional classes
 import {
-  Box, Button, Collapse, IconButton, useDisclosure
-} from '@chakra-ui/react';
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+
+// Markdown plugins
 import remarkGfm from 'remark-gfm';
-import remarkMath from 'remark-math';
-import { useConfig } from './ConfigContext'; // <-- Import useConfig
 import remarkSupersub from 'remark-supersub';
+import remarkMath from 'remark-math';
+
+// Your application-specific imports
+import { useConfig } from './ConfigContext';
 import { MessageTurn } from './ChatHistory';
 
-// List components
+// List components (kept as is with inline styles, as per "don't break it")
 type ListProps = {
   children?: ReactNode;
   ordered?: boolean;
@@ -45,7 +49,7 @@ const Ol = ({ children, ...rest }: ListProps) => (
   }} {...rest}>{children}</ol>
 );
 
-// Paragraph
+// Paragraph (kept as is)
 type ParagraphProps = { children?: ReactNode } & HTMLAttributes<HTMLParagraphElement>;
 const P = ({ children, ...rest }: ParagraphProps) => (
   <p style={{
@@ -56,103 +60,128 @@ const P = ({ children, ...rest }: ParagraphProps) => (
     whiteSpace: 'pre-wrap'
   }} {...rest}>{children}</p>
 );
+// Props for our custom Pre component, extending standard 'pre' props
+type CustomPreProps = ComponentPropsWithoutRef<'pre'>;
 
-// Pre/code
-type PreProps = { children?: ReactNode } & HTMLAttributes<HTMLPreElement>;
-const Pre = ({ children, ...rest }: PreProps) => (
-  <pre style={{
-    overflow: 'scroll',
-    paddingLeft: '1rem',
-    paddingTop: '0.5rem',
-    paddingBottom: '0.5rem',
-    margin: '1rem 0',
-    background: 'var(--markdown-pre-bg, var(--text))',
-    color: 'var(--markdown-pre-fg, var(--bg))',
-    borderRadius: '16px',
-    maxWidth: '80vw'
-  }} {...rest}>{children}</pre>
-);
+const Pre = (props: CustomPreProps) => {
+  const { children, className: preClassName, ...restPreProps } = props;
 
-type CodeProps = { children?: ReactNode; className?: string; inline?: boolean } & HTMLAttributes<HTMLElement>;
-const Code = ({ children, className, inline, ...rest }: CodeProps) => {
   const [copied, setCopied] = useState(false);
   const [hovered, setHovered] = useState(false);
+  // react-markdown passes the <code> element as children to <pre>
+  // We need to extract the actual code string and language class from it.
+  const codeElement = Children.only(children) as ReactElement<any> | null;
+  let codeString = '';
+  if (codeElement?.props?.children) {
+    // Ensure children of codeElement are treated as a flat string
+    if (Array.isArray(codeElement.props.children)) {
+      codeString = codeElement.props.children.map(child => typeof child === 'string' ? child : '').join('');
+    } else {
+      codeString = String(codeElement.props.children);
+    }
+    codeString = codeString.trim(); // Trim for cleaner copying
+  }
+  const languageClass = codeElement?.props?.className || ''; // e.g., "language-js"
 
   const copyToClipboard = () => {
-    if (typeof children === 'string') {
+    if (codeString) {
       setCopied(true);
-      navigator.clipboard.writeText(children);
+      navigator.clipboard.writeText(codeString);
       setTimeout(() => setCopied(false), 1500);
     }
   };
+  const preElementStyles: CSSProperties = {
+    overflow: 'auto',
+    padding: '1rem', // Consistent padding for all code blocks
+    margin: 0,       // Margin is handled by the outer div
+    background: 'var(--markdown-pre-background)', // Corrected: Use pre-specific background
+    color: 'var(--markdown-pre-foreground)',       // Corrected: Use pre-specific foreground
+    borderRadius: '8px',
+    maxWidth: '100%'
+  };
 
-  const match = /language-(\w+)/.exec(className || '');
-  const isBlock = !!match;
-
-  if (isBlock) {
-    return (
-      <Box
-        position="relative"
-        my={4}
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
+  return (
+    <div
+      className="relative my-4" // Margin for the entire code block
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      <pre
+        style={preElementStyles}
+        className={preClassName} // Pass through any className for the <pre> itself
+        {...restPreProps}       // Pass through other <pre> props
+        
       >
-        <pre style={{
-          overflow: 'auto',
-          padding: '1rem',
-          margin: 0,
-          background: 'var(--markdown-code-bg, var(--text))',
-          color: 'var(--markdown-code-fg, var(--bg))',
-          borderRadius: '8px',
-          maxWidth: '100%'
-        }} {...rest}>
-          <code className={className}>{children}</code>
-        </pre>
-        <IconButton
-          _hover={{ background: 'var(--active)' }}
-          aria-label={copied ? "Copied!" : "Copy code"}
-          background="var(--bg)"
-          color="var(--text)"
-          icon={<FiCopy />}
-          position="absolute"
-          right="0.5rem"
-          size="sm"
-          title={copied ? "Copied!" : "Copy code"}
-          top="0.5rem"
-          onClick={copyToClipboard}
-          opacity={hovered ? 1 : 0}
-          transition="opacity 0.2s"
-          pointerEvents={hovered ? 'auto' : 'none'}
-        />
-      </Box>
+      {/* This is the <code> element, which will be handled by our Code component */}
+      {children}
+    </pre>
+      {codeString && ( // Only show copy button if there's content
+          (<Button
+            variant="ghost"
+            size="sm"
+            aria-label={copied ? "Copied!" : "Copy code"}
+            title={copied ? "Copied!" : "Copy code"}
+            className={cn(
+              "absolute right-2 top-2 h-8 w-8 p-0", // Ensure padding doesn't make it too big
+              "bg-background text-foreground hover:bg-accent hover:text-accent-foreground", // Styles from original IconButton
+              "transition-opacity duration-200",
+              (hovered || copied) ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+            )}
+            onClick={copyToClipboard}
+          >
+            {copied ? <FiCheck className="h-4 w-4" /> : <FiCopy className="h-4 w-4" />}
+          </Button>)
+          )}
+    </div>
+  );
+    };
+
+// Props for our custom Code component, extending standard 'code' props
+type CustomCodeProps = ComponentPropsWithoutRef<'code'> & {
+  inline?: boolean; // Provided by react-markdown
+};
+
+const Code = (props: CustomCodeProps) => {
+  const { children, className, inline, ...restCodeProps } = props;
+
+  if (inline) {
+    // Styling for inline code: `code`
+    return (
+      <code
+        style={{
+          color: 'var(--markdown-inline-code-foreground, var(--foreground))', // Use specific inline var
+          background: 'var(--markdown-code-background, var(--muted))',    // Use consolidated code bg var
+          padding: '0.2rem 0.4rem',
+          borderRadius: '4px'
+        }}
+        className={className} // Pass through className for syntax highlighting themes
+        {...restCodeProps}
+      >
+        {children}
+      </code>
     );
   }
 
-  // Inline code
-  return (
-    <code style={{
-      color: 'var(--markdown-code-fg, var(--bg))',
-      background: 'var(--markdown-code-bg, var(--text))',
-      padding: '0.2rem 0.4rem',
-      borderRadius: '4px'
-    }}
-    className={className}
-    {...rest}
-    >
-      {children}
-    </code>
-  );
+  // For block code (rendered inside our <Pre> component)
+  // Just render the <code> tag; styling is handled by the parent <Pre>.
+  // className (e.g., language-js) is important for syntax highlighters.
+        
+return (
+<code className={className} {...restCodeProps}>
+{children}
+</code>
+);
 };
 
-// Anchor
+// Anchor (kept as is)
 type AnchorProps = { children?: ReactNode; href?: string } & HTMLAttributes<HTMLAnchorElement>;
 const A = ({ children, href, ...rest }: AnchorProps) => (
   <a href={href}
     style={{
-      color: 'var(--markdown-link, var(--link))',
+      color: 'var(--markdown-link, var(--primary))', // Assuming --link maps to --primary
       textDecoration: 'underline',
       padding: '2px 7px',
-      borderRadius: '6px'
+      borderRadius: '6px' // rounded-md is 0.375rem (6px)
     }}
     target="_blank"
     rel="noopener noreferrer"
@@ -162,75 +191,74 @@ const A = ({ children, href, ...rest }: AnchorProps) => (
   </a>
 );
 
-// Headings
+// Headings (kept as is)
 type HeadingProps = { children?: ReactNode } & HTMLAttributes<HTMLHeadingElement>;
 const H1 = ({ children, ...rest }: HeadingProps) => (
   <h1 style={{
-    fontSize: '1.5rem',
-    fontWeight: 800,
-    margin: '1rem 0 1rem',
-    borderBottom: '2px solid var(--markdown-h1, var(--text))',
-    paddingBottom: '0.5rem',
-    color: 'var(--markdown-h1, var(--text))'
+    fontSize: '1.5rem', // text-2xl
+    fontWeight: 800,    // font-extrabold
+    margin: '1rem 0 1rem', // my-4
+    borderBottom: '2px solid var(--markdown-h1, var(--foreground))', // Assuming --text maps to --foreground
+    paddingBottom: '0.5rem', // pb-2
+    color: 'var(--markdown-h1, var(--foreground))'
   }} {...rest}>{children}</h1>
 );
 
 const H2 = ({ children, ...rest }: HeadingProps) => (
   <h2 style={{
-    fontSize: '1.25rem',
-    fontWeight: 700,
-    margin: '1rem 0 0.75rem',
-    borderBottom: '1px solid var(--markdown-h2, var(--text))',
-    paddingBottom: '0.4rem',
-    color: 'var(--markdown-h2, var(--text))'
+    fontSize: '1.25rem', // text-xl
+    fontWeight: 700,     // font-bold
+    margin: '1rem 0 0.75rem', // mt-4 mb-3
+    borderBottom: '1px solid var(--markdown-h2, var(--foreground))',
+    paddingBottom: '0.4rem', // ~pb-1.5
+    color: 'var(--markdown-h2, var(--foreground))'
   }} {...rest}>{children}</h2>
 );
 
 const H3 = ({ children, ...rest }: HeadingProps) => (
   <h3 style={{
-    fontSize: '1.1rem',
-    fontWeight: 600,
-    margin: '0.75rem 0 0.5rem',
-    borderBottom: '1px dashed var(--markdown-h3, var(--text))',
-    paddingBottom: '0.3rem',
-    color: 'var(--markdown-h3, var(--text))'
+    fontSize: '1.1rem', // ~text-lg
+    fontWeight: 600,    // font-semibold
+    margin: '0.75rem 0 0.5rem', // mt-3 mb-2
+    borderBottom: '1px dashed var(--markdown-h3, var(--foreground))',
+    paddingBottom: '0.3rem', // ~pb-1
+    color: 'var(--markdown-h3, var(--foreground))'
   }} {...rest}>{children}</h3>
 );
 
-// Strong/Em
+// Strong/Em (kept as is)
 type StrongProps = { children?: ReactNode } & HTMLAttributes<HTMLElement>;
 const Strong = ({ children, ...rest }: StrongProps) => (
   <strong style={{
-    color: 'var(--markdown-strong, var(--bold))',
-    fontWeight: 700,
-    fontFamily: 'Poppins, sans-serif'
+    color: 'var(--markdown-strong, var(--foreground))', // Assuming --bold (if a color) maps to --foreground or a specific theme color
+    fontWeight: 700, // font-bold
+    fontFamily: 'Poppins, sans-serif' // Ensure Poppins is loaded if used
   }} {...rest}>{children}</strong>
 );
 
 type EmProps = { children?: ReactNode } & HTMLAttributes<HTMLElement>;
 const Em = ({ children, ...rest }: EmProps) => (
   <em style={{
-    color: 'var(--markdown-em, var(--italic))',
+    color: 'var(--markdown-em, var(--foreground))', // Assuming --italic (if a color) maps to --foreground or a specific theme color
     fontStyle: 'italic'
   }} {...rest}>{children}</em>
 );
 
-// Table
+// Table components (kept as is, Tr simplified as CSS handles hover)
 type TableProps = { children?: ReactNode } & HTMLAttributes<HTMLTableElement>;
 const Table = ({ children, ...rest }: TableProps) => (
   <table style={{
-    border: `2px solid var(--markdown-table-border, var(--text))`,
+    border: `2px solid var(--markdown-table-border, var(--foreground))`,
     borderCollapse: 'collapse',
     width: '100%',
-    margin: '1rem 0'
+    margin: '1rem 0' // my-4
   }} {...rest}>{children}</table>
 );
 
 type THeadProps = { children?: ReactNode } & HTMLAttributes<HTMLTableSectionElement>;
 const THead = ({ children, ...rest }: THeadProps) => (
   <thead style={{
-    background: 'var(--active)',
-    borderBottom: `2px solid var(--markdown-table-border, var(--text))`
+    borderBottom: `2px solid var(--markdown-table-border, var(--foreground))`
   }} {...rest}>{children}</thead>
 );
 
@@ -240,43 +268,36 @@ const TBody = ({ children, ...rest }: TBodyProps) => (
 );
 
 type TrProps = { children?: ReactNode } & HTMLAttributes<HTMLTableRowElement>;
-const Tr = ({ children, ...rest }: TrProps) => (
-  <Box
-    as="tr"
-    _hover={{ background: 'rgba(0,0,0,0.05)' }}
-    {...rest}
-  >
-    {children}
-  </Box>
-);
+// Simplified Tr: relies on .markdown-body tr:hover from index.css
+const Tr = (props: TrProps) => <tr {...props} />;
 
 type ThProps = { children?: ReactNode } & HTMLAttributes<HTMLTableCellElement>;
 const Th = ({ children, ...rest }: ThProps) => (
   <th style={{
-    padding: '0.5rem',
-    border: `1px solid var(--markdown-table-border, var(--text))`,
-    fontWeight: 700
+    padding: '0.5rem', // p-2
+    border: `1px solid var(--markdown-table-border, var(--foreground))`,
+    fontWeight: 700 // font-bold
   }} {...rest}>{children}</th>
 );
 
 type TdProps = { children?: ReactNode } & HTMLAttributes<HTMLTableCellElement>;
 const Td = ({ children, ...rest }: TdProps) => (
   <td style={{
-    padding: '0.5rem',
-    border: `1px solid var(--markdown-table-border, var(--text))`
+    padding: '0.5rem', // p-2
+    border: `1px solid var(--markdown-table-border, var(--foreground))`
   }} {...rest}>{children}</td>
 );
 
-// Blockquote
+// Blockquote (kept as is)
 type BlockquoteProps = { children?: ReactNode } & HTMLAttributes<HTMLElement>;
 const Blockquote = ({ children, ...rest }: BlockquoteProps) => (
   <blockquote
     style={{
-      borderLeft: '4px solid var(--markdown-h2, var(--text))',
-      margin: '1em 0',
-      padding: '0.5em 1em',
-      background: 'rgba(0,0,0,0.03)',
-      color: 'var(--markdown-h2, var(--text))'
+      borderLeft: '4px solid var(--markdown-h2, var(--foreground))',
+      margin: '1em 0', // my-4 (approx)
+      padding: '0.5em 1em', // py-2 px-4 (approx)
+      background: 'rgba(0,0,0,0.03)', // e.g. bg-black/5 dark:bg-white/5 or bg-muted/30
+      color: 'var(--markdown-h2, var(--foreground))'
     }}
     {...rest}
   >
@@ -286,42 +307,48 @@ const Blockquote = ({ children, ...rest }: BlockquoteProps) => (
 
 // Thinking block
 const ThinkingBlock = ({ content }: { content: string }) => {
-  const { isOpen, onToggle } = useDisclosure();
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <Box mb={2}>
-      <Button
-        _hover={{ bg: 'var(--active)' }}
-        borderColor='var(--text)'
-        color='var(--text)'
-        mb={1}
-        size='sm'
-        variant='outline'
-        onClick={onToggle}
-      >
-        {isOpen ? 'Hide Thoughts' : 'Show Thoughts'}
-      </Button>
-      <Collapse in={isOpen} animateOpacity>
-        <Box
-          bg='rgba(0,0,0,0.05)'
-          border='1px dashed'
-          borderColor='var(--text)'
-          borderRadius='md'
-          p={3}
-        >
-          <div className="markdown-body">
-            <Markdown
-              remarkPlugins={[remarkGfm]}
-              components={{
-                ...markdownComponents,
-                h1: H1,
-                h2: H2,
-                h3: H3
-              }}>{content}</Markdown>
+    <div className="mb-2"> {/* Equivalent to Box mb={2} */}
+      <Collapsible open={isOpen} onOpenChange={setIsOpen} className="w-full">
+        <CollapsibleTrigger asChild>
+          <Button
+            variant="outline"
+            size="sm"
+            className={cn(
+              "mb-1", // Chakra mb={1} (0.25rem)
+              // Assuming var(--text) maps to foreground, var(--active) to accent
+              "border-foreground text-foreground hover:bg-accent hover:text-accent-foreground"
+            )}
+          >
+            {isOpen ? 'Hide Thoughts' : 'Show Thoughts'}
+          </Button>
+        </CollapsibleTrigger>
+        <CollapsibleContent>
+          <div
+            className={cn(
+              "p-3 rounded-md border border-dashed", // Chakra p={3}, borderRadius='md', border='1px dashed'
+              "bg-muted", // Use muted background for the block
+              "border-muted-foreground", // Use muted-foreground color for the border
+              "text-muted-foreground"  // Use muted-foreground for the text inside the block
+            )}
+          >
+            <div className="markdown-body">
+              <Markdown
+                remarkPlugins={[remarkGfm]}
+                components={{
+                  ...markdownComponents, // Spread existing components
+                  // Override specific headings if needed, though they are already styled
+                  h1: H1,
+                  h2: H2,
+                  h3: H3,
+                }}>{content}</Markdown>
+            </div>
           </div>
-        </Box>
-      </Collapse>
-    </Box>
+        </CollapsibleContent>
+      </Collapsible>
+    </div>
   );
 };
 
@@ -344,13 +371,12 @@ const markdownComponents = {
   tr: Tr,
   th: Th,
   td: Td,
-  blockquote: Blockquote // <-- Add this line
+  blockquote: Blockquote,
 };
 
 interface MessageProps {
   turn: MessageTurn;
-  index: number; // Keep index
-  // Add editing props
+  index: number;
   isEditing: boolean;
   editText: string;
   onStartEdit: (index: number, currentContent: string) => void;
@@ -359,92 +385,90 @@ interface MessageProps {
   onCancelEdit: () => void;
 }
 
-// Rename component to reflect its new capability
-export const EditableMessage: React.FC<MessageProps> = ({
+export const EditableMessage: FC<MessageProps> = ({
   turn, index, isEditing, editText, onStartEdit, onSetEditText, onSaveEdit, onCancelEdit
 }) => {
-  const { config } = useConfig(); // <-- Get config
-  const contentToRender = turn.rawContent || ''; // Still needed for display mode and starting edit
+  const { config } = useConfig();
+  const contentToRender = turn.rawContent || '';
   const parts = contentToRender.split(/(<think>[\s\S]*?<\/think>)/g).filter(part => part && part.trim() !== '');
   const thinkRegex = /<think>([\s\S]*?)<\/think>/;
 
   return (
-    <Box
-      background={turn.role === 'assistant' ? 'var(--active)' : 'var(--bg)'}
-      border="1px"
-      borderColor={turn.role === 'assistant' ? 'var(--text)' : 'var(--text)'}
-      borderRadius={16}
-      className={`chatMessage ${config?.paperTexture ? 'chat-message-bubble' : ''}`} // <-- Add conditional class
-      color={'var(--text)'}
-      fontSize="md"
-      fontStyle={'normal'}
-      fontWeight={600}
-      // Let's try explicitly setting width instead of maxWidth
-      width="calc(100% - 3rem)" // Or try "98%" if you prefer that look
-      ml={2}
-      mr={2}
-      pb={1}
-      pl={4}
-      pr={4}
-      pt={2}
-      boxShadow="0 4px 12px rgba(0, 0, 0, 0.1)" // Soft shadow added here
-      sx={{
-        // Keep position relative for potential future absolute positioned children
-        textAlign: 'left',
-        position: 'relative',
+    <div // Replaces Chakra Box
+      className={cn(
+        "border rounded-2xl text-base font-semibold", // Chakra: border, borderRadius={16}, fontSize="md", fontWeight={600}
+        "w-[calc(100%-2rem)] mx-1 my-2", // Adjusted width, ml/mr/my (Chakra uses different spacing scale)
+                                        // Original: width="calc(100% - 3rem)" ml={2} mr={2}
+                                        // Chakra ml={2} (0.5rem) -> mx-2. Let's use mx-1 (0.25rem) and my-2 (0.5rem) as example. Adjust as needed.
+        "pb-1 pl-4 pr-4 pt-1", 
+        "shadow-lg text-left relative", // Chakra: boxShadow, textAlign, position
+        turn.role === 'assistant' ? 'bg-accent border-accent-foreground' : 'bg-background border-foreground', // Chakra: background, borderColor
+        // Note: Original borderColor was var(--text) for both. If accent has different border, adjust.
+        // Using border-accent-foreground for assistant for contrast with bg-accent. Or stick to border-foreground.
+        // Let's stick to original: border-foreground for both.
+        // turn.role === 'assistant' ? 'bg-accent' : 'bg-background',
+        // 'border-foreground', // Common border color
+        config?.paperTexture ? 'chat-message-bubble' : '',
+        'chatMessage', isEditing ? 'editing' : ''  // Add "editing" class conditionally
+      )}
+      style={{
+        // Apply conditional background and border color using style prop for CSS variables if preferred
+        // background: turn.role === 'assistant' ? 'var(--accent)' : 'var(--background)',
+        // borderColor: 'var(--foreground)',
+        // Or rely on Tailwind classes above, which is more standard for shadcn
       }}
-      // Add double-click handler ONLY for user messages to initiate editing
       onDoubleClick={() => {
-        // Allow editing for both user and assistant messages
         if (!isEditing) {
           onStartEdit(index, turn.rawContent);
         }
       }}
-      title={"Double-click to edit"} // Add tooltip hint for all messages
+      title={"Double-click to edit"}
     >
       {isEditing ? (
-        // --- Editing UI ---
-        <VStack spacing={2} align="stretch" width="100%">
-          <Textarea
-            as={AutosizeTextarea} // Use the autosize component
+        <div className="flex flex-col space-y-2 items-stretch w-full p-1"> {/* VStack equivalent */}
+          <AutosizeTextarea
             value={editText}
             onChange={(e) => onSetEditText(e.target.value)}
             placeholder="Edit your message..."
-            size="md" // Adjust size as needed
-            width="100%"// Adjust to fit the container
-            minRows={3} // Start with a minimum of 3 rows
-            // minHeight="100px" // Or set a larger minHeight if you prefer over minRows
-            bg="var(--bg)" // Use background color for contrast
-            color="var(--text)"
-            borderColor="var(--text)"
-            focusBorderColor="var(--link)" // Use link color for focus
-            _hover={{ borderColor: "var(--link)" }}
-            autoFocus // Focus the textarea when editing starts
+            className={cn("autosize-textarea",
+              // Base shadcn textarea styles (adapted for AutosizeTextarea)
+              "flex w-full rounded-md border bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground",
+              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+              // Original Chakra styles translated:
+              "text-foreground", // color="var(--text)"
+              "border-input", // Default shadcn border, original was var(--text) -> border-foreground
+                              // If you need border-foreground: "border-foreground hover:border-primary focus-visible:border-primary",
+                              // For consistency with shadcn forms, border-input is fine.
+                              // Let's use original intent:
+              "border-foreground hover:border-primary focus-visible:border-primary focus-visible:ring-0",
+              "min-h-[60px]" // Approximate minRows={3}
+            )}
+            minRows={3}
+            autoFocus
           />
-          <HStack justify="flex-end" spacing={2}>
-            <IconButton
-              aria-label="Save edit"
-              icon={<FiCheck />} // Use FiCheck
+          <div className="flex justify-end space-x-2"> {/* HStack equivalent */}
+            <Button
               size="sm"
-              colorScheme="green" // Use Chakra color schemes
-              variant="solid"
               onClick={onSaveEdit}
               title="Save changes"
-            />
-            <IconButton
-              aria-label="Cancel edit"
-              icon={<FiX />} // Use FiX
-              size="sm"
-              colorScheme="red" // Use Chakra color schemes
+              // Assuming default primary button is visually distinct (like green)
+              // className="bg-green-600 hover:bg-green-700 text-primary-foreground" // If specific green needed
+            >
+              <FiCheck className="h-4 w-4 mr-1" /> Save
+            </Button>
+            <Button
               variant="outline"
+              size="sm"
+              className="text-destructive border-destructive hover:text-destructive-foreground hover:bg-destructive"
               onClick={onCancelEdit}
               title="Discard changes"
-            />
-          </HStack>
-        </VStack>
+            >
+              <FiX className="h-4 w-4 mr-1" /> Cancel
+            </Button>
+          </div>
+        </div>
       ) : (
-        // --- Display UI (Original Content) ---
-        <div className="message-markdown" style={{ position: 'relative', zIndex: 1 }}> {/* <-- Ensure content is above texture */}
+        <div className="message-markdown markdown-body relative z-[1] text-foreground"> {/* ADDED markdown-body class */}
           {turn.role === 'assistant' && turn.webDisplayContent && (
             <div className="message-prefix">
               <Markdown remarkPlugins={[[remarkGfm, { singleTilde: false }], remarkMath, remarkSupersub]} components={markdownComponents}>
@@ -469,6 +493,6 @@ export const EditableMessage: React.FC<MessageProps> = ({
           })}
         </div>
       )}
-    </Box>
+    </div>
   );
 };

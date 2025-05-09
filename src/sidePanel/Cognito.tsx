@@ -1,16 +1,21 @@
 import { useEffect, useState, useRef } from 'react';
 import { toast, Toaster } from 'react-hot-toast';
-import {
-  Box,
-  Container,
-  Tooltip,
-  IconButton,
-  HStack,
-} from '@chakra-ui/react';
+// Removed Chakra UI imports: Box, Container, Tooltip, IconButton, HStack
 import localforage from 'localforage';
-import { TbWorldSearch, TbBrowserPlus } from "react-icons/tb"; // <-- Import icons
-import { BiBrain } from "react-icons/bi";
+import { TbWorldSearch, TbBrowserPlus } from "react-icons/tb"; // Keep icons
+import { BiBrain } from "react-icons/bi"; // Keep icons
 
+// Shadcn/ui imports
+import { Button } from "@/components/ui/button"; // Shadcn Button
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"; // Shadcn Tooltip
+import { cn } from "@/src/background/util"; // Utility for conditional classes
+
+// Keep existing custom component imports
 import { useChatTitle } from './hooks/useChatTitle';
 import useSendMessage from './hooks/useSendMessage';
 import { useUpdateModels } from './hooks/useUpdateModels';
@@ -23,11 +28,12 @@ import { Input } from './Input';
 import { Messages } from './Messages';
 import {
  downloadImage, downloadJson, downloadText
-} from './messageUtils';
+} from '../background/messageUtils';
 import { Send } from './Send';
 import { Settings } from './Settings';
 import storage from '../background/storageUtil';
 
+// bridge and injectBridge functions remain unchanged...
 function bridge() {
     // Collect image alt texts
   const altTexts = Array.from(document.images)
@@ -55,7 +61,6 @@ function bridge() {
   return response;
 }
 
-// Modify the injectBridge function
 async function injectBridge() {
   const queryOptions = { active: true, lastFocusedWindow: true };
   const [tab] = await chrome.tabs.query(queryOptions);
@@ -145,32 +150,22 @@ async function injectBridge() {
 
 const generateChatId = () => `chat_${Math.random().toString(16).slice(2)}`;
 
-const MessageTemplate = ({ children, onClick }: { children: React.ReactNode, onClick: () => void }) => ( // Keep type annotation
-  <Box
-    background="var(--active)"
-    border="1px solid var(--text)"
-    borderRadius={16}
-    color="var(--text)"
-    cursor="pointer"
-    display="flex"
-    alignItems="center"
-    justifyContent="center"
-    fontSize="md"
-    fontWeight={800}
-    p={0.5}
-    placeItems="center"
-    position="relative"
-    textAlign={'center'}
-    width="4rem"
-    onClick={onClick}
-    flexShrink={0}
-    _hover={{ // Keep hover effect
-        background: "rgba(var(--text-rgb), 0.1)"
-    }}
-    transition="background 0.2s ease-in-out"
+// --- MessageTemplate Component (Migrated) ---
+const MessageTemplate = ({ children, onClick }: { children: React.ReactNode, onClick: () => void }) => (
+  // Replace Box with div and Tailwind classes
+  (<div
+    className={cn(
+      "bg-[var(--active)] border border-[var(--text)] rounded-[16px] text-[var(--text)]", // background, border, borderRadius, color
+      "cursor-pointer flex items-center justify-center", // cursor, display, alignItems, justifyContent
+      "text-md font-extrabold p-0.5 place-items-center relative text-center", // fontSize, fontWeight, p, placeItems, position, textAlign
+      "w-16 flex-shrink-0", // width="4rem", flexShrink=0
+      "transition-colors duration-200 ease-in-out", // transition
+      "hover:bg-[rgba(var(--text-rgb),0.1)]" // _hover.background
+    )}
+    onClick={onClick} // Keep onClick
   >
     {children}
-  </Box>
+  </div>)
 );
 
 const Cognito = () => {
@@ -178,7 +173,7 @@ const Cognito = () => {
   const [message, setMessage] = useState('');
   const [chatId, setChatId] = useState(generateChatId());
   const [webContent, setWebContent] = useState('');
-  const [pageContent, setPageContent] = useState(''); // Keep state, might be used by useSendMessage
+  const [pageContent, setPageContent] = useState('');
   const [isLoading, setLoading] = useState(false);
   const [settingsMode, setSettingsMode] = useState(false);
   const [historyMode, setHistoryMode] = useState(false);
@@ -186,13 +181,13 @@ const Cognito = () => {
   const [currentTabInfo, setCurrentTabInfo] = useState<{ id: number | null, url: string }>({ id: null, url: '' });
 
   const containerRef = useRef<HTMLDivElement>(null);
-  const lastInjectedRef = useRef<{ id: number | null, url: string }>({ id: null, url: '' }); // Keep ref for tab change logic
+  const lastInjectedRef = useRef<{ id: number | null, url: string }>({ id: null, url: '' });
 
   // Resize observer remains the same
   useEffect(() => {
     const resizeObserver = new ResizeObserver(() => {
       if (containerRef.current) {
-        containerRef.current.style.minHeight = '100dvh';
+        containerRef.current.style.minHeight = '100dvh'; // Use 100dvh
         requestAnimationFrame(() => {
           if (containerRef.current) {
             containerRef.current.style.minHeight = '';
@@ -204,19 +199,16 @@ const Cognito = () => {
     return () => resizeObserver.disconnect();
   }, []);
 
-  // Tab management useEffect (Reverted Logic - simpler check)
+  // Tab management useEffect remains the same (no Chakra UI)
   useEffect(() => {
     if (config?.chatMode !== 'page') return;
 
-    // Function to check and inject if needed (Reverted - simpler logic)
     const checkAndInject = async () => {
       const [tab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
       if (!tab?.id || !tab.url) return;
 
-      // Skip injection for restricted URLs upfront
       if (tab.url.startsWith('chrome://') || tab.url.startsWith('chrome-extension://') || tab.url.startsWith('about:')) {
           console.log(`[Cognito ] Active tab is restricted (${tab.url}). Skipping injection.`);
-          // Clear storage if the active tab is restricted and changed
           if (lastInjectedRef.current.id !== tab.id || lastInjectedRef.current.url !== tab.url) {
               storage.deleteItem('pagestring');
               storage.deleteItem('pagehtml');
@@ -225,44 +217,36 @@ const Cognito = () => {
               console.log("[Cognito ] Cleared storage due to restricted tab activation/update.");
           }
           lastInjectedRef.current = { id: tab.id, url: tab.url };
-          setCurrentTabInfo({ id: tab.id, url: tab.url }); // Update current tab info
-          return; // Don't inject
+          setCurrentTabInfo({ id: tab.id, url: tab.url });
+          return;
       }
 
-      // Inject if tab or URL changed (and not restricted)
-      // Use lastInjectedRef to track if injection already happened for this tab/url
       if (tab.id !== lastInjectedRef.current.id || tab.url !== lastInjectedRef.current.url) {
         console.log(`[Cognito ] Tab changed or updated. Old: ${lastInjectedRef.current.id}/${lastInjectedRef.current.url}, New: ${tab.id}/${tab.url}. Re-injecting bridge.`);
-        lastInjectedRef.current = { id: tab.id, url: tab.url }; // Update ref *before* injection
-        setCurrentTabInfo({ id: tab.id, url: tab.url }); // Update current tab info
-        await injectBridge(); // Inject using the reverted function
+        lastInjectedRef.current = { id: tab.id, url: tab.url };
+        setCurrentTabInfo({ id: tab.id, url: tab.url });
+        await injectBridge();
       } else {
         console.log(`[Cognito ] Tab activated/updated, but ID and URL match last injection. Skipping bridge injection.`);
       }
     };
 
-    // Initial check when mode switches to 'page'
     checkAndInject();
 
-    // Set up tab change listeners (Reverted - simpler logic)
     const handleTabActivated = (activeInfo: chrome.tabs.TabActiveInfo) => {
       console.log(`[Cognito ] Tab activated: tabId ${activeInfo.tabId}`);
-      // Get tab info to check URL and call checkAndInject
       chrome.tabs.get(activeInfo.tabId, (tab) => {
         if (chrome.runtime.lastError) {
           console.warn(`[Cognito ] Error getting tab info on activation: ${chrome.runtime.lastError.message}`);
           return;
         }
-        // checkAndInject handles restricted URLs and injection decision
         checkAndInject();
       });
     };
 
     const handleTabUpdated = (tabId: number, changeInfo: chrome.tabs.TabChangeInfo, tab: chrome.tabs.Tab) => {
-      // Inject only when the active tab finishes loading or its URL changes
       if (tab.active && (changeInfo.status === 'complete' || (changeInfo.url && tab.status === 'complete'))) {
          console.log(`[Cognito ] Active tab updated: tabId ${tabId}, status: ${changeInfo.status}, url changed: ${!!changeInfo.url}`);
-         // checkAndInject handles restricted URLs and injection decision
          checkAndInject();
       }
     };
@@ -270,34 +254,31 @@ const Cognito = () => {
     chrome.tabs.onActivated.addListener(handleTabActivated);
     chrome.tabs.onUpdated.addListener(handleTabUpdated);
 
-    // Cleanup listeners
     return () => {
       console.log("[Cognito ] Cleaning up tab listeners for 'page' mode.");
       chrome.tabs.onActivated.removeListener(handleTabActivated);
       chrome.tabs.onUpdated.removeListener(handleTabUpdated);
-      // Clear last injected ref when mode changes away from 'page' or component unmounts
       lastInjectedRef.current = { id: null, url: '' };
     };
-  }, [config?.chatMode]); // Re-run setup/cleanup when chatMode changes
+  }, [config?.chatMode]);
 
   const { chatTitle, setChatTitle } = useChatTitle(isLoading, turns, message);
-
   const onSend = useSendMessage(isLoading, message, turns, webContent, config, setTurns, setMessage, setWebContent, setPageContent, setLoading);
-
   useUpdateModels();
 
+  // reset, onReload, loadChat, deleteAll functions remain the same (no Chakra UI)
   const reset = () => {
     console.log("[Cognito ] Resetting chat state.");
     setTurns([]);
-    setPageContent(''); // Reset this state too
+    setPageContent('');
     setWebContent('');
     setLoading(false);
-    updateConfig({ chatMode: undefined, computeLevel: 'low' }); // Reset computeLevel here
+    updateConfig({ chatMode: undefined, computeLevel: 'low' });
     setMessage('');
     setChatTitle('');
     setChatId(generateChatId());
     setHistoryMode(false);
-    setSettingsMode(false); // Ensure settings mode is also reset
+    setSettingsMode(false);
   };
 
   const onReload = () => {
@@ -321,33 +302,15 @@ const Cognito = () => {
     setChatTitle(chat.title || '');
     setTurns(chat.turns);
     setChatId(chat.id);
-    setHistoryMode(false); // Exit history mode after loading
-    setSettingsMode(false); // Ensure settings mode is off
-    updateConfig({ chatMode: undefined }); // Reset chat mode when loading history
-    // Clear any potentially stale page content from storage
+    setHistoryMode(false);
+    setSettingsMode(false);
+    updateConfig({ chatMode: undefined });
     storage.deleteItem('pagestring');
     storage.deleteItem('pagehtml');
     storage.deleteItem('alttexts');
     storage.deleteItem('tabledata');
-    lastInjectedRef.current = { id: null, url: '' }; // Reset injection ref
+    lastInjectedRef.current = { id: null, url: '' };
   };
-
-  // Chat saving useEffect (Reverted - simpler log)
-  useEffect(() => {
-    if (turns.length > 0 && !isLoading && !historyMode && !settingsMode) { // Added history/settings check
-      const savedChat: ChatMessage = {
-        id: chatId,
-        title: chatTitle || `Chat ${new Date(Date.now()).toLocaleString()}`, // Ensure title exists
-        turns,
-        last_updated: Date.now(),
-        model: config?.selectedModel
-      };
-      console.log(`[Cognito ] Saving chat ${chatId} (Turns: ${turns.length})`); // Simpler log
-      localforage.setItem(chatId, savedChat).catch(err => {
-        console.error(`[Cognito ] Error saving chat ${chatId}:`, err);
-      });
-    }
-  }, [chatId, turns, isLoading, chatTitle, config?.selectedModel, historyMode, settingsMode]); // Keep dependencies
 
   const deleteAll = async () => {
     console.log("[Cognito ] Deleting all chat history from localforage.");
@@ -355,28 +318,43 @@ const Cognito = () => {
         const keys = await localforage.keys();
         const chatKeys = keys.filter(key => key.startsWith('chat_'));
         await Promise.all(chatKeys.map(key => localforage.removeItem(key)));
-        toast.success("Deleted all chats"); // Keep user feedback
-        reset(); // Reset the current chat state after deleting all
+        toast.success("Deleted all chats");
+        reset();
     } catch (error) {
         console.error("[Cognito] Error deleting all chats:", error);
-        toast.error("Failed to delete chats"); // Keep user feedback
+        toast.error("Failed to delete chats");
     }
   };
 
-  // Panel open/close useEffect (Revised - Don't set lastInjectedRef on open)
+  // Chat saving useEffect remains the same (no Chakra UI)
+  useEffect(() => {
+    if (turns.length > 0 && !isLoading && !historyMode && !settingsMode) {
+      const savedChat: ChatMessage = {
+        id: chatId,
+        title: chatTitle || `Chat ${new Date(Date.now()).toLocaleString()}`,
+        turns,
+        last_updated: Date.now(),
+        model: config?.selectedModel
+      };
+      console.log(`[Cognito ] Saving chat ${chatId} (Turns: ${turns.length})`);
+      localforage.setItem(chatId, savedChat).catch(err => {
+        console.error(`[Cognito ] Error saving chat ${chatId}:`, err);
+      });
+    }
+  }, [chatId, turns, isLoading, chatTitle, config?.selectedModel, historyMode, settingsMode]);
+
+  // Panel open/close useEffect remains the same (no Chakra UI)
   useEffect(() => {
     let cancelled = false;
 
     const handlePanelOpen = async () => {
       console.log("[Cognito - Revised] Panel opened. Resetting state.");
-      reset(); // Reset state first
+      reset();
 
-      // Check current tab immediately on open ONLY to clear storage if needed
       try {
         const [tab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
         if (!cancelled && tab?.id && tab.url) {
-            // Only update currentTabInfo state here, NOT lastInjectedRef
-            setCurrentTabInfo({ id: tab.id, url: tab.url }); // Keep this for UI/display if needed
+            setCurrentTabInfo({ id: tab.id, url: tab.url });
 
             if (tab.url.startsWith('chrome://') || tab.url.startsWith('chrome-extension://') || tab.url.startsWith('about:')) {
                 console.log("[Cognito - Revised] Panel opened on restricted tab. Clearing storage.");
@@ -384,26 +362,22 @@ const Cognito = () => {
                 storage.deleteItem('pagehtml');
                 storage.deleteItem('alttexts');
                 storage.deleteItem('tabledata');
-                // Explicitly reset lastInjectedRef here too for clarity, although close should handle it
                 lastInjectedRef.current = { id: null, url: '' };
             } else {
                 console.log("[Cognito - Revised] Panel opened on valid tab. Injection will occur if mode switched to 'page'. lastInjectedRef is currently:", lastInjectedRef.current);
-                // DO NOT set lastInjectedRef here. Let checkAndInject handle it.
             }
         } else if (!cancelled) {
             console.log("[Cognito - Revised] Panel opened, but no active tab found or tab has no URL.");
-            // Reset refs and state if no valid tab found
             lastInjectedRef.current = { id: null, url: '' };
             setCurrentTabInfo({ id: null, url: '' });
-            storage.deleteItem('pagestring'); // Clear storage too
+            storage.deleteItem('pagestring');
             storage.deleteItem('pagehtml');
             storage.deleteItem('alttexts');
             storage.deleteItem('tabledata');
         }
       } catch (error) {
-        if (!cancelled) { 
+        if (!cancelled) {
         console.error("[Cognito - Revised] Error during panel open tab check:", error);
-          // Reset refs and state on error
           lastInjectedRef.current = { id: null, url: '' };
           setCurrentTabInfo({ id: null, url: '' });
           storage.deleteItem('pagestring');
@@ -414,245 +388,246 @@ const Cognito = () => {
     }
   }
 
-    handlePanelOpen(); // Run on component mount (panel open)
+    handlePanelOpen();
 
-    // Return cleanup function for component unmount (panel close) - Keep this as is
     return () => {
-      cancelled = true; // Set cancelled to true to prevent state updates
+      cancelled = true;
       console.log("[Cognito - Revised] Panel closing (component unmount). Clearing cached content and resetting state.");
-      // Clear cached content from storage
       storage.deleteItem('pagestring');
       storage.deleteItem('pagehtml');
       storage.deleteItem('alttexts');
       storage.deleteItem('tabledata');
-      // Reset component state fully on close
       reset();
-      lastInjectedRef.current = { id: null, url: '' }; // Clear injection ref
+      lastInjectedRef.current = { id: null, url: '' };
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Empty dependency array ensures this runs only on mount and unmount
+  }, []);
 
-  // Function to handle editing a specific turn
+  // handleEditTurn remains the same (no Chakra UI)
   const handleEditTurn = (index: number, newContent: string) => {
     setTurns(prevTurns => {
       const updatedTurns = [...prevTurns];
-      // Update the turn regardless of the role for visual editing
       if (updatedTurns[index]) {
         updatedTurns[index] = { ...updatedTurns[index], rawContent: newContent };
       }
       return updatedTurns;
     });
-    // The useEffect for saving chat will automatically pick up the change in 'turns'
   };
 
-  const [isHovering, setIsHovering] = useState(false);
+  const [isHovering, setIsHovering] = useState(false); // Keep state for hover effect
 
   return (
-    <Container
-      ref={containerRef}
-      maxWidth="100%"
-      minHeight="100dvh" // Use dynamic viewport height
-      padding={0}
-      position="relative" // Ensure proper stacking context
-      overflow="hidden" // Prevent layout shifts
-      display="flex"
-      flexDirection="column"
-      bg="var(--bg)" // Ensure background color is set
-    >
-      <Box
-        display="flex"
-        flexDir="column"
-        justifyContent="space-between"
-        minHeight="100dvh" // Changed from 100vh to 100dvh
-        flexGrow={1} // Allow this box to grow
+    // Replace Container with div and Tailwind classes
+    // Wrap with TooltipProvider for Shadcn Tooltips
+    // Close TooltipProvider
+    <TooltipProvider delayDuration={500}>
+      <div
+        ref={containerRef}
+        className={cn(
+          "w-full min-h-dvh p-0 relative overflow-hidden", // maxWidth, minHeight, padding, position, overflow
+          "flex flex-col bg-[var(--bg)]" // display, flexDirection, bg
+        )}
       >
-        <Header
-          chatTitle={chatTitle}
-          deleteAll={deleteAll}
-          downloadImage={() => downloadImage(turns)}
-          downloadJson={() => downloadJson(turns)}
-          downloadText={() => downloadText(turns)}
-          historyMode={historyMode}
-          reset={reset}
-          setHistoryMode={setHistoryMode}
-          setSettingsMode={setSettingsMode}
-          settingsMode={settingsMode}
-        />
-          {settingsMode && <Settings />}
-        <Box display="flex" flexDir="column" flex="1 1 0%" minHeight={0}>
-          {!settingsMode && !historyMode && turns.length > 0 && (
-                <Messages
-                  isLoading={isLoading}
-                  turns={turns}
-                  settingsMode={settingsMode}
-                  onReload={onReload}
-                  onEditTurn={handleEditTurn} // Pass the edit handler down
-                />
-              )}
-          {!settingsMode && !historyMode && turns.length === 0 && !config?.chatMode && (
-            // Adjust positioning and layout if needed for icons
-            <Box bottom="4rem" left="2rem" position="absolute" display="flex" flexDirection="column" gap={2}>
-                    <Tooltip
-                    label={`Compute Level: ${config.computeLevel?.toUpperCase()}. Click to change. [Warning]: beta feature and resource costly.`}
-                    placement="right"
-                    hasArrow
-                    bg="var(--bg)"      // Added style
-                    color="var(--text)" // Added style
-                  >
-                {/* Use IconButton */}
-                    <IconButton
+        {/* Replace Box with div */}
+        <div
+          className={cn(
+            "flex flex-col justify-between min-h-dvh",
+          )}
+        >
+          {/* Header remains the same */}
+          <Header
+            chatTitle={chatTitle}
+            deleteAll={deleteAll}
+            downloadImage={() => downloadImage(turns)}
+            downloadJson={() => downloadJson(turns)}
+            downloadText={() => downloadText(turns)}
+            historyMode={historyMode}
+            reset={reset}
+            setHistoryMode={setHistoryMode}
+            setSettingsMode={setSettingsMode}
+            settingsMode={settingsMode}
+          />
+          {settingsMode && (
+            <div id="settings" className="relative flex-grow overflow-auto"> {/* Added wrapper with ID and relative positioning */}
+              <Settings />
+            </div>
+          )}
+
+          {/* Replace Box with div */}
+          <div className="flex flex-col min-h-0"> {/* display, flexDir, flex="1 1 0%", minHeight={0} */}
+            {!settingsMode && !historyMode && turns.length > 0 && (
+                  <Messages
+                    isLoading={isLoading}
+                    turns={turns}
+                    settingsMode={settingsMode}
+                    onReload={onReload}
+                    onEditTurn={handleEditTurn}
+                  />
+                )}
+            {!settingsMode && !historyMode && turns.length === 0 && !config?.chatMode && (
+              // Replace Box with div for icon container
+              (<div className="absolute bottom-16 left-8 flex flex-col gap-2"> {/* bottom, left, position, display, flexDirection, gap */}
+                {/* --- Compute Level Button (Migrated) --- */}
+                <Tooltip>
+                  <TooltipTrigger>
+                    {/* Replace IconButton with Shadcn Button */}
+                    <Button
                       aria-label="Cycle compute level"
-                      icon={<BiBrain size="24px" />} // Increased size
-                      color={
-                        config.computeLevel === 'high' ? 'red.500' :
-                        config.computeLevel === 'medium' ? 'orange.500' :
-                        'var(--text)' // Default color for low
-                      }
-                      onClick={() => {
+                      variant="ghost" // variant="ghost"
+                      size="icon" // size="lg" -> maps to h-11 w-11 in Shadcn default
+                      onClick={() => { // Keep onClick
                         const currentLevel = config.computeLevel;
                         const nextLevel = currentLevel === 'low' ? 'medium' : currentLevel === 'medium' ? 'high' : 'low';
                         updateConfig({ computeLevel: nextLevel });
                       }}
+                      className={cn(
+                        "hover:bg-secondary/70", // _hover.bg approximation
+                        // Conditional text color based on level
+                        config.computeLevel === 'high' ? 'text-red-600' :
+                        config.computeLevel === 'medium' ? 'text-orange-300' :
+                        'text-[var(--text)]' // Default color
+                      )}
+                    >
+                      <BiBrain /> {/* Keep icon */}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="right" className="bg-[var(--active)]/50 text-[var(--text)] border-[var(--text)] max-w-80"> {/* Map placement, bg, color */}
+                    <p>{`Compute Level: ${config.computeLevel?.toUpperCase()}. Click to change. [Warning]: beta feature and resource costly.`}</p> {/* Map label */}
+                  </TooltipContent>
+                </Tooltip>
+                {/* --- Web Search Button (Migrated) --- */}
+                <Tooltip>
+                  <TooltipTrigger>
+                    {/* Replace IconButton with Shadcn Button */}
+                    <Button
+                      aria-label="Add Web Search Results to LLM Context"
                       variant="ghost"
-                      size="lg" // Match other icon button sizes
-                      _hover={{ bg: 'rgba(128, 128, 128, 0.2)' }}
-                  />
-                  </Tooltip>
-                  <Tooltip
-                    label="Add Web Search Results to LLM Context"
-                    placement="right"
-                    hasArrow
-                    bg="var(--bg)"      // Added style
-                    color="var(--text)" // Added style
-                  >
-                {/* Use IconButton */}
-                    <IconButton
-                  aria-label="Add Web Search Results to LLM Context" // Important for accessibility
-                  icon={<TbWorldSearch size="24px" />} // Pass icon component to 'icon' prop
-                  onClick={() => {
-                    updateConfig({ chatMode: 'web' });
-                  }}
-                  variant="ghost" // Use 'ghost' for minimal styling, or 'unstyled'
-                  size="lg"      // Adjust size: 'sm', 'md', 'lg'
-                  color="var(--text)" // Ensure icon color matches
-                  // isRound // Optional: makes the button circular
-                  _hover={{ bg: 'rgba(128, 128, 128, 0.2)' }} // Optional: subtle hover effect
-                    />
-                  </Tooltip>
-                  <Tooltip
-                    label="Add Current Web Page to LLM Context"
-                    placement="right"
-                    hasArrow
-                    bg="var(--bg)"      // Added style
-                    color="var(--text)" // Added style
-                  >
-                {/* Use IconButton */}
-                    <IconButton
+                      size="icon"
+                      onClick={() => { updateConfig({ chatMode: 'web' }); }}
+                      className="text-[var(--text)] hover:bg-secondary/70" // color, _hover.bg
+                    >
+                      <TbWorldSearch />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="right" className="bg-[var(--active)]/50 text-[var(--text)] border-[var(--text)]">
+                    <p>Add Web Search Results to LLM Context</p>
+                  </TooltipContent>
+                </Tooltip>
+                {/* --- Page Context Button (Migrated) --- */}
+                <Tooltip>
+                  <TooltipTrigger>
+                    {/* Replace IconButton with Shadcn Button */}
+                    <Button
                       aria-label="Add Current Web Page to LLM Context"
-                      icon={<TbBrowserPlus size="24px" />}
-                  onClick={() => {
-                    updateConfig({ chatMode: 'page' });
-                  }}
                       variant="ghost"
-                      size="lg"
-                      color="var(--text)"
-                  // isRound
-                      _hover={{ bg: 'rgba(128, 128, 128, 0.2)' }}
-                    />
-                  </Tooltip>
-                </Box>
+                      size="icon"
+                      onClick={() => { updateConfig({ chatMode: 'page' }); }}
+                      className="text-[var(--text)] hover:bg-secondary/70"
+                    >
+                      <TbBrowserPlus />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="right" className="bg-[var(--active)]/50 text-[var(--text)] border-[var(--text)]">
+                    <p>Add Current Web Page to LLM Context</p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>)
+                )}
+            {!settingsMode && !historyMode && config?.chatMode === "page" && (
+                   // Replace Box with div for page mode templates container
+                   (<div
+                      className={cn(
+                        "fixed bottom-14 left-0 right-0", // bottom, left, right, position
+                        "flex flex-row justify-center", // display, flexDirection, justifyContent
+                        "w-full h-12 z-[2]", // maxWidth, height, zIndex
+                        "transition-all duration-200 ease-in-out", // transition
+                        isHovering ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2.5", // opacity, transform based on state
+                        "bg-transparent px-0 py-0" // sx background, padding
+                      )}
+                      style={{ backdropFilter: 'blur(10px)' }} // Keep backdropFilter from sx
+                      onMouseEnter={() => setIsHovering(true)} // Keep event handlers
+                      onMouseLeave={() => setIsHovering(false)}
+                   >
+                     {/* Replace HStack with div and flex/spacing */}
+                     <div className="flex items-center space-x-6 max-w-full overflow-x-auto px-4"> {/* spacing, maxW, overflowX, px */}
+                       {/* Use migrated MessageTemplate */}
+                       <MessageTemplate onClick={() => onSend('Provide your summary.')}>
+                         TLDR
+                       </MessageTemplate>
+                       <MessageTemplate onClick={() => onSend('Extract all key figures, names, locations, and dates mentioned on this page and list them.')}>
+                         Facts
+                       </MessageTemplate>
+                       <MessageTemplate onClick={() => onSend('Find positive developments, achievements, or opportunities mentioned on this page.')}>
+                         Yay!
+                       </MessageTemplate>
+                       <MessageTemplate onClick={() => onSend('Find concerning issues, risks, or criticisms mentioned on this page.')}>
+                         Oops
+                       </MessageTemplate>
+                     </div>
+                   </div>)
+            )}
+          </div>
+
+          {/* Input Area */}
+          {!settingsMode && !historyMode && (
+            // Replace Box with div
+            (<div
+              className={cn(
+                "bg-[var(--active)] border-t border-[var(--text)]", // background, borderTop
+                "flex justify-between items-center", // display, justifyContent, alignItems (added for vertical alignment)
+                "pb-1 pt-1 relative z-[2]",
+                "not-focus-visible" // pb, pt, position, zIndex
               )}
-          {!settingsMode && !historyMode && config?.chatMode === "page" && (
-                 <Box
-              bottom="3.5rem"
-              left="0rem"
-              right="0rem"
-              position="fixed" 
-                    display="flex"
-              flexDirection="row"
-              justifyContent="center"
-              maxWidth="100%"
-              height="3rem"
-              zIndex={2}
-              opacity={isHovering ? 1 : 0} // Fade in/out
-              transform={isHovering ? "translateY(0)" : "translateY(-10px)"} // Slide up/down
-              transition="all 0.2s ease-in-out" // Smooth animation
-                    onMouseEnter={() => setIsHovering(true)}
-                    onMouseLeave={() => setIsHovering(false)}
-                       sx={{
-                 background: 'transparent',
-                 padding: '0rem',
-                 backdropFilter: 'blur(10px)',
-               }}
+              style={{ opacity: settingsMode ? 0 : 1 }} // Keep inline style for opacity
             >
-             <HStack spacing={6} maxW="100%" overflowX="auto" px={4}> {/* Added padding */}
-              <MessageTemplate onClick={() => onSend('Provide your summary.')}>
-                TLDR
-              </MessageTemplate>
-              <MessageTemplate onClick={() => onSend('Extract all key figures, names, locations, and dates mentioned on this page and list them.')}>
-                Facts
-              </MessageTemplate>
-              <MessageTemplate onClick={() => onSend('Find positive developments, achievements, or opportunities mentioned on this page.')}>
-                Yay!
-              </MessageTemplate>
-              <MessageTemplate onClick={() => onSend('Find concerning issues, risks, or criticisms mentioned on this page.')}>
-                Oops
-              </MessageTemplate>
-                    </HStack>
-                  </Box>
+              {/* Input, AddToChat, Send components remain the same */}
+              <Input isLoading={isLoading} message={message} setMessage={setMessage} onSend={onSend} />
+              <AddToChat />
+              <Send isLoading={isLoading} onSend={() => onSend(message)} />
+            </div>)
           )}
-        </Box>
-        {!settingsMode && !historyMode && (
-          <Box
-            background="var(--active)"
-            borderTop="1px solid var(--text)"
-            display="flex"
-            justifyContent="space-between"
-            pb={1}
-            position="relative"  // Add this
-            pt={1}
-            style={{ opacity: settingsMode ? 0 : 1 }}
-            zIndex={2}
-          >
-            <Input isLoading={isLoading} message={message} setMessage={setMessage} onSend={onSend} />
-            <AddToChat />
-            <Send isLoading={isLoading} onSend={() => onSend(message)} />
-          </Box>
-        )}
-        {historyMode && (
-          <ChatHistory 
-            loadChat={loadChat} 
-            onDeleteAll={deleteAll}  // Change this line to use the main deleteAll function
-          />
-        )}
-        {config?.backgroundImage ? <Background /> : null}
-      </Box>
-      <Toaster
-        containerStyle={{
-          borderRadius: 16,
-          bottom: '60px', // Adjust position if needed
-        }}
-        toastOptions={{
-          duration: 2000,
-          position: "bottom-center",
-          style: {
-            background: 'var(--bg)',
-            color: 'var(--text)',
-            fontSize: "1rem", // Reverted font size
-            border: '1px solid var(--text)',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-          },
-          success: {
+
+          {/* History Area */}
+          {historyMode && (
+            <ChatHistory
+            className="flex-1 w-full overflow-y-auto min-h-0"
+            loadChat={loadChat}
+              onDeleteAll={deleteAll}
+            />
+          )}
+
+          {/* Background remains the same */}
+          {config?.backgroundImage ? <Background /> : null}
+        </div>
+
+        {/* Toaster remains the same */}
+        <Toaster
+          containerStyle={{
+            borderRadius: 16,
+            bottom: '60px',
+          }}
+          toastOptions={{
             duration: 2000,
+            position: "bottom-center",
             style: {
               background: 'var(--bg)',
               color: 'var(--text)',
-              fontSize: "1.25rem"
+              fontSize: "1rem",
+              border: '1px solid var(--text)',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+            },
+            success: {
+              duration: 2000,
+              style: {
+                background: 'var(--bg)',
+                color: 'var(--text)',
+                fontSize: "1.25rem"
+              }
             }
-          }
-        }}
-      />
-    </Container>
+          }}
+        />
+      </div>
+    </TooltipProvider>
   );
 };
 

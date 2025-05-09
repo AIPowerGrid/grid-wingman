@@ -1,10 +1,10 @@
 export interface Persona {
   Ein: string;
   Jan: string;
-  Bruce: string;
+  Spike: string;
   Sherlock: string;
   Agatha: string;
-  Charlie: string;
+  Jet: string;
   Warren: string;
 }
 
@@ -30,15 +30,15 @@ export interface Config {
   persona: string;
   generateTitle?: boolean;
   backgroundImage?: boolean;
-  webMode?: 'duckduckgo' | 'brave' | 'google' | string;
+  webMode?: 'Duckduckgo' | 'Brave' | 'Google' | string;
   webLimit?: number;
   pageMode?: 'text' | 'html';
-  contextLimit?: number;
+  contextLimit: number;
   ModelSettingsPanel?: Record<string, unknown>; // For model parameters like temperature
-  temperature?: number;
-  maxTokens?: number;
-  topP?: number;
-  presencePenalty?: number;
+  temperature: number;
+  maxTokens: number;
+  topP: number;
+  presencepenalty: number;
   lmStudioUrl?: string;
   lmStudioConnected?: boolean;
   lmStudioError?: string | unknown;
@@ -78,6 +78,7 @@ export interface Config {
     codeFg?: string;
     preBg?: string;
     preFg?: string;
+    mute?: string;
     tableBorder?: string;
     error?: string;
     success?: string;

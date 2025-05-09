@@ -1,54 +1,51 @@
-import { Box, Text } from '@chakra-ui/react';
+import type { ReactNode } from 'react';
+import { cn } from "@/src/background/util"; // Assuming this path is correct
 
 interface SettingTitleProps {
   text?: string;
-  widget?: React.ReactNode;
-  // padding?: number; // Removed padding prop, handled by AccordionButton
-  icon?: string;
+  widget?: ReactNode;
+  icon?: string; // Assuming icon is a string (like an emoji or character) based on original usage
 }
 
 export const SettingTitle = ({
  text = '', widget = <></>, icon = ''
 }: SettingTitleProps) => (
-  // This Text component now represents the content *inside* the AccordionButton
-  <Box // Changed outer element to Box for better flex control
-    display="flex"
-    alignItems="center" // Align icon, text, and widget vertically
-    justifyContent="space-between"
-    width="100%"
-    // Removed padding, fontSize, fontWeight - these are now controlled by AccordionButton styles
-  >
+  // Outer div replacing Box, applying flex layout
+  (<div className="flex items-center justify-between w-full">
     {/* Left side: Icon + Text */}
-    <Box display="flex" alignItems="center">
+    <div className="flex items-center">
       {icon && (
-        <Text
-          as="span" // Use span for inline display
-          color="var(--text)"
-          fontSize="1.25rem" // Keep icon size distinct if needed
-          lineHeight="1" // Adjust line height for better alignment
-          mr={3} // Keep margin-right
-          // Removed padding, fontWeight, etc.
+        // Span replacing Text for icon
+        (<span
+          className={cn(
+            "text-foreground", // color="var(--text)"
+            "text-xl",        // fontSize="1.25rem"
+            "leading-none",   // lineHeight="1"
+            "mr-3"            // mr={3}
+          )}
         >
           {icon}
-        </Text>
+        </span>)
       )}
-      {/* Apply drawer title styles here */}
-      <Text
-        as="span" // Use span for inline display
-        color="var(--text)"
-        opacity={0.9} // Slightly less opaque than drawer titles for hierarchy
-        fontSize="md" // Slightly smaller than drawer section titles
-        fontWeight="medium" // Match drawer button weight
-        textTransform="none" // Keep original case for accordion titles
-        // Removed padding, width, textAlign, etc.
+      {/* Span replacing Text for main text */}
+      <span
+        className={cn(
+          "text-foreground", // color="var(--text)"
+          "opacity-90",     // opacity={0.9}
+          "text-base",      // fontSize="md" (Tailwind's base is 1rem, md is 1rem)
+          "font-medium"     // fontWeight="medium"
+          // textTransform="none" is default
+        )}
       >
         {text}
-      </Text>
-    </Box>
-
+      </span>
+    </div>
     {/* Right side: Widget */}
-    <Box ml={2}> {/* Add some margin if widget exists */}
-      {widget}
-    </Box>
-  </Box>
+    {/* Render widget directly if it exists, wrap in div for margin */}
+    {widget && (
+      <div className="ml-2"> {/* ml={2} */}
+        {widget}
+      </div>
+    )}
+  </div>)
 );

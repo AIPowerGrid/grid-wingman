@@ -132,7 +132,7 @@ const useSendMessage = (
     // --- Step 2: Perform Web Search ---
     if (performSearch) {
       console.log(`[${callId}] useSendMessage: Performing web search...`);
-      searchRes = await webSearch(queryForProcessing, config.webMode || 'google').catch(/* ... */);
+      searchRes = await webSearch(queryForProcessing, config.webMode || 'Google').catch(/* ... */);
       console.log(`[${callId}] useSendMessage: Web search done. Length: ${searchRes.length}`);
    }
 
@@ -297,9 +297,9 @@ const useSendMessage = (
               ...messageForApi // Use the history + original user message
             ],
             temperature: config?.temperature ?? 0.7,
-            max_tokens: config?.maxTokens ?? 2048,
+            max_tokens: config?.maxTokens ?? 32048,
             top_p: config?.topP ?? 1,
-            presence_penalty: config?.presencePenalty ?? 0,
+            presence_penalty: config?.presencepenalty ?? 0,
           },
           (part: string, isFinished?: boolean, isError?: boolean) => {
             // Only process if this is the active call

@@ -1,5 +1,4 @@
 import { events } from 'fetch-event-stream';
-import { cleanUrl } from './WebSearch';
 import '../types/config.ts';
 import type { Config, Model } from 'src/types/config';
 import { speakMessage } from '../background/ttsUtils'
@@ -23,6 +22,7 @@ export const processQueryWithAI = async (
   currentModel: Model,
   authHeader?: Record<string, string>,
   contextMessages: ApiMessage[] = [],
+  temperatureOverride?: number // New 6th argument for temperature
 ): Promise<string> => {
   try {
    // Ensure currentModel and host exist before trying to get the URL
@@ -86,14 +86,33 @@ Output:
     // console.log('Chat history context:', contextMessages);
     console.log('Formatted Context for Prompt:', formattedContext); // Debug log
 
-    const requestBody = {
-      model: config?.selectedModel || '',
+    const requestBody: {
+      model: string;
+      messages: ApiMessage[];
+      stream: boolean;
+      temperature?: number; // Temperature is optional in the request body
+    } = {
+      model: config?.selectedModel || currentModel.id || '', // Use currentModel.id as a fallback
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: query }
       ],
       stream: false // Explicitly set stream to false
     };
+        // Determine the effective temperature for the API call
+    let effectiveTemperature: number | undefined = undefined;
+    if (temperatureOverride !== undefined) {
+      effectiveTemperature = temperatureOverride;
+    } else if (config.temperature !== undefined) { 
+      // Assuming config.temperature is the general setting.
+      // If temperature is nested, e.g., config.ModelSettingsPanel?.temperature, adjust accordingly.
+      effectiveTemperature = config.temperature;
+    }
+
+    // Add temperature to request body if it's defined
+    if (effectiveTemperature !== undefined) {
+      requestBody.temperature = effectiveTemperature;
+    }
 
     // Adjust fetch options based on host if necessary (e.g., Gemini might need different body/headers)
     const response = await fetch(apiUrl, {
@@ -159,9 +178,9 @@ export const urlRewriteRuntime = async function (domain: string) {
 };
 
 export const webSearch = async (query: string, webMode: string) => {
-  const baseUrl = webMode === 'brave'
+  const baseUrl = webMode === 'Brave'
     ? `https://search.brave.com/search?q=${encodeURIComponent(query)}`
-    : webMode === 'google'
+    : webMode === 'Google'
       ? `https://www.google.com/search?q=${encodeURIComponent(query)}`
       : `https://duckduckgo.com/html/?q=${encodeURIComponent(query)}`;
 
@@ -196,7 +215,7 @@ export const webSearch = async (query: string, webMode: string) => {
 
     let resultsText = '';
     
-    if (webMode === 'duckduckgo') {
+    if (webMode === 'Duckduckgo') {
       // DuckDuckGo's current structure
       const results = htmlDoc.querySelectorAll('.web-result');
       results.forEach(result => {
@@ -204,7 +223,7 @@ export const webSearch = async (query: string, webMode: string) => {
         const snippet = result.querySelector('.result__snippet')?.textContent?.trim();
         if (title) resultsText += `${title}\n${snippet || ''}\n\n`;
       });
-    } else if (webMode === 'google') {
+    } else if (webMode === 'Google') {
       // Google's current structure
       const results = htmlDoc.querySelectorAll('.MjjYud');
       results.forEach(result => {
@@ -244,7 +263,7 @@ export const webSearch = async (query: string, webMode: string) => {
       });
       console.log('Google Result Structure:', resultsText);
 
-    } else if (webMode === 'brave') {
+    } else if (webMode === 'Brave') {
       // Brave's updated structure
       const braveResults = htmlDoc.querySelectorAll('#results .snippet');
       braveResults.forEach(result => {
@@ -303,7 +322,14 @@ export async function fetchDataAsStream(
     }
   };
 
-  // --- Your Original URL Checks (Correct Placement) ---
+  const cleanUrl = (url: string) => {
+    if (url.endsWith('/')) {
+      return url.slice(0, -1);
+    }
+  
+    return url;
+    }
+  
   if (url.startsWith('chrome://')) {
     console.log("fetchDataAsStream: Skipping chrome:// URL:", url);
     // Optionally call finishStream with an appropriate message/error if needed

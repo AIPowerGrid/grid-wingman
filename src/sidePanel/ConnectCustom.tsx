@@ -1,140 +1,146 @@
+// ConnectCustom.tsx
 import { useState } from 'react';
 import toast from 'react-hot-toast';
-import { FaEye, FaEyeSlash, FaTimes } from 'react-icons/fa'; // Import React Icons
-import {
-  Box,
-  Button,
-  IconButton,
-  Input,
-} from '@chakra-ui/react';
-
+import { FaEye, FaEyeSlash, FaCheck, FaTimes } from 'react-icons/fa';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { useConfig } from './ConfigContext';
+import { cn } from "@/src/background/util";
 
 export const ConnectCustom = () => {
   const { config, updateConfig } = useConfig();
   const [apiKey, setApiKey] = useState(config?.customApiKey || '');
   const [endpoint, setEndpoint] = useState(config?.customEndpoint || '');
-  const [visibleApiKeys, setVisibleApiKeys] = useState(false);
+  const [visibleApiKey, setVisibleApiKey] = useState(false);
+  const [isLoading, setIsLoading] = useState(false); // For future async connection test
 
-  const onConnect = async () => {
-    toast.success('Custom endpoint connected');
-    updateConfig({
-      customApiKey: apiKey,
-      customEndpoint: endpoint,
-      customConnected: true,
-      customError: undefined,
-      models: [
-        ...(config?.models || []),
-        { id: 'custom', host: 'custom', active: true },
-      ],
-      selectedModel: 'custom',
-    });
+  const isDark = config?.theme === 'dark';
+  const controlBg = isDark ? 'bg-[rgba(255,255,255,0.04)]' : 'bg-[rgba(255,250,240,0.6)]';
+  const subtleBorderClass = 'border-[var(--text)]/10';
+  const inputHeightClass = 'h-8';
+  const buttonHeightClass = 'h-8';
+
+  // For custom, "connect" primarily means saving the settings.
+  // A true connection test would require knowing the endpoint structure.
+  const onSaveSettings = () => {
+    if (!endpoint) {
+        toast.error("Custom endpoint URL is required.");
+        return;
+    }
+    setIsLoading(true); // Simulate loading for UX consistency
+    // Simulate a save operation
+    setTimeout(() => {
+      updateConfig({
+        customApiKey: apiKey,
+        customEndpoint: endpoint,
+        customConnected: true, // Assume connected once saved, actual test might be separate
+        customError: undefined,
+        models: (config?.models || []).filter(m => m.id !== 'custom_endpoint').concat([
+          { id: 'custom_endpoint', host: 'custom', name: 'Custom Endpoint Model', active: true }
+        ]),
+        selectedModel: 'custom_endpoint',
+      });
+      toast.success('Custom endpoint settings saved');
+      setIsLoading(false);
+    }, 500);
   };
 
-  const disabled = config?.customApiKey === apiKey && config?.customEndpoint === endpoint;
-  const isConnected = config?.customConnected;
+  const onResetSettings = () => {
+    setApiKey('');
+    setEndpoint('');
+    updateConfig({
+      customApiKey: '',
+      customEndpoint: '',
+      customConnected: false,
+      customError: undefined,
+      models: (config?.models || []).filter(m => m.id !== 'custom_endpoint'),
+    });
+    toast.success('Custom endpoint settings reset');
+  };
+
+  const saveButtonDisabled = (!endpoint && !apiKey) || isLoading; // Disable if both are empty or loading
+  const isConnected = config?.customConnected; // "Connected" means settings are saved
 
   return (
-    <Box display="flex" flexDirection="column" gap={2} mb={4} ml={4} mr={4}>
+    <div className="space-y-2"> {/* Vertical stacking of endpoint and api key row */}
       <Input
-        placeholder="custom_openai_endpoint"
+        id="custom-endpoint-url"
+        placeholder="Custom OpenAI-Compatible Endpoint URL"
         value={endpoint}
         onChange={e => setEndpoint(e.target.value)}
-        mb={2}
-        size="sm"
-        border="2px"
-        borderColor="var(--text)"
-        borderRadius={16}
-        color="var(--text)"
-        fontSize="md"
-        fontWeight={600}
-        variant="outline"
+        className={cn(
+          "w-full", inputHeightClass, controlBg, subtleBorderClass,
+          "text-[var(--text)] rounded-md shadow-sm text-sm px-2.5",
+          "focus:border-[var(--active)] focus:ring-1 focus:ring-[var(--active)] focus:ring-offset-0",
+          "hover:border-[var(--active)]"
+        )}
+        disabled={isLoading}
       />
-      <Box display="flex">
-        <Input
-          _focus={{
-            borderColor: 'var(--text)',
-            boxShadow: 'none !important'
-          }}
-          _hover={{
-            borderColor: !disabled && 'var(--text)',
-            boxShadow: !disabled && 'none !important'
-          }}
-          autoComplete="off"
-          border="2px"
-          borderColor="var(--text)"
-          borderRadius={16}
-          color="var(--text)"
-          fontSize="md"
-          fontStyle="bold"
-          fontWeight={600}
-          id="user-input"
-          mr={4}
-          placeholder="CUSTOM_API_KEY"
-          size="sm"
-          type={!visibleApiKeys ? 'password' : undefined}
-          value={apiKey}
-          variant="outline"
-          onChange={e => setApiKey(e.target.value)}
-        />
+      <div className="flex items-center space-x-3">
+        <div className="relative flex-grow">
+            <Input
+            id="custom-api-key"
+            autoComplete="off"
+            placeholder="API Key (Optional)"
+            type={visibleApiKey ? 'text' : 'password'}
+            value={apiKey}
+            onChange={e => setApiKey(e.target.value)}
+            className={cn(
+                "w-full", inputHeightClass, controlBg, subtleBorderClass,
+                "text-[var(--text)] rounded-md shadow-sm text-sm px-2.5",
+                "focus:border-[var(--active)] focus:ring-1 focus:ring-[var(--active)] focus:ring-offset-0",
+                "hover:border-[var(--active)]",
+                {"pr-8": true}
+            )}
+            disabled={isLoading}
+            />
+            <Button
+                variant="ghost" size="sm"
+                className={cn(
+                    "absolute inset-y-0 right-0 flex items-center justify-center",
+                    buttonHeightClass, "w-8 text-[var(--text)]/70 hover:text-[var(--text)]"
+                )}
+                onClick={() => setVisibleApiKey(!visibleApiKey)}
+                aria-label={visibleApiKey ? "Hide API key" : "Show API key"}
+                disabled={isLoading}
+            >
+                {visibleApiKey ? <FaEyeSlash className="h-4 w-4" /> : <FaEye className="h-4 w-4" />}
+            </Button>
+        </div>
+
         {!isConnected && (
           <Button
-            _hover={{
-              background: 'var(--active)',
-              border: '2px solid var(--text)'
-            }}
-            background="var(--active)"
-            border="2px solid var(--text)"
-            borderRadius={16}
-            color="var(--text)"
-            disabled={disabled}
-            size="sm"
-            onClick={onConnect}
+            onClick={onSaveSettings}
+            className={cn(
+              buttonHeightClass, "px-3 text-sm font-medium whitespace-nowrap",
+              "bg-[var(--active)] text-[var(--bg)] hover:bg-[var(--active)]/90 rounded-md shadow-sm",
+              "focus-visible:ring-1 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--bg)]"
+            )}
+            disabled={saveButtonDisabled}
           >
-            connect
+            {isLoading ? "..." : "Save"}
           </Button>
         )}
         {isConnected && (
           <>
-            <IconButton
-              _hover={{
-                background: 'var(--active)',
-                border: '2px solid var(--text)'
-              }}
-              aria-label="Done"
-              background="var(--active)"
-              border="2px solid var(--text)"
-              color="var(--text)"
-              fontSize="19px"
-              icon={visibleApiKeys ? <FaEyeSlash /> : <FaEye />} // Use React Icons
-              size="sm"
-              variant="solid"
-              isRound
-              onClick={() => setVisibleApiKeys(!visibleApiKeys)}
-            />
-            <IconButton
-              aria-label="Reset Custom Endpoint"
-              icon={<FaTimes />}
-              ml={2}
-              borderRadius={16}
-              background="var(--active)"
-              border="2px solid var(--text)"
-              color="var(--text)"
-              size="sm"
-              onClick={() => {
-                setApiKey('');
-                setEndpoint('');
-                updateConfig({
-                  customApiKey: '',
-                  customEndpoint: '',
-                  customConnected: false,
-                  customError: undefined,
-                });
-              }}
-            />
+            {/* "Saved" checkmark could replace the eye icon if API key is not sensitive or always visible after save */}
+            <Button
+              variant="ghost" size="sm" aria-label="Custom Endpoint Settings Saved"
+              className={cn(buttonHeightClass, "w-8 rounded-md text-[var(--success)]")}
+            >
+              <FaCheck className="h-5 w-5" />
+            </Button>
+            <Button
+              variant="ghost" size="sm" aria-label="Reset Custom Endpoint Settings"
+              onClick={onResetSettings}
+              className={cn(buttonHeightClass, "w-8 rounded-md text-[var(--error)] hover:bg-[var(--error)]/10")}
+              disabled={isLoading}
+            >
+              <FaTimes className="h-4 w-4" />
+            </Button>
           </>
         )}
-      </Box>
-    </Box>
+      </div>
+    </div>
   );
 };
