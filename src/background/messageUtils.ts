@@ -1,7 +1,11 @@
 import { toPng } from 'html-to-image';
 import { MessageTurn } from '../sidePanel/ChatHistory'; // Adjust path if needed
 
-// downloadText and downloadJson functions remain the same...
+// Helper function to generate a timestamp string
+const getTimestamp = () => {
+  return new Date().toJSON().slice(0, 19).replace('T', '_').replace(/:/g, '-');
+  // Produces YYYY-MM-DD_HH-MM-SS
+};
 
 export const downloadText = (turns: MessageTurn[]) => {
   if (!turns || turns.length === 0) return;
@@ -19,7 +23,7 @@ export const downloadText = (turns: MessageTurn[]) => {
   const element = document.createElement('a');
 
   element.setAttribute('href', `data:text/plain;charset=utf-8,${encodeURIComponent(text)}`);
-  const filename = `chat_${(new Date().toJSON().slice(0,10))}.txt`
+  const filename = `chat_${getTimestamp()}.txt`;
 
   element.setAttribute('download', filename);
 
@@ -39,7 +43,7 @@ export const downloadJson = (turns: MessageTurn[]) => {
   const element = document.createElement('a');
 
   element.setAttribute('href', `data:text/plain;charset=utf-8,${encodeURIComponent(text)}`);
-  const filename = `chat_${(new Date().toJSON().slice(0,10))}.json`
+  const filename = `chat_${getTimestamp()}.json`;
 
   element.setAttribute('download', filename);
 
@@ -65,7 +69,7 @@ export const downloadImage = (turns: MessageTurn[]) => {
   const wrapper = document.createElement('div');
   // Keep existing wrapper styles
   wrapper.style.display = 'flex';
-  wrapper.style.flexDirection = 'column-reverse'; // To maintain chat order in the image
+  wrapper.style.flexDirection = 'column'; // To maintain chat order in the image
   wrapper.style.paddingBottom = '1rem';
   // Adjust margin if needed based on new layout, -2rem might have been specific to Chakra layout
   // wrapper.style.marginRight = '-2rem'; // Consider removing or adjusting this
@@ -130,7 +134,7 @@ export const downloadImage = (turns: MessageTurn[]) => {
     .then(dataUrl => {
       const element = document.createElement('a');
       element.setAttribute('href', dataUrl);
-      const filename = `chat_${(new Date().toJSON().slice(0,10))}.png`;
+      const filename = `chat_${getTimestamp()}.png`;
       element.setAttribute('download', filename);
       element.style.display = 'none';
       document.body.appendChild(element);
