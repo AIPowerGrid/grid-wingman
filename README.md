@@ -73,13 +73,13 @@ Cognito offers the following personas to tailor the AI's behavior to your specif
 
 *   **Ein:** Academic researcher
 *   **Warren:** Business analyst
-*   **Charlie:** Friendly assistant
+*   **Jet:** Friendly assistant
 *   **Agatha:** Creative thinker
 *   **Jan:** Strategist
 *   **Sherlock:** Detective
-*   **Bruce:** All-around assistant
+*   **Spike:** All-around assistant
 
-See the [documentation](DOCS.md) for a complete overview of each persona's capabilities.
+~See the [documentation](DOCS.md) for a complete overview of each persona's capabilities.~
 
 ## Installation
 
@@ -98,8 +98,8 @@ See the [documentation](DOCS.md) for a complete overview of each persona's capab
 
 ## Documentation
 
-For detailed usage instructions, persona guides, and troubleshooting, please refer to the [documentation page](DOCS.md).
-
+~For detailed usage instructions, persona guides, and troubleshooting, please refer to the [documentation page](DOCS.md).~
+It's outdated, so I deleted. New Doc needs some time. 
 
 ## Contributing
 
