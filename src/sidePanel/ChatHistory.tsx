@@ -35,8 +35,7 @@ declare global {
 }
 
 // Configurable: Maximum number of chat sessions to display per page.
-// You can change this value as needed. For testing, it's set to 3.
-export const ITEMS_PER_PAGE = 13;
+export const ITEMS_PER_PAGE = 12;
 
 export const ChatHistory = ({ loadChat, onDeleteAll, className }: ChatHistoryProps) => {
   const [allMessages, setAllMessages] = useState<ChatMessage[]>([]);
@@ -120,66 +119,70 @@ export const ChatHistory = ({ loadChat, onDeleteAll, className }: ChatHistoryPro
   const totalPages = useMemo(() => Math.max(1, Math.ceil(allMessages.length / ITEMS_PER_PAGE)), [allMessages]);
   const handleNextPage = useCallback(() => setCurrentPage(p => Math.min(p + 1, totalPages)), [totalPages]);
   const handlePrevPage = useCallback(() => setCurrentPage(p => Math.max(p - 1, 1)), []);
+  const rootComputedClassName = `flex flex-col w-full ${className || ''}`.trim();
 
 
   if (allMessages.length === 0) {
     return (
-      <ScrollArea
-        className={className || "w-full"} // Should be "flex-1 w-full overflow-y-auto min-h-0"
-      >
-        <div className="px-4 pb-4 pt-5 text-center text-foreground/70">
-          No chat history found.
-        </div>
-      </ScrollArea>
-    );
+      <div className={rootComputedClassName}>
+        <ScrollArea className="flex-1 w-full">
+          <div className="px-4 pb-4 pt-5 text-center text-foreground/70 h-full flex items-center justify-center">
+            No chat history found.
+          </div>
+        </ScrollArea>
+        {/* No pagination controls needed here, an empty div could reserve space if needed for layout consistency */}
+        {/* e.g., <div className="h-[50px]" /> if pagination has a fixed height and you want to maintain it */}
+      </div>    );
   }
 
   return (
-    <ScrollArea
-      className={className} // Should be "flex-1 w-full overflow-y-auto min-h-0"
-    >
-      <div className="px-4 pb-4 flex flex-col justify-start"> {/* Ensures content within starts at top */}
-        {uniqueDates.map(date => (
-          <div key={date} className="mb-3 mt-3">
-            <p
-              className="text-foreground text-xl font-extrabold overflow-hidden pl-4 pb-1 text-left text-ellipsis whitespace-nowrap w-[90%]"
-            >
-              {date === dateToString(new Date()) ? 'Today' : date}
-            </p>
-            {messagesWithDates
-              .filter(m => m.date === date)
-              .map(message => (
-                <div
-                  key={message.id}
-                  className="flex items-center group"
-                  onMouseEnter={() => setHoverId(message.id)}
-                  onMouseLeave={() => setHoverId(null)}
-                >
-                  <span className="text-foreground text-lg font-normal pl-4 w-[4.5rem] flex-shrink-0">
-                    {(`0${(new Date(message.last_updated)).getHours()}`).slice(-2)}:{(`0${(new Date(message.last_updated)).getMinutes()}`).slice(-2)}
-                  </span>
-                  <button className={`text-foreground text-lg font-semibold overflow-hidden px-4 py-2 text-left text-ellipsis whitespace-nowrap flex-grow hover:underline hover:underline-offset-4 hover:decoration-2 ${message.id === removeId ? 'line-through decoration-2' : ''}`} onClick={() => loadChat(message)}>
-                    {message.title || 'Untitled Chat'}
-                  </button>
-                  <motion.div className={`transition-opacity duration-150 ${hoverId === message.id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`} whileHover={{ rotate: '15deg' }} onMouseEnter={() => setRemoveId(message.id)} onMouseLeave={() => setRemoveId(null)}>
-                    <Button variant="ghost" size="sm" aria-label="Delete chat" className="rounded-full w-8 h-8" onClick={(e) => { e.stopPropagation(); deleteMessage(message.id); }}>
-                      <FiTrash2 className="h-4 w-4 text-foreground" />
-                    </Button>
-                  </motion.div>
-                </div>
-              ))}
-          </div>
-        ))}
+    <div className={rootComputedClassName}>
+      <ScrollArea
+        className="flex-1 w-full overflow-y-auto min-h-0" // Message area: scrolls, takes available vertical space
+      >
+        <div className="px-4 pb-4"> {/* Content wrapper for messages */}
+          {uniqueDates.map(date => (
+            <div key={date} className="mb-3 mt-3">
+              <p
+                className="text-foreground text-xl font-extrabold overflow-hidden pl-4 pb-1 text-left text-ellipsis whitespace-nowrap w-[90%]"
+              >
+                {date === dateToString(new Date()) ? 'Today' : date}
+              </p>
+              {messagesWithDates
+                .filter(m => m.date === date)
+                .map(message => (
+                  <div
+                    key={message.id}
+                    className="flex items-center group"
+                    onMouseEnter={() => setHoverId(message.id)}
+                    onMouseLeave={() => setHoverId(null)}
+                  >
+                    <span className="text-foreground text-lg font-normal pl-4 w-[4.5rem] flex-shrink-0">
+                      {new Date(message.last_updated).getHours().toString().padStart(2, '0')}:
+                      {new Date(message.last_updated).getMinutes().toString().padStart(2, '0')}
+                    </span>
+                    <button className={`text-foreground text-lg font-semibold overflow-hidden px-4 py-2 text-left text-ellipsis whitespace-nowrap flex-grow hover:underline hover:underline-offset-4 hover:decoration-2 ${message.id === removeId ? 'line-through decoration-2' : ''}`} onClick={() => loadChat(message)}>
+                      {message.title || 'Untitled Chat'}
+                    </button>
+                    <motion.div className={`transition-opacity duration-150 ${hoverId === message.id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`} whileHover={{ rotate: '15deg' }} onMouseEnter={() => setRemoveId(message.id)} onMouseLeave={() => setRemoveId(null)}>
+                      <Button variant="ghost" size="sm" aria-label="Delete chat" className="rounded-full w-8 h-8" onClick={(e) => { e.stopPropagation(); deleteMessage(message.id); }}>
+                        <FiTrash2 className="h-4 w-4 text-foreground" />
+                      </Button>
+                    </motion.div>
+                  </div>
+                ))}
+            </div>
+          ))}
+        </div>
+      </ScrollArea>
 
-        {totalPages > 1 && (
-          <div className="flex justify-center items-center space-x-2 mt-4">
-            {/* ... pagination buttons ... */}
-            <Button onClick={handlePrevPage} disabled={currentPage === 1} variant="outline">Prev</Button>
-            <span>Page {currentPage} of {totalPages}</span>
-            <Button onClick={handleNextPage} disabled={currentPage === totalPages} variant="outline">Next</Button>
-          </div>
-        )}
-      </div>
-    </ScrollArea>
+      {totalPages > 1 && (
+        <div className="flex justify-center items-center space-x-2 p-2 border-t border-border">
+          <Button onClick={handlePrevPage} disabled={currentPage === 1} variant="outline">Prev</Button>
+          <span>Page {currentPage} of {totalPages}</span>
+          <Button onClick={handleNextPage} disabled={currentPage === totalPages} variant="outline">Next</Button>
+        </div>
+      )}
+    </div>
   );
 };
