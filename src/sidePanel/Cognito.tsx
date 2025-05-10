@@ -33,32 +33,118 @@ import { Send } from './Send';
 import { Settings } from './Settings';
 import storage from '../background/storageUtil';
 
-// bridge and injectBridge functions remain unchanged...
 function bridge() {
-    // Collect image alt texts
-  const altTexts = Array.from(document.images)
-      .map(img => img.alt)
-    .filter(alt => alt.trim().length > 0)
-      .join('. ');
+    // --- Safety Measure 1: Basic DOM readiness check (optional, usually not an issue for content scripts) ---
+    // if (document.readyState !== 'complete' && document.readyState !== 'interactive') {
+    //     console.warn('[Cognito Bridge] DOM not fully ready. Content might be incomplete.');
+    //     // You could return an error or empty data here if critical
+    // }
 
-    // Extract table contents
-  const tableData = Array.from(document.querySelectorAll('table'))
-    .map(table => table.innerText.replace(/\s\s+/g, ' '))
-    .join('\n');
+    let title = '';
+    let textContent = '';
+    let htmlContent = '';
+    let altTexts = '';
+    let tableData = '';
+    let metaDescription = '';
+    let metaKeywords = '';
 
-  const response = JSON.stringify({
-    title: document.title,
-    text: document.body.innerText.replace(/\s\s+/g, ' '),
-    html: document.body.innerHTML.replace(/\s\s+/g, ' '),
-    altTexts,
-    tableData,
-    meta: {
-      description: document.querySelector('meta[name="description"]')?.getAttribute('content'),
-      keywords: document.querySelector('meta[name="keywords"]')?.getAttribute('content')
+    try {
+        title = document.title || '';
+
+        // --- Safety Measure 2: Limit the scope for innerText/innerHTML if body is enormous ---
+        // This is a heuristic. You might need to adjust MAX_CHARS or disable.
+        const MAX_BODY_CHARS_FOR_DIRECT_EXTRACTION = 5_000_000; // Approx 5MB of text
+        let bodyElement = document.body;
+
+        if (document.body && document.body.innerHTML.length > MAX_BODY_CHARS_FOR_DIRECT_EXTRACTION) {
+            console.warn(`[Cognito Bridge] Document body is very large (${document.body.innerHTML.length} chars). Attempting to use a cloned, simplified version for text extraction to improve performance/stability.`);
+
+            // Fallback to a light clone and minimal cleaning for very large pages
+            // This is a compromise: might lose some formatting innerText would preserve,
+            // but aims for stability.
+            const clonedBody = document.body.cloneNode(true) as HTMLElement;
+            clonedBody.querySelectorAll('script, style, noscript, iframe, embed, object').forEach(el => el.remove());
+            textContent = (clonedBody.textContent || '').replace(/\s\s+/g, ' ').trim();
+            // For HTML, you might still want the original or decide to send the cleaned one
+            htmlContent = document.body.innerHTML.replace(/\s\s+/g, ' '); // Or clonedBody.innerHTML
+            // Or, if even clonedBody.innerHTML is too big, send a truncated version or placeholder
+            // if (htmlContent.length > MAX_BODY_CHARS_FOR_DIRECT_EXTRACTION * 1.5) { // HTML can be larger
+            //    htmlContent = `HTML content too large (length: ${htmlContent.length}). Truncated.`;
+            // }
+
+        } else if (document.body) {
+            textContent = (document.body.innerText || '').replace(/\s\s+/g, ' ').trim();
+            htmlContent = (document.body.innerHTML || '').replace(/\s\s+/g, ' ');
+        } else {
+            console.warn('[Cognito Bridge] document.body is not available.');
+        }
+
+
+        // --- Alt Texts and Table Data (generally safe as is) ---
+        altTexts = Array.from(document.images)
+            .map(img => img.alt)
+            .filter(alt => alt && alt.trim().length > 0)
+            .join('. ');
+
+        tableData = Array.from(document.querySelectorAll('table'))
+            .map(table => (table.innerText || '').replace(/\s\s+/g, ' '))
+            .join('\n');
+
+        // --- Meta Tags (generally safe as is) ---
+        const descElement = document.querySelector('meta[name="description"]');
+        metaDescription = descElement ? descElement.getAttribute('content') || '' : '';
+
+        const keywordsElement = document.querySelector('meta[name="keywords"]');
+        metaKeywords = keywordsElement ? keywordsElement.getAttribute('content') || '' : '';
+
+    } catch (error) {
+        console.error('[Cognito Bridge] Error during content extraction:', error);
+        // Return a structured error or partial data if possible
+        return JSON.stringify({
+            error: `Extraction failed: ${error.message}`,
+            title: document.title || 'Error extracting title', // Try to get title anyway
+            text: '', html: '', altTexts: '', tableData: '',
+            meta: { description: '', keywords: '' }
+        });
     }
-  });
 
-  return response;
+    // --- Safety Measure 3: Truncate extremely long outputs before stringifying ---
+    // This protects the extension storage and IPC messages if something goes unexpectedly huge.
+    const MAX_OUTPUT_STRING_LENGTH = 10_000_000; // 10MB for the whole JSON string
+    
+    let responseCandidate = {
+        title,
+        text: textContent,
+        html: htmlContent,
+        altTexts,
+        tableData,
+        meta: {
+            description: metaDescription,
+            keywords: metaKeywords
+        }
+    };
+
+    // Simple truncation strategy: prioritize text, then HTML, then others.
+    // A more sophisticated strategy might be needed for extreme cases.
+    if (JSON.stringify(responseCandidate).length > MAX_OUTPUT_STRING_LENGTH) {
+        console.warn('[Cognito Bridge] Total extracted content is very large. Attempting to truncate.');
+        const availableLength = MAX_OUTPUT_STRING_LENGTH - JSON.stringify({ ...responseCandidate, text: "", html: "" }).length;
+        let remainingLength = availableLength;
+
+        if (responseCandidate.text.length > remainingLength * 0.6) { // Prioritize text
+            responseCandidate.text = responseCandidate.text.substring(0, Math.floor(remainingLength * 0.6)) + "... (truncated)";
+        }
+        remainingLength = availableLength - responseCandidate.text.length;
+
+        if (responseCandidate.html.length > remainingLength * 0.8) { // Then HTML
+             responseCandidate.html = responseCandidate.html.substring(0, Math.floor(remainingLength * 0.8)) + "... (truncated)";
+        }
+        // Could add more truncation for altTexts, tableData if still too large
+        console.warn('[Cognito Bridge] Content truncated. Final approx length:', JSON.stringify(responseCandidate).length);
+    }
+
+
+    return JSON.stringify(responseCandidate);
 }
 
 async function injectBridge() {

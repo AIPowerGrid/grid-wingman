@@ -310,14 +310,14 @@ const ThinkingBlock = ({ content }: { content: string }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="mb-2"> {/* Equivalent to Box mb={2} */}
+    <div className="mb-2">
       <Collapsible open={isOpen} onOpenChange={setIsOpen} className="w-full">
         <CollapsibleTrigger asChild>
           <Button
             variant="outline"
             size="sm"
             className={cn(
-              "mb-1", // Chakra mb={1} (0.25rem)
+              "mb-1", 
               // Assuming var(--text) maps to foreground, var(--active) to accent
               "border-foreground text-foreground hover:bg-accent hover:text-accent-foreground"
             )}
