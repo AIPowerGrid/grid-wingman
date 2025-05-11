@@ -1,6 +1,6 @@
 // input.tsx
 import type { TextareaHTMLAttributes, RefObject, FC } from 'react';
-
+import { AddToChat } from './AddToChat'; // Import AddToChat
 import { ForwardedRef, useEffect, useRef, useState, useCallback } from 'react';
 import { FaRegStopCircle } from 'react-icons/fa';
 import { SlMicrophone } from "react-icons/sl";
@@ -62,7 +62,7 @@ export const AutoResizeTextarea = (
         // Custom focus/hover (overriding shadcn focus ring)
         "focus:border-foreground focus:shadow-none",
         "hover:border-foreground hover:shadow-none",
-        "focus-visible:ring-0 focus-visible:ring-offset-0",
+        "focus-visible:ring-1 focus-visible:ring-offset-0",
         className
       )}
       {...props}
@@ -195,7 +195,8 @@ export const Input: FC<InputProps> = ({ isLoading, message, setMessage, onSend }
     (window.SpeechRecognition || window.webkitSpeechRecognition);
 
   return (
-    <div className="ml-2 relative w-full flex items-center">
+    <div className="relative w-full flex items-center"> {/* Removed ml-2 */}
+      <AddToChat /> {/* AddToChat button placed here */}
       <TooltipProvider delayDuration={500}>
         <Tooltip>
           <TooltipTrigger>
@@ -214,6 +215,7 @@ export const Input: FC<InputProps> = ({ isLoading, message, setMessage, onSend }
               size="sm"
               className={cn(
                 "rounded-md mr-2",
+                "not-focus-visible", // Add your class here
                 isListening ? "text-red-500 hover:bg-destructive/10" : "text-foreground hover:bg-muted/50",
               )}
               disabled={isLoading || !isSpeechRecognitionSupported}
@@ -223,7 +225,7 @@ export const Input: FC<InputProps> = ({ isLoading, message, setMessage, onSend }
           </TooltipTrigger>
           <TooltipContent
             side="top"
-            className="bg-background text-foreground border border-border"
+            className="bg-secondary/50 text-foreground"
           >
             <p>{isListening ? "Stop" : "Recording"}</p>
           </TooltipContent>

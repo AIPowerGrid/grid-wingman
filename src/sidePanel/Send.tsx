@@ -1,6 +1,6 @@
 import { Loader2 } from 'lucide-react';
 import { motion } from 'motion/react';
-import { TbSend } from "react-icons/tb";
+import { BsSend } from "react-icons/bs";
 import { Button } from "@/components/ui/button"; // Import shadcn Button
 import { cn } from "@/src/background/util"; // Use the specified path for cn
 
@@ -43,7 +43,7 @@ export const Send = ({ isLoading, onSend }: SendProps) => {
           // <Spinner color="var(--text)" speed="2s" size="xs" /> // Adjust size if needed
         ) : (
           // Use react-icon directly
-          (<TbSend className="h-4 w-4 text-foreground" />) // fontSize="16px" -> h-4 w-4
+          (<BsSend className="h-4 w-4 text-foreground" />) // fontSize="16px" -> h-4 w-4
         )}
       </Button>
     </motion.div>)

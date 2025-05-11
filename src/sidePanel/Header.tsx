@@ -130,7 +130,7 @@ const Badge = ({ children }: { children: React.ReactNode }) => (
   <div
     className={cn(
       "inline-block whitespace-nowrap overflow-hidden text-ellipsis w-full max-w-xs",
-      "bg-[var(--bg)] text-[var(--text)]",
+      "bg-transparent text-[var(--text)]",
       "rounded-md px-3 py-0.5",
       "font-['poppins',_sans-serif] text-md font-medium",
       "shadow-xs"

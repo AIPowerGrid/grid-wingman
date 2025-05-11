@@ -666,9 +666,7 @@ const Cognito = () => {
               )}
               style={{ opacity: settingsMode ? 0 : 1 }} // Keep inline style for opacity
             >
-              {/* Input, AddToChat, Send components remain the same */}
               <Input isLoading={isLoading} message={message} setMessage={setMessage} onSend={onSend} />
-              <AddToChat />
               <Send isLoading={isLoading} onSend={() => onSend(message)} />
             </div>)
           )}
