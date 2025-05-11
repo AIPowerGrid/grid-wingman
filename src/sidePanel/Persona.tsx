@@ -33,7 +33,7 @@ import { cn } from "@/src/background/util";
 
 // Styling constants
 const commonSubtleBorderClass = 'border-[var(--text)]/10';
-const commonControlBg = (isDark: boolean) => isDark ? 'bg-[rgba(255,255,255,0.04)]' : 'bg-[rgba(255,250,240,0.6)]';
+const commonControlBg = (isDark: boolean) => isDark ? 'bg-[rgba(255,255,255,0.1)]' : 'bg-[rgba(255,250,240,0.4)]';
 const commonItemShadow = 'shadow-md';
 const commonItemRounded = 'rounded-xl';
 const commonInputHeight = 'h-9';

@@ -250,7 +250,7 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
 
   const isDark = config?.theme === 'dark';
   const subtleBorderClass = 'border-[var(--text)]/10';
-  const controlBg = isDark ? 'bg-[rgba(255,255,255,0.04)]' : 'bg-[rgba(255,250,240,0.6)]';
+  const controlBg = isDark ? 'bg-[rgba(255,255,255,0.1)]' : 'bg-[rgba(255,250,240,0.4)]';
   const inputHeight = 'h-9';
   const sectionPaddingX = 'px-6';
   const controlFilter = 'brightness-102 contrast-98';

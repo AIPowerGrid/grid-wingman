@@ -19,8 +19,8 @@ export const Settings = () => {
   // These styles will be applied within child components like Themes.tsx, Connect.tsx, etc.
   const subtleBorderClass = 'border-[var(--text)]/10'; // 1px semi-transparent border
   const controlBg = isDark
-    ? 'bg-[rgba(255,255,255,0.04)]' // Brighter solid color for dark theme
-    : 'bg-[rgba(255,250,240,0.6)]'; // Brighter solid color for light theme
+    ? 'bg-[rgba(255,255,255,0.1)]' // Brighter solid color for dark theme
+    : 'bg-[rgba(255,250,240,0.4)]'; // Brighter solid color for light theme
   const itemShadow = 'shadow-md'; // Consistent shadow, same as Header.tsx's floatingShadow
   const itemRounded = 'rounded-xl'; // Consistent rounding
 

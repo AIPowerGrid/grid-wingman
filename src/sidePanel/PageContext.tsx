@@ -76,8 +76,8 @@ export const PageContext = () => {
 
   const subtleBorderClass = 'border-[var(--text)]/10';
   const controlBg = isDark
-    ? 'bg-[rgba(255,255,255,0.04)]'
-    : 'bg-[rgba(255,250,240,0.6)]';
+    ? 'bg-[rgba(255,255,255,0.1)]'
+    : 'bg-[rgba(255,250,240,0.4)]';
   const itemShadow = 'shadow-md';
   const itemRounded = 'rounded-xl';
 

@@ -14,7 +14,7 @@ export const ConnectOllama = () => {
 
   // Styling variables (can be moved to a shared constants file if used in many places)
   const isDark = config?.theme === 'dark'; // For controlBg, if needed, though direct vars are used below
-  const controlBg = isDark ? 'bg-[rgba(255,255,255,0.04)]' : 'bg-[rgba(255,250,240,0.6)]';
+  const controlBg = isDark ? 'bg-[rgba(255,255,255,0.1)]' : 'bg-[rgba(255,250,240,0.4)]';
   const subtleBorderClass = 'border-[var(--text)]/10';
   const inputHeightClass = 'h-8'; // Target height: 2rem or 32px. Adjust as needed (e.g., h-9 for 36px)
   const buttonHeightClass = 'h-8'; // Match input height

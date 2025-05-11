@@ -56,7 +56,7 @@ export const themes: Theme[] = [
     codeFg: '#F5E9D5',
     preBg: '#5B4636',
     preFg: '#F5E9D5',
-    mute: '#A08C7D', // Lighter brown
+    mute: '#A08C7D',
     tableBorder: '#5B4636',
     error: '#d32f2f',
     success: '#388e3c',
@@ -64,18 +64,18 @@ export const themes: Theme[] = [
   },
   {
     name: 'smoke',
-    active: '#939393',
-    bg: '#dfdfdf',
-    text: '#000000',
-    bold: '#eafadb',
-    italic: '#fbe1cf',
-    link: '#c3d5fa',
-    codeBg: '#333333',
-    codeFg: '#dfdfdf',
-    preBg: '#333333',
-    preFg: '#dfdfdf',
-    mute: '#757575', // Mid-gray
-    tableBorder: '#333333',
+    active: '#787878',
+    bg: '#91989F',
+    text: '#FCFAF2',
+    bold: '#E9CD4C',
+    italic: '#A8D8B9',
+    link: '#8aa8e8',
+    codeBg: '#FCFAF2',
+    codeFg: '#91989F',
+    preBg: '#FCFAF2',
+    preFg: '#91989F',
+    mute: '#f2f1ec', 
+    tableBorder: '#FCFAF2',
     error: '#d32f2f',
     success: '#388e3c',
     warning: '#fbc02d',
@@ -258,7 +258,7 @@ export const Themes = () => {
   const isDark = config?.theme === 'dark';
 
   const subtleBorderClass = 'border-[var(--text)]/10';
-  const controlBg = isDark ? 'bg-[rgba(255,255,255,0.04)]' : 'bg-[rgba(255,250,240,0.6)]';
+  const controlBg = isDark ? 'bg-[rgba(255,255,255,0.1)]' : 'bg-[rgba(255,250,240,0.4)]';
   const itemShadow = 'shadow-md';
   const itemRounded = 'rounded-xl';
   

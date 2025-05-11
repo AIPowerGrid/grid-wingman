@@ -14,7 +14,7 @@ export const ConnectGroq = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const isDark = config?.theme === 'dark';
-  const controlBg = isDark ? 'bg-[rgba(255,255,255,0.04)]' : 'bg-[rgba(255,250,240,0.6)]';
+  const controlBg = isDark ? 'bg-[rgba(255,255,255,0.1)]' : 'bg-[rgba(255,250,240,0.4)]';
   const subtleBorderClass = 'border-[var(--text)]/10';
   const inputHeightClass = 'h-8';
   const buttonHeightClass = 'h-8';
