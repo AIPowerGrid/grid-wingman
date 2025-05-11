@@ -659,7 +659,7 @@ const Cognito = () => {
             // Replace Box with div
             (<div
               className={cn(
-                "bg-[var(--active)] border-t border-[var(--text)]", // background, borderTop
+                "bg-[var(--active)]/50 border-t border-[var(--text)]/50", // background, borderTop
                 "flex justify-between items-center", // display, justifyContent, alignItems (added for vertical alignment)
                 "pb-1 pt-1 relative z-[2]",
                 "not-focus-visible" // pb, pt, position, zIndex

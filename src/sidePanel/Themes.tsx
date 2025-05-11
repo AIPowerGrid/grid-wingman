@@ -99,6 +99,24 @@ export const themes: Theme[] = [
     warning: '#fbc02d',
   },
   {
+    name: 'light',
+    active: '#E0EFFF',     // Light, clear blue (for active element backgrounds)
+    bg: '#FFFFFF',         // White (main background)
+    text: '#212529',       // Dark Gray/Off-Black (main text)
+    bold: '#004080',       // Darker blue (for bold text)
+    italic: '#555555',     // Dark Gray (for italic text)
+    link: '#0056b3',       // Accessible standard blue (for links)
+    codeBg: '#F8F9FA',     // Very light gray (background for inline code)
+    codeFg: '#212529',     // Dark gray/off-black (text for inline code)
+    preBg: '#F8F9FA',      // Very light gray (background for code blocks)
+    preFg: '#212529',      // Dark gray/off-black (text for code blocks)
+    mute: '#6C757D',       // Muted gray (for less prominent text)
+    tableBorder: '#DEE2E6', // Light gray (for table borders)
+    error: '#d32f2f',
+    success: '#388e3c',
+    warning: '#fbc02d',
+  },
+  {
     name: 'dark',
     active: '#7473af',
     bg: '#373737',
