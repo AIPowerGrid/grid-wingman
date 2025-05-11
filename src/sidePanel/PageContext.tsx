@@ -10,6 +10,19 @@ import { cn } from "@/src/background/util";
 import { useConfig } from './ConfigContext';
 import { SettingTitle } from './SettingsTitle';
 
+// Define a type for the config object based on its usage
+interface AppConfig {
+  pageMode?: 'text' | 'html';
+  contextLimit?: number;
+  theme?: string;
+  // Add other potential config properties if known
+}
+
+// Define a type for the updateConfig function
+type UpdateConfigFn = (updates: Partial<AppConfig>) => void;
+
+
+
 // Consistent Slider class string (copied from ModelSettingsPanel.tsx)
 const sliderClass = cn(
   "w-full",
@@ -24,10 +37,15 @@ const sliderClass = cn(
   "[&_button:focus-visible]:ring-[var(--active)]"
 );
 
-const PageModeSelector = ({ pageMode, updateConfig }) => (
+interface PageModeSelectorProps {
+  pageMode?: 'text' | 'html';
+  updateConfig: UpdateConfigFn;
+}
+
+const PageModeSelector = ({ pageMode, updateConfig }: PageModeSelectorProps) => (
   <RadioGroup
     value={pageMode || 'text'}
-    onValueChange={(value) => updateConfig({ pageMode: value })}
+    onValueChange={(value: string) => updateConfig({ pageMode: value as 'text' | 'html' })}
     className="w-1/2 space-y-3"
   >
     {['text', 'html'].map(mode => (
@@ -52,7 +70,12 @@ const PageModeSelector = ({ pageMode, updateConfig }) => (
   </RadioGroup>
 );
 
-const ContextLimitSlider = ({ size, updateConfig }) => (
+interface ContextLimitSliderProps {
+  size: number;
+  updateConfig: UpdateConfigFn;
+}
+
+const ContextLimitSlider = ({ size, updateConfig }: ContextLimitSliderProps) => (
   <div className="w-[45%] ml-auto">
     <p className="text-[var(--text)] text-base font-medium pb-6 text-left">
       Char Limit:{' '}
@@ -64,7 +87,7 @@ const ContextLimitSlider = ({ size, updateConfig }) => (
       min={1}
       step={1}
       className={sliderClass} // Apply consistent slider class
-      onValueChange={value => updateConfig({ contextLimit: value[0] })}
+      onValueChange={(value: number[]) => updateConfig({ contextLimit: value[0] })}
     />
   </div>
 );
