@@ -18,9 +18,14 @@ const extractTitle = (response: string): string => {
     .replace(/"/g, '')
     .replace(/#/g, '')
     .trim();
-    
-  // If we have content after removing thinking blocks, use it
-  return titleOnly || "New Chat";
+
+  if (!titleOnly) {
+    return "New Chat";
+  }
+
+  // Limit to a maximum of 4 words
+  const words = titleOnly.split(/\s+/); // Split by any whitespace
+  return words.slice(0, 4).join(' ') || "New Chat";
 };
 
 export const useChatTitle = (isLoading: boolean, turns: MessageTurn[], message: string) => {
