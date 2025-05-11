@@ -164,7 +164,7 @@ export const ChatHistory = ({ loadChat, onDeleteAll, className }: ChatHistoryPro
                     <button className={`text-foreground text-lg font-semibold overflow-hidden px-4 py-2 text-left text-ellipsis whitespace-nowrap flex-grow hover:underline hover:underline-offset-4 hover:decoration-2 ${message.id === removeId ? 'line-through decoration-2' : ''}`} onClick={() => loadChat(message)}>
                       {message.title || 'Untitled Chat'}
                     </button>
-                    <motion.div className={`transition-opacity duration-150 ${hoverId === message.id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`} whileHover={{ rotate: '15deg' }} onMouseEnter={() => setRemoveId(message.id)} onMouseLeave={() => setRemoveId(null)}>
+                    <motion.div className={`shrink-0 transition-opacity duration-150 ${hoverId === message.id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`} whileHover={{ rotate: '15deg' }} onMouseEnter={() => setRemoveId(message.id)} onMouseLeave={() => setRemoveId(null)}>
                       <Button variant="ghost" size="sm" aria-label="Delete chat" className="rounded-full w-8 h-8" onClick={(e) => { e.stopPropagation(); deleteMessage(message.id); }}>
                         <FiTrash2 className="h-4 w-4 text-foreground" />
                       </Button>
