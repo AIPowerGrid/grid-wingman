@@ -7,7 +7,7 @@
 3.  **Fetch Page Content:** For each selected URL, fetch its HTML content.
 4.  **Extract Main Content:** Parse the fetched HTML and try to extract the meaningful text content, stripping out boilerplate (headers, footers, ads, navigation). This is the trickiest part and often requires heuristics.
 5.  **Combine Results:** Format the output to include the original snippet *and* the extracted content from the visited page.
-6.  **Concurrency:** Fetch the linked pages concurrently to speed things up, it's much faster than you click on them.
+6.  **Concurrency:** Fetch the linked pages concurrently to speed things up; it's much faster than clicking on them.
 
 ![image](.doc/websearch.png)
 ![image](.doc/websearch1.png)
