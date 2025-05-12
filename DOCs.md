@@ -9,8 +9,8 @@
 5.  **Combine Results:** Format the output to include the original snippet *and* the extracted content from the visited page.
 6.  **Concurrency:** Fetch the linked pages concurrently to speed things up; it's much faster than clicking on them.
 
-![image](.docs/websearch.png)
-![image](.docs/websearch1.png)
+![image](./docs/websearch.png)
+![image](./docs/websearch1.png)
 
 **Detailed Explanation**
 
