@@ -18,6 +18,7 @@ Built on [sidellama](https://github.com/gyopak/sidellama).
 *   Replace 'deep research' with local/basic API services (even free tier)
 *   "Memory" for the chat history with RAG and search.
 *   Comparison mode (RAG or hybrid search can do this).
+*   File support from direct API from Chrome
 ## Screenshot
 
 ![](docs/screenshot.png)
