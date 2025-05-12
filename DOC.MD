@@ -10,7 +10,7 @@
 6.  **Concurrency:** Fetch the linked pages concurrently to speed things up, it's much faster than you click on them.
 
 ![image](.doc/websearch.png)
-![image](.doc/websearch1.png)]
+![image](.doc/websearch1.png)
 
 **Detailed Explanation**
 
