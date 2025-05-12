@@ -3,24 +3,10 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { cn } from "@/src/background/util";
-import { useConfig } from './ConfigContext';
+import { useConfig } from './ConfigContext'; // Assuming this provides { config: Config, updateConfig: (updates: Partial<Config>) => void }
 import { SettingTitle } from './SettingsTitle';
-
-// Define a type for the config object based on its usage
-interface AppConfig {
-  pageMode?: 'text' | 'html';
-  contextLimit?: number;
-  theme?: string;
-  // Add other potential config properties if known
-}
-
-// Define a type for the updateConfig function
-type UpdateConfigFn = (updates: Partial<AppConfig>) => void;
-
 
 
 // Consistent Slider class string (copied from ModelSettingsPanel.tsx)
@@ -37,46 +23,15 @@ const sliderClass = cn(
   "[&_button:focus-visible]:ring-[var(--active)]"
 );
 
-interface PageModeSelectorProps {
-  pageMode?: 'text' | 'html';
-  updateConfig: UpdateConfigFn;
-}
-
-const PageModeSelector = ({ pageMode, updateConfig }: PageModeSelectorProps) => (
-  <RadioGroup
-    value={pageMode || 'text'}
-    onValueChange={(value: string) => updateConfig({ pageMode: value as 'text' | 'html' })}
-    className="w-1/2 space-y-3"
-  >
-    {['text', 'html'].map(mode => (
-      <div key={mode} className="flex items-center space-x-2">
-        <RadioGroupItem
-          value={mode}
-          id={`pageMode-${mode}`}
-          className={cn(
-            "border-[var(--text)] text-[var(--active)]",
-            "focus:ring-1 focus:ring-[var(--active)] focus:ring-offset-0",
-            "data-[state=checked]:border-[var(--active)]"
-          )}
-        />
-        <Label
-          htmlFor={`pageMode-${mode}`}
-          className="text-[var(--text)] text-base font-medium cursor-pointer"
-        >
-          {mode} mode
-        </Label>
-      </div>
-    ))}
-  </RadioGroup>
-);
-
 interface ContextLimitSliderProps {
   size: number;
-  updateConfig: UpdateConfigFn;
+  // This typing assumes useConfig() returns an object with an updateConfig method.
+  // Adjust if your useConfig hook has a more specific exported type for its return value or for updateConfig.
+  updateConfig: ReturnType<typeof useConfig>['updateConfig'];
 }
 
 const ContextLimitSlider = ({ size, updateConfig }: ContextLimitSliderProps) => (
-  <div className="w-[45%] ml-auto">
+  <div className="w-full"> {/* Changed from w-[45%] ml-auto to take full width */}
     <p className="text-[var(--text)] text-base font-medium pb-6 text-left">
       Char Limit:{' '}
       <span className="font-normal">{size === 128 ? 'inf' : `${size}k`}</span>
@@ -94,6 +49,7 @@ const ContextLimitSlider = ({ size, updateConfig }: ContextLimitSliderProps) => 
 
 export const PageContext = () => {
   const { config, updateConfig } = useConfig();
+  // Ensure default for size is reasonable, 1 seems fine as slider min is 1.
   const size = config?.contextLimit || 1;
   const isDark = config?.theme === 'dark';
 
@@ -131,10 +87,7 @@ export const PageContext = () => {
         />
       </AccordionTrigger>
       <AccordionContent className="px-3 pb-4 pt-2 text-[var(--text)]">
-        <div className="flex">
-          <PageModeSelector pageMode={config?.pageMode} updateConfig={updateConfig} />
-          <ContextLimitSlider size={size} updateConfig={updateConfig} />
-        </div>
+        <ContextLimitSlider size={size} updateConfig={updateConfig} />
       </AccordionContent>
     </AccordionItem>
   );

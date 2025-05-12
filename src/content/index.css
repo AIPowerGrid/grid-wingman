@@ -428,3 +428,14 @@ html[data-paper-texture="true"] #root::before {
   border-radius: 0;
   padding: 0;
 }
+
+.not-focus-visible:focus-visible {
+  outline: none !important; /* Removes standard outline */
+  box-shadow: none !important; /* Removes box-shadow based focus */
+  /* Specifically for Tailwind rings, you might need to override CSS variables or use utilities */
+  --tw-ring-offset-shadow: 0 0 #0000 !important;
+  --tw-ring-shadow: 0 0 #0000 !important;
+  --tw-ring-opacity: 0 !important;
+  --tw-ring-offset-width: 0px !important;
+  --tw-ring-width: 0px !important; /* This is often the key for rings */
+}

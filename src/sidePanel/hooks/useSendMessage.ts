@@ -1,18 +1,38 @@
 import { Dispatch, SetStateAction, useRef } from 'react';
 import { MessageTurn } from '../ChatHistory'; // Adjust path if needed
 import { fetchDataAsStream, webSearch, processQueryWithAI } from '../network';
-import storage from 'src/background/storageUtil';// --- Interfaces (Model, Config, ApiMessage) remain the same ---
+import storage from 'src/background/storageUtil';
 import type { Config, Model } from 'src/types/config';
 import { normalizeApiEndpoint } from 'src/background/util';
-import { handleHighCompute, handleMediumCompute } from './computeHandlers'; // Import handlers
+import { handleHighCompute, handleMediumCompute } from './computeHandlers';
+
+// Import pdf.js
+import * as pdfjsLib from 'pdfjs-dist';
+
+// Set the workerSrc for pdf.js
+// Make sure 'pdf.worker.mjs' is accessible at the root of your extension.
+// If you've placed it in a subdirectory (e.g., 'assets'), adjust the path.
+// e.g., chrome.runtime.getURL('assets/pdf.worker.mjs')
+try {
+  const workerUrl = chrome.runtime.getURL('pdf.worker.mjs');
+  // Check if the URL is valid before assigning, to prevent errors if the file is missing
+  if (workerUrl) {
+    pdfjsLib.GlobalWorkerOptions.workerSrc = workerUrl;
+  } else {
+    console.error("Failed to get URL for pdf.worker.mjs. PDF parsing might fail.");
+  }
+} catch (e) {
+    console.error("Error setting pdf.js worker source:", e);
+}
+
 
 interface ApiMessage {
   role: 'user' | 'assistant' | 'system';
   content: string;
 }
 
-// getAuthHeader remains the same...
 export const getAuthHeader = (config: Config, currentModel: Model) => {
+  // ... (getAuthHeader remains the same)
   if (currentModel?.host === 'groq' && config.groqApiKey) {
     return { Authorization: `Bearer ${config.groqApiKey}` };
   }
@@ -31,11 +51,45 @@ export const getAuthHeader = (config: Config, currentModel: Model) => {
   return undefined;
 };
 
+// Helper function to extract text from a PDF URL
+async function extractTextFromPdf(pdfUrl: string, callId?: number): Promise<string> {
+  try {
+    console.log(`[${callId || 'PDF'}] Attempting to fetch PDF from URL: ${pdfUrl}`);
+    const response = await fetch(pdfUrl);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch PDF: ${response.status} ${response.statusText}`);
+    }
+    const arrayBuffer = await response.arrayBuffer();
+    console.log(`[${callId || 'PDF'}] PDF fetched, size: ${arrayBuffer.byteLength} bytes. Parsing...`);
+
+    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    console.log(`[${callId || 'PDF'}] PDF parsed. Number of pages: ${pdf.numPages}`);
+    
+    let fullText = '';
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      const textContent = await page.getTextContent();
+      const pageText = textContent.items.map(item => ('str' in item ? item.str : '')).join(' ');
+      fullText += pageText + '\n\n'; // Add double newline between pages for readability
+      if (i % 10 === 0 || i === pdf.numPages) { // Log progress for large PDFs
+        console.log(`[${callId || 'PDF'}] Extracted text from page ${i}/${pdf.numPages}`);
+      }
+    }
+    console.log(`[${callId || 'PDF'}] PDF text extraction complete. Total length: ${fullText.length}`);
+    return fullText.trim();
+  } catch (error) {
+    console.error(`[${callId || 'PDF'}] Error extracting text from PDF (${pdfUrl}):`, error);
+    // Optionally, rethrow or return a specific error message string
+    throw error; // Rethrow to be caught by the caller
+  }
+}
+
+
 const useSendMessage = (
   isLoading: boolean,
   originalMessage: string,
   currentTurns: MessageTurn[],
-  webContent: string,
+  _webContent: string, 
   config: Config | null | undefined,
   setTurns: Dispatch<SetStateAction<MessageTurn[]>>,
   setMessage: Dispatch<SetStateAction<string>>,
@@ -43,16 +97,15 @@ const useSendMessage = (
   setPageContent: Dispatch<SetStateAction<string>>,
   setLoading: Dispatch<SetStateAction<boolean>>
 ) => {
-   // Use a ref to track if the completion logic for a specific call has run
-   const completionGuard = useRef<number | null>(null); // Store the callId being processed
-  
-   const onSend = async (overridedMessage?: string) => {
-    // Generate a unique ID for this specific call to onSend
+  const completionGuard = useRef<number | null>(null);
+
+  const onSend = async (overridedMessage?: string) => {
     const callId = Date.now();
     console.log(`[${callId}] useSendMessage: onSend triggered.`);
     
     const message = overridedMessage || originalMessage;
 
+    // ... (initial checks for isLoading, message, config, completionGuard remain the same)
     if (isLoading) {
       console.log(`[${callId}] useSendMessage: Bailing out: isLoading is true.`);
       return;
@@ -62,19 +115,59 @@ const useSendMessage = (
       return;
     }
 
-        // Prevent concurrent sends
     if (completionGuard.current !== null) {
         console.warn(`[${callId}] useSendMessage: Bailing out: Another send operation (ID: ${completionGuard.current}) is already in progress.`);
         return;
     }
 
     console.log(`[${callId}] useSendMessage: Setting loading true.`);
-
     setLoading(true);
-    setWebContent(''); // Clear previous web content display
+    setWebContent('');
     setPageContent('');
-    // Reset the guard for this new call
-    completionGuard.current = callId; // Mark this callId as active
+    completionGuard.current = callId;
+    
+    const updateAssistantTurn = (update: string, isFinished: boolean, isError?: boolean) => {
+      // ... (updateAssistantTurn remains the same as your corrected version)
+      if (completionGuard.current !== callId && !isFinished && !(isError === true) ) {
+        console.log(`[${callId}] updateAssistantTurn: Guard mismatch (current: ${completionGuard.current}), skipping non-final update.`);
+        return;
+      }
+
+      setTurns(prevTurns => {
+        if (prevTurns.length === 0 || prevTurns[prevTurns.length - 1].role !== 'assistant') {
+          console.warn(`[${callId}] updateAssistantTurn: No assistant turn found or last turn is not assistant.`);
+          if (isError) {
+            const errorTurn: MessageTurn = {
+              role: 'assistant',
+              rawContent: `Error: ${update || 'Unknown operation error'}`,
+              status: 'error',
+              timestamp: Date.now(),
+            };
+            return [...prevTurns, errorTurn];
+          }
+          return prevTurns;
+        }
+        const lastTurn = prevTurns[prevTurns.length - 1];
+        const updatedContent = (isError === true) ? `Error: ${update || 'Unknown stream/handler error'}` : update;
+        const updatedStatus = (isError === true) ? 'error' : (isFinished ? 'complete' : 'streaming');
+        
+        return [
+          ...prevTurns.slice(0, -1),
+          {
+            ...lastTurn,
+            rawContent: updatedContent,
+            status: updatedStatus,
+            timestamp: Date.now()
+          }
+        ];
+      });
+
+      if (isFinished || (isError === true)) {
+        console.log(`[${callId}] updateAssistantTurn: Final state (Finished: ${isFinished}, Error: ${isError}). Clearing guard and loading.`);
+        setLoading(false);
+        completionGuard.current = null;
+      }
+    };
 
     const userTurn: MessageTurn = {
       role: 'user',
@@ -83,98 +176,125 @@ const useSendMessage = (
       timestamp: Date.now()
     };
     setTurns(prevTurns => [...prevTurns, userTurn]);
-    setMessage(''); // Clear input field
+    setMessage('');
     console.log(`[${callId}] useSendMessage: User turn added to state.`);
 
-    let queryForProcessing = message; // Use a different variable for the potentially optimized query
+    let queryForProcessing = message;
     let searchRes: string = '';
-    let processedQueryDisplay = ''; // To store the query for display
+    let processedQueryDisplay = '';
 
     const performSearch = config?.chatMode === 'web';
     const currentModel = config?.models?.find(m => m.id === config.selectedModel);
 
     if (!currentModel) {
-      console.error("[${callId}] useSendMessage: No current model found.");
-      setLoading(false);
+      console.error(`[${callId}] useSendMessage: No current model found.`);
+      updateAssistantTurn("Configuration error: No model selected.", true, true);
       return;
     }
     const authHeader = getAuthHeader(config, currentModel);
 
-    // --- Step 1: Optimize Query ---
+    // ... (Step 1: Optimize Query remains the same)
     if (performSearch) {
-      console.log("[${callId}] useSendMessage: Optimizing query...");
-      
+      console.log(`[${callId}] useSendMessage: Optimizing query...`);
       const historyForQueryOptimization: ApiMessage[] = currentTurns.map(turn => ({
         role: turn.role,
-        content: turn.rawContent // Use only the raw content
-    }));
+        content: turn.rawContent
+      }));
+      try {
+        const optimizedQuery = await processQueryWithAI(
+          message,
+          config,
+          currentModel,
+          authHeader,
+          historyForQueryOptimization
+        );
+        if (optimizedQuery && optimizedQuery.trim() && optimizedQuery !== message) {
+          queryForProcessing = optimizedQuery;
+          processedQueryDisplay = `**SUB:** [*${queryForProcessing}*]\n\n`;
+          console.log(`[${callId}] useSendMessage: Query optimized to: "${queryForProcessing}"`);
+        } else {
+          processedQueryDisplay = `**ORG:** (${queryForProcessing})\n\n`;
+          console.log(`[${callId}] useSendMessage: Using original query: "${queryForProcessing}"`);
+        }
+      } catch (optError) {
+        console.error(`[${callId}] Query optimization failed:`, optError);
+        processedQueryDisplay = `**ORG:** (${queryForProcessing}) [Optimization Failed]\n\n`;
+      }
+    } else {
+      queryForProcessing = message;
+    }
 
-      const optimizedQuery = await processQueryWithAI(
-        message,
-        config,
-        currentModel,
-        authHeader,
-        historyForQueryOptimization
-      );
-      // Only update finalQuery if optimization was successful and different
-      if (optimizedQuery && optimizedQuery.trim() && optimizedQuery !== message) {
-        queryForProcessing = optimizedQuery;
-        processedQueryDisplay = `**SUB:** [*${queryForProcessing}*]\n\n`; // Prepare for display
-        console.log(`[${callId}] useSendMessage: Query optimized to: "${queryForProcessing}"`);
-   } else {
-    processedQueryDisplay = `**ORG:** (${queryForProcessing})\n\n`;
-    console.log(`[${callId}] useSendMessage: Using original query: "${queryForProcessing}"`);
- }
-}  else {
-  queryForProcessing = message;
-}
-
-    // --- Step 2: Perform Web Search ---
+    // ... (Step 2: Perform Web Search remains the same)
     if (performSearch) {
       console.log(`[${callId}] useSendMessage: Performing web search...`);
-      searchRes = await webSearch(queryForProcessing, config.webMode || 'Google').catch(/* ... */);
+      try {
+        searchRes = await webSearch(queryForProcessing, config.webMode || 'Google');
+      } catch (searchError) {
+        console.error(`[${callId}] Web search failed:`, searchError);
+        searchRes = ''; 
+        processedQueryDisplay += `[Web Search Failed: ${searchError instanceof Error ? searchError.message : String(searchError)}]`;
+      }
       console.log(`[${callId}] useSendMessage: Web search done. Length: ${searchRes.length}`);
-   }
+    }
 
-    // Use the potentially optimized query for subsequent steps if web search was done
     const messageToUse = performSearch ? queryForProcessing : message;
-
-    // *** This variable holds the string you want to prepend ***
     const webLimit = 1000 * (config?.webLimit || 1);
     const limitedWebResult = webLimit && typeof searchRes === 'string'
       ? searchRes.substring(0, webLimit)
       : searchRes;
-
-    const combinedWebContentDisplay = processedQueryDisplay; 
-
+    const combinedWebContentDisplay = processedQueryDisplay;
     const webContentForLlm = config?.webLimit === 128 ? searchRes : limitedWebResult;
     console.log(`[${callId}] useSendMessage: Web content prepared for display.`);
 
-    // --- Step 3: Prepare Context & Turns ---
     const messageForApi: ApiMessage[] = currentTurns
       .map((turn): ApiMessage => ({
         content: turn.rawContent || '',
         role: turn.role
       }))
-      .concat({ role: 'user', content: message });    
-
+      .concat({ role: 'user', content: message });
 
     let pageContentForLlm = '';
     if (config?.chatMode === 'page') {
-      let currentPageContent = '';console.log(`[${callId}] useSendMessage: Preparing page content...`);
-      const [tab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
-      
-      if (tab?.url && !tab.url.startsWith('chrome://')) {
+      let currentPageContent = '';
+      console.log(`[${callId}] useSendMessage: Preparing page content...`);
+      try {
+        const [tab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
         
-        const storedPageString = await storage.getItem('pagestring');
-        const storedPageHtml = await storage.getItem('pagehtml');
-        const pageStringContent = storedPageString || '';
-        const pageHtmlContent = storedPageHtml || '';
+        if (tab?.url && !tab.url.startsWith('chrome://')) {
+          const tabUrl = tab.url;
+          // Check if the URL is likely a PDF
+          // More robust checking might involve looking at tab.mimeType if available and reliable,
+          // but URL extension is a good first pass.
+          // Assert mimeType if type definitions are problematic. Ideally, ensure @types/chrome is up-to-date.
+          const tabMimeType = (tab as chrome.tabs.Tab & { mimeType?: string }).mimeType;
+          const isPdfUrl = tabUrl.toLowerCase().endsWith('.pdf') ||
+                           (tabMimeType && tabMimeType === 'application/pdf');
 
-        currentPageContent = config?.pageMode === 'html' ? pageHtmlContent : pageStringContent;
-        console.log(`useSendMessage: Retrieved page content. Mode: ${config?.pageMode}. String length: ${pageStringContent.length}, HTML length: ${pageHtmlContent.length}`);
-      } else {
-        console.log("useSendMessage: Not fetching page content.");
+          if (isPdfUrl) {
+            console.log(`[${callId}] Detected PDF URL: ${tabUrl}. Attempting to extract text.`);
+            try {
+              currentPageContent = await extractTextFromPdf(tabUrl, callId);
+              console.log(`[${callId}] Successfully extracted text from PDF. Length: ${currentPageContent.length}`);
+            } catch (pdfError) {
+              console.error(`[${callId}] Failed to extract text from PDF ${tabUrl}:`, pdfError);
+              currentPageContent = `Error extracting PDF content: ${pdfError instanceof Error ? pdfError.message : "Unknown PDF error"}. Falling back.`;
+              // Optionally, try to get storedPageString as a fallback if PDF extraction fails
+              // const storedPageString = await storage.getItem('pagestring');
+              // currentPageContent = storedPageString || `Failed to process PDF: ${tabUrl}`;
+            }
+          } else {
+            // Not a PDF, use existing logic for HTML/text content from storage
+            console.log(`[${callId}] URL is not a PDF. Fetching from storage: ${tabUrl}`);
+            const storedPageString = await storage.getItem('pagestring');
+            currentPageContent = storedPageString || '';
+            console.log(`[${callId}] Retrieved page text content from storage. Length: ${currentPageContent.length}`);
+          }
+        } else {
+          console.log(`[${callId}] Not fetching page content for URL: ${tab?.url} (might be chrome:// or no active tab).`);
+        }
+      } catch (pageError) {
+        console.error(`[${callId}] Error getting active tab or initial page processing:`, pageError);
+        currentPageContent = `Error accessing page content: ${pageError instanceof Error ? pageError.message : "Unknown error"}`;
       }
 
       const charLimit = 1000 * (config?.contextLimit || 1);
@@ -182,15 +302,13 @@ const useSendMessage = (
       const limitedContent = charLimit && safeCurrentPageContent
         ? safeCurrentPageContent.substring(0, charLimit)
         : safeCurrentPageContent;
-
-      pageContentForLlm = config?.contextLimit === 128 ? currentPageContent : limitedContent;
+      pageContentForLlm = config?.contextLimit === 128 ? safeCurrentPageContent : limitedContent;
       setPageContent(pageContentForLlm || '');
-      console.log(`[${callId}] useSendMessage: Page content prepared. Length: ${pageContentForLlm?.length}`);
+      console.log(`[${callId}] Page content prepared for LLM. Length: ${pageContentForLlm?.length}`);
     } else {
       setPageContent('');
     }
 
-    // Construct the system prompt (using webContentForLlm which doesn't have the display prefix)
     const persona = config?.personas?.[config?.persona] || '';
     const systemContent = `
       ${persona}
@@ -199,44 +317,28 @@ const useSendMessage = (
     `.trim().replace(/\s+/g, ' ');
     console.log(`[${callId}] useSendMessage: System prompt constructed.`);
 
-    // --- Add Placeholder Assistant Turn ---
     const assistantTurnPlaceholder: MessageTurn = {
       role: 'assistant',
-      rawContent: '', // Start empty
-      status: 'complete', // Set to complete initially
-      webDisplayContent: combinedWebContentDisplay, // Store the prefix info here!
-      timestamp: Date.now() + 1 // Ensure slightly later timestamp
+      rawContent: '',
+      status: 'streaming',
+      webDisplayContent: combinedWebContentDisplay,
+      timestamp: Date.now() + 1
     };
     setTurns(prevTurns => [...prevTurns, assistantTurnPlaceholder]);
     console.log(`[${callId}] useSendMessage: Assistant placeholder turn added.`);
 
     // --- Step 4: Execute based on Compute Level ---
     try {
-      if (config?.computeLevel === 'high' && currentModel) { // Keep currentModel check
+      // ... (rest of the try block for compute levels and fetchDataAsStream remains the same)
+      if (config?.computeLevel === 'high' && currentModel) {
         console.log(`[${callId}] useSendMessage: Starting HIGH compute level.`);
-        // Pass messageToUse (potentially optimized) to handleHighCompute
         await handleHighCompute(
           messageToUse,
-          currentTurns, // Pass history for context if needed inside handleHighCompute
+          currentTurns,
           config,
           currentModel,
           authHeader,
-          (update, isFinished) => {
-            // Update the last (assistant) turn
-            setTurns(prevTurns => {
-              if (prevTurns.length === 0 || prevTurns[prevTurns.length - 1].role !== 'assistant') return prevTurns;
-              const lastTurn = prevTurns[prevTurns.length - 1];
-              return [
-                ...prevTurns.slice(0, -1),
-                {
-                  ...lastTurn,
-                  rawContent: update, // Update with progress or final result
-                  status: isFinished ? 'complete' : 'streaming',
-                  timestamp: Date.now()
-                }
-              ];
-            });
-          }
+          (update, isFinished) => updateAssistantTurn(update, isFinished)
         );
         console.log(`[${callId}] useSendMessage: HIGH compute level finished.`);
       } else if (config?.computeLevel === 'medium' && currentModel) {
@@ -247,26 +349,10 @@ const useSendMessage = (
           config,
           currentModel,
           authHeader,
-          (update, isFinished) => {
-            // Update the last (assistant) turn (same logic as high)
-            setTurns(prevTurns => {
-              if (prevTurns.length === 0 || prevTurns[prevTurns.length - 1].role !== 'assistant') return prevTurns;
-              const lastTurn = prevTurns[prevTurns.length - 1];
-              return [
-                ...prevTurns.slice(0, -1),
-                {
-                  ...lastTurn,
-                  rawContent: update,
-                  status: isFinished ? 'complete' : 'streaming',
-                  timestamp: Date.now()
-                }
-              ];
-            });
-          }
+          (update, isFinished) => updateAssistantTurn(update, isFinished)
         );
         console.log(`[${callId}] useSendMessage: MEDIUM compute level finished.`);
       } else {
-        // --- Standard Streaming Call (Low Compute or Default) ---
         console.log(`[${callId}] useSendMessage: Starting standard streaming.`);
         const normalizedUrl = normalizeApiEndpoint(config?.customEndpoint);
         const configBody = { stream: true };
@@ -282,7 +368,7 @@ const useSendMessage = (
         const host = currentModel.host || '';
         const url = urlMap[host];
 
-        if (!url || !currentModel) { // Add currentModel check
+        if (!url) {
           throw new Error(`Could not determine API URL for host: ${currentModel.host}`);
         }
 
@@ -294,7 +380,7 @@ const useSendMessage = (
             model: config?.selectedModel || '',
             messages: [
               { role: 'system', content: systemContent },
-              ...messageForApi // Use the history + original user message
+              ...messageForApi
             ],
             temperature: config?.temperature ?? 0.7,
             max_tokens: config?.maxTokens ?? 32048,
@@ -302,26 +388,9 @@ const useSendMessage = (
             presence_penalty: config?.presencepenalty ?? 0,
           },
           (part: string, isFinished?: boolean, isError?: boolean) => {
-            // Only process if this is the active call
-            if (completionGuard.current !== callId) return;
-
-            setTurns(prevTurns => {
-              if (prevTurns.length === 0 || prevTurns[prevTurns.length - 1].role !== 'assistant') return prevTurns;
-              const lastTurn = prevTurns[prevTurns.length - 1];
-              const updatedContent = isError ? `Error: ${part || 'Unknown stream error'}` : part;
-              const updatedStatus = isError ? 'error' : (isFinished ? 'complete' : 'streaming');
-
-              return [
-                ...prevTurns.slice(0, -1),
-                { ...lastTurn, rawContent: updatedContent, status: updatedStatus }
-              ];
-            });
-
+            updateAssistantTurn(part, Boolean(isFinished), Boolean(isError));
             if (isFinished || isError) {
               console.log(`[${callId}] fetchDataAsStream Callback: Stream finished/errored.`);
-              setLoading(false);
-              completionGuard.current = null; // Allow next send
-              console.log(`[${callId}] --- Stream finished processing COMPLETE ---`);
             }
           },
           authHeader,
@@ -331,33 +400,13 @@ const useSendMessage = (
       }
     } catch (error) {
       console.error(`[${callId}] useSendMessage: Error during send operation:`, error);
-      // Update the last turn with error status
-      setTurns(prevTurns => {
-        if (prevTurns.length === 0 || prevTurns[prevTurns.length - 1].role !== 'assistant') return prevTurns;
-        const lastTurn = prevTurns[prevTurns.length - 1];
-        return [
-          ...prevTurns.slice(0, -1),
-          { ...lastTurn, rawContent: `Error: ${error instanceof Error ? error.message : String(error)}`, status: 'error' }
-        ];
-      });
-    } finally {
-      // Ensure loading is always set to false and guard is cleared if the process wasn't streaming
-      if (config?.computeLevel === 'high' || config?.computeLevel === 'medium') {
-        console.log(`[${callId}] useSendMessage: Finalizing HIGH compute level state.`);
-         setLoading(false);
-         completionGuard.current = null; // Allow next send
-      } else if (completionGuard.current === callId) {
-        // If it was a streaming call but finished abruptly or errored before the callback cleared it
-        // setLoading(false); // Should be handled by the callback's isFinished/isError
-        // completionGuard.current = null;
-        console.log(`[${callId}] useSendMessage: Stream completion/error should handle final state.`);
-      }
-     }
-   };
- 
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      updateAssistantTurn(errorMessage, true, true);
+    }
+    console.log(`[${callId}] useSendMessage: onSend processing logic completed.`);
+  };
 
   return onSend;
 }
-// --- Export the hook ---
 
 export default useSendMessage;
