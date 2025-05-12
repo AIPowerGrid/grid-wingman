@@ -1,7 +1,7 @@
 {
   "name": "cognito",
   "version": "3.1.0",
-  "description": "Cognito is a Chrome extension that allows you to communicate with your browser.",
+  "description": "Cognito uses AI to interpret your needs, letting you guide, query, and control your Chrome browser through natural interaction.",
   "main": "index.js",
   "scripts": {
     "start": "npm run clear && webpack -w --config config/webpack.config.js",
