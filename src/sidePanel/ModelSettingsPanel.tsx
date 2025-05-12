@@ -69,7 +69,7 @@ export const ModelSettingsPanel = () => {
           "data-[state=open]:border-b data-[state=open]:border-[var(--text)]/5"
         )}
       >
-        <SettingTitle icon="⚙️" text="Model Parameters" />
+        <SettingTitle icon="⚙️" text="Model Config" />
       </AccordionTrigger>
       <AccordionContent
         className="px-3 pb-4 pt-2 text-[var(--text)]"
