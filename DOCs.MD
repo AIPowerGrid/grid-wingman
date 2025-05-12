@@ -23,6 +23,6 @@
 7.  **Error Handling:** Improved error handling for both the initial SERP fetch and individual page fetches. Failed fetches will result in an error message within the final output for that specific result.
 8.  **Output Formatting:** The final string now includes the Title, URL, Snippet, and the extracted `Content` (truncated to 1500 chars) for each visited result.
 9.  **User-Agent & Headers:** Using a common browser User-Agent and standard `Accept` headers for both SERP and page fetches can help avoid being blocked by websites.
-10. **`manifest.json` Permissions (CRITICAL):** Remember to add `"host_permissions": ["<all_urls>"]` (or more specific URLs) to your extension's `manifest.json` file. Without this, the `fetch` calls to the search result URLs will be blocked by the browser's security policies.
+10. **`manifest.json` Permissions:** `"host_permissions": ["<all_urls>"]` to `manifest.json` file. Without this, the `fetch` calls to the search result URLs will be blocked by the browser's security policies.
 11. **Complexity:** This significantly increases the complexity and execution time of `webSearch`. Visiting multiple pages takes time and resources.
 12. **Website Variability:** The `extractMainContent` function is a best effort. Website structures vary wildly, and it might grab too little or too much content from some pages. Libraries like Mozilla's Readability.js offer more sophisticated content extraction but are harder to integrate directly into a simple fetch function.
