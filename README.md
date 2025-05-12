@@ -18,7 +18,8 @@ Built on [sidellama](https://github.com/gyopak/sidellama).
 *   Replace 'deep research' with local/basic API services (even free tier)
 *   "Memory" for the chat history with RAG and search.
 *   Comparison mode (RAG or hybrid search can do this).
-*   File support from direct API from Chrome
+*   ~File support from direct API from Chrome~ [20250512]
+*   Edit text content directly from sidepanel.Basically, I want to extend this to the "AI agent".
 ## Screenshot
 
 ![](docs/screenshot.png)
@@ -37,7 +38,7 @@ Built on [sidellama](https://github.com/gyopak/sidellama).
 
 *   **Diverse Personas:** Seven pre-built personas designed to cater to specific needs (see below).
 *   **Web Search Integration:** Enhanced access to information for context-aware AI interactions.
-*   **Page context reading** Transcripts reading included for Bloomberg, YouTube, or other providers who put the transcripts in their HTML.
+*   **Page context reading** Transcripts reading included for Bloomberg, YouTube, or other providers who put the transcripts in their HTML. PDF supports.
 *   **Enhanced Summarization** More granular control over summary length and detail over personas.
 *   **TTS** Currently, there is only basic TTS from the browser, so if you want some natural voices, you should use Edge or you have integrated TTS API from elsewhere. https://github.com/ken107/piper-browser-extension Here is an excellent Chrome extension that can add a local TTS service directly to Chrome, so you can find the downloaded models in the select dropdown in settings. And I found some https://github.com/remsky/Kokoro-FastAPI https://github.com/Lex-au/Orpheus-FastAPI, maybe we can integrate with them too. I have put a .tsx like that in the files anyway. I will look into this further. I hope someone can add this if possible, because so far it's good enough for me. But still, it's better to have some more choices without breaking anything.
 *   **Computation Levels** New function, https://github.com/AlexBefest/highCompute.py, I use this idea and some of his code. Thanks. **WARN: STILL TESTING - Please use your local LLM, it will trigger resource exhaustion. Even though I add one second decay to every prompt to avoid concurrent prompts. And from the [readme](https://github.com/AlexBefest/highCompute.py) it might be good for coding, but the result is meh for paperwork, I guess.** check my test 'making 3k in one day' [low](https://github.com/user-attachments/assets/ea26cf72-393b-4027-a26a-058086b1dd71) check [medium](https://github.com/user-attachments/assets/9ebfd187-4f3f-4370-846e-3c7c3c5e5c19) After checking logs, it appears to be my code and prompt are fine, it just needs a better model. QWEN 3 8B is good enough for simple QA, but it falls short when it comes to complex instructions in automatic procedures. So you need a good local model to run it here, or you can just use the 'deep research' function directly in their websites. I will try to optimize the query processing and prompts.
