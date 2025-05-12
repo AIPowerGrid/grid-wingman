@@ -19,7 +19,7 @@ Built on [sidellama](https://github.com/gyopak/sidellama).
 *   "Memory" for the chat history with RAG and search.
 *   Comparison mode (RAG or hybrid search can do this).
 *   ~File support from direct API from Chrome~ [20250512]
-*   Edit text content directly from sidepanel
+*   Edit text content directly from sidepanel.Basically, I want to extend this to the "AI agent".
 ## Screenshot
 
 ![](docs/screenshot.png)
