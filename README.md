@@ -10,7 +10,7 @@ Built on [sidellama](https://github.com/gyopak/sidellama).
 
 *   Bug fixes and improvements.
 *   Evaluate and integrate pull requests.
-*   ~Migrate to Shadcn/ui from Chakra-UI V2,~ and ~React 19~.
+*   ~Migrate to Shadcn/ui from Chakra-UI V2,~ and ~React 19~. [20250509]
 *   Search with API for wikipedia/kiwix(zim-reader)
 *   Search with API for Google
 *   Simple tool use to enhance the current web search to reduce the cost of running LLM and get a better result.
@@ -18,6 +18,7 @@ Built on [sidellama](https://github.com/gyopak/sidellama).
 *   Replace 'deep research' with local/basic API services (even free tier)
 *   "Memory" for the chat history with RAG and search.
 *   Comparison mode (RAG or hybrid search can do this).
+*   File support from direct API from Chrome
 ## Screenshot
 
 ![](docs/screenshot.png)
