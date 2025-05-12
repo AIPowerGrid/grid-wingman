@@ -14,7 +14,7 @@ Built on [sidellama](https://github.com/gyopak/sidellama).
 *   Search with API for wikipedia/kiwix(zim-reader)
 *   Search with API for Google
 *   ~Simple tool use to enhance the current web search to reduce the cost of running LLM and get a better result.~ [20250512]
-*   Better local TTS/STT by API.
+*   Better local TTS/STT by API. [not important]
 *   Replace 'deep research' with local/basic API services (even free tier)
 *   "Memory" for the chat history with RAG and search.
 *   Comparison mode (RAG or hybrid search can do this).
