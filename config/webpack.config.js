@@ -33,7 +33,7 @@ const config = {
   },
   module: { rules: require('./rules') },
   resolve: {
-    extensions: ['.js', '.ts', '.jsx', '.tsx', '.css', '.scss'],
+    extensions: ['.js', '.ts', '.jsx', '.tsx', '.css'],
     alias: {
       lib: Lib,
       '@': Root,
@@ -56,7 +56,7 @@ const config = {
           chunks: ['app']
         }),
     ...browsers.map(browser => new GenerateJsonFromJsPlugin({
-          path: join(__dirname, 'manifest', `${browser}.js`),
+          path: join(__dirname, 'manifest', 'v3.js'), // Explicitly use v3.js
           filename: 'manifest.json',
           options: {
             replacer: (key, value) => {
@@ -75,6 +75,10 @@ const config = {
         {
           from: Public,
           to: 'assets'
+        },
+        {
+          from: require.resolve('pdfjs-dist/build/pdf.worker.mjs'),
+          to: '.' // Copies pdf.worker.mjs to the root of the output directory
         }
       ]
     })

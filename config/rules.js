@@ -27,7 +27,6 @@ module.exports = [
       { loader: inDev() ? 'style-loader' : MiniCssExtractPlugin.loader },
       { loader: 'css-loader' },
       { loader: 'postcss-loader' }, // Add postcss-loader here
-      { loader: 'sass-loader' }
     ]
   },
   {
