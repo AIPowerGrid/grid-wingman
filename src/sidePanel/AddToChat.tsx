@@ -38,10 +38,8 @@ export const AddToChat = () => {
                 size="sm" 
                 aria-label="Switch Chat Mode"
                 className={cn(
-                  "rounded-md ml-2 text-foreground hover:bg-muted/50 font-extrabold", // Removed ml-2, Added mr-2
-                  // Adjust width/padding if text makes it too wide/narrow
-                  "px-2",
-                  "not-focus" // Add your class here
+                  "rounded-md ml-2 text-foreground hover:bg-muted/50 font-extrabold", 
+                  "px-2 not-focus-visible",
                 )}
               >
                 {/* Center content using flexbox */}

@@ -189,8 +189,8 @@ export const Input: FC<InputProps> = ({ isLoading, message, setMessage, onSend }
     (window.SpeechRecognition || window.webkitSpeechRecognition);
 
   return (
-    <div className="relative w-full flex items-center"> {/* Removed ml-2 */}
-      <AddToChat /> {/* AddToChat button placed here */}
+    <div className="relative w-full flex items-center"> 
+      <AddToChat /> 
       <TooltipProvider delayDuration={500}>
         <Tooltip>
           <TooltipTrigger>
@@ -209,9 +209,10 @@ export const Input: FC<InputProps> = ({ isLoading, message, setMessage, onSend }
               size="sm"
               className={cn(
                 "rounded-md mr-2",
-                "not-focus-visible", // Add your class here
+                "not-focus",
                 isListening ? "text-red-500 hover:bg-destructive/10" : "text-foreground hover:bg-muted/50",
               )}
+              style={{ paddingLeft: '0.5rem', paddingRight: '0.5rem' }} // Override padding here
               disabled={isLoading || !isSpeechRecognitionSupported}
             >
               {isListening ? <FaRegStopCircle /> : <SlMicrophone />}
