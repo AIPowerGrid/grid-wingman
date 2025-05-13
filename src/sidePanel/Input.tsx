@@ -44,25 +44,19 @@ export const AutoResizeTextarea = (
       maxRows={maxRows}
       className={cn(
         // Base shadcn textarea styles
-        "flex w-full rounded-md bg-background px-3 py-1 text-sm ring-offset-background",
+        "flex w-full rounded-xl bg-background px-3 py-1 text-sm ring-offset-background",
         "placeholder:text-muted-foreground",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+        "focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-1",
         "disabled:cursor-not-allowed disabled:opacity-50",
         // Original specific styles mapped to Tailwind:
         "min-h-[unset]",
         "overflow-y-auto",
         "resize-none",
-        "rounded-2xl",
-        "border-foreground", // Specific border color
         "text-foreground",
-        "text-sm",
         "font-semibold",
-        "px-3", // Specific padding
-        "py-1", // Specific padding
         // Custom focus/hover (overriding shadcn focus ring)
         "focus:border-foreground focus:shadow-none",
         "hover:border-foreground hover:shadow-none",
-        "focus-visible:ring-1 focus-visible:ring-offset-0",
         className
       )}
       {...props}
