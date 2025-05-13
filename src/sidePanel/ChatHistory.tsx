@@ -202,7 +202,7 @@ export const ChatHistory = ({ loadChat, onDeleteAll, className }: ChatHistoryPro
   if (filteredMessages.length === 0 && searchQuery) {
     return (
       <div className={rootComputedClassName}>
-        <div className="p-4 border-b border-border">
+        <div className="p-1 border-b border-border">
           <Input
             type="text"
             placeholder="Search chat history..."
@@ -222,7 +222,7 @@ export const ChatHistory = ({ loadChat, onDeleteAll, className }: ChatHistoryPro
 
   return (
     <div className={rootComputedClassName}>
-       <div className="p-4 border-b border-border">
+       <div className="p-1 border-b border-border">
         <Input
           type="text"
           placeholder="Search chat history (titles & content)..."
