@@ -608,7 +608,7 @@ export const Header: React.FC<HeaderProps> = ({
               </Button>
             </TooltipTrigger>
             {!showBackButton && (
-                <TooltipContent side="bottom" className="bg-[var(--bg)] text-[var(--text)] border-[var(--text)]">
+                <TooltipContent side="bottom" className="bg-[var(--active)]/50 text-[var(--text)] border-[var(--text)]">
                   {leftButtonLabel}
                 </TooltipContent>
             )}
@@ -658,7 +658,7 @@ export const Header: React.FC<HeaderProps> = ({
                      <FiTrash2 size="18px" />
                    </Button>
                  </TooltipTrigger>
-                 <TooltipContent side="bottom" className="bg-[var(--bg)] text-[var(--text)] border-[var(--text)]">
+                 <TooltipContent side="bottom" className="bg-[var(--active)]/50 text-[var(--text)] border-[var(--text)]">
                    Reset Chat
                  </TooltipContent>
                </Tooltip>
@@ -670,7 +670,7 @@ export const Header: React.FC<HeaderProps> = ({
                       aria-label="Delete All History"
                       variant="ghost"
                       size="sm" // Kept as sm, or 'icon'
-                      className="text-[var(--text)] hover:bg-red-500/10 dark:hover:bg-red-500/20 rounded-md"
+                      className="text-[var(--text)] hover:bg-black/10 dark:hover:bg-black/10 rounded-md"
                       onClick={deleteAll}
                     >
                       <FiTrash2 size="18px" />
