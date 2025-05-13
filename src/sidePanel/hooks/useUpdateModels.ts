@@ -45,35 +45,6 @@ export const useUpdateModels = () => {
   // const [chatTitle, setChatTitle] = useState('');
   const { config, updateConfig } = useConfig();
 
-  // Helper to update models in config
-  const updateModels = useCallback((newModels: Model[], host: string) => {
-    console.log(`[updateModels] Called for host: ${host} with ${newModels.length} new models.`); // Add log
-    const haveModelsChanged = (newModels: Model[], existingModels: Model[] = []) => {
-      if (newModels.length !== existingModels.length) return true;
-      const sortById = (a: Model, b: Model) => a.id.localeCompare(b.id);
-      const sortedNew = [...newModels].sort(sortById);
-      const sortedExisting = [...existingModels].sort(sortById);
-      return JSON.stringify(sortedNew) !== JSON.stringify(sortedExisting);
-    };
-
-    const existingModels = (config?.models ?? []).filter(m => m.host !== host);
-    console.log(`[updateModels] Existing models after filtering host ${host}:`, existingModels.length); // Add log
-    const combinedModels = [...existingModels, ...newModels];
-
-    if (haveModelsChanged(combinedModels, config?.models)) {
-      console.log(`[updateModels] Models changed for host ${host}. Updating config.`); // Add log
-      const isSelectedAvailable = config?.selectedModel &&
-        combinedModels.some(m => m.id === config?.selectedModel);
-
-      updateConfig({
-        models: combinedModels,
-        selectedModel: isSelectedAvailable ? config?.selectedModel : combinedModels[0]?.id
-      });
-    }
-    // Optional: Add else block for logging if needed:
-    // else { console.log(`[updateModels] Models for host ${host} did not change. Skipping update.`); }
-  }, [config, updateConfig]);
-
   const FETCH_INTERVAL =  30 * 1000; // 30s
   const lastFetchRef = useRef(0);
 
@@ -158,49 +129,90 @@ export const useUpdateModels = () => {
     }
     lastFetchRef.current = now;
 
-    if (!config) {
+    const currentConfig = config; // Capture config at the start of the operation
+    if (!currentConfig) {
       console.warn('[useUpdateModels] Config not available, skipping fetch.');
       return;
     }
 
     console.log('[useUpdateModels] Starting model fetch for all configured services...');
 
-    const fetchPromises = serviceConfigs.map(async (service) => {
-      if (!service.isEnabled(config)) {
-        // Clear models if service is not enabled/configured
-        updateModels([], service.host);
-        return;
-      }
+    const results = await Promise.allSettled(
+      serviceConfigs.map(async (service) => {
+        if (!service.isEnabled(currentConfig)) {
+          return { host: service.host, models: [], status: 'disabled' as const };
+        }
 
-      const url = service.getUrl(config);
-      if (!url) {
-        console.warn(`[useUpdateModels] Could not determine URL for host: ${service.host}`);
-        updateModels([], service.host); // Clear models if URL is invalid
-        return;
-      }
+        const url = service.getUrl(currentConfig);
+        if (!url) {
+          console.warn(`[useUpdateModels] Could not determine URL for host: ${service.host}`);
+          return { host: service.host, models: [], status: 'error' as const, error: 'Invalid URL' };
+        }
 
-      const fetchOptions = service.getFetchOptions ? service.getFetchOptions(config) : {};
-      const data = await fetchDataSilently(url, fetchOptions);
+        const fetchOptions = service.getFetchOptions ? service.getFetchOptions(currentConfig) : {};
+        const data = await fetchDataSilently(url, fetchOptions);
 
-      if (data) {
-        const parsedModels = service.parseFn(data, service.host);
-        updateModels(parsedModels, service.host);
-      } else {
-        // console.log('[useUpdateModels] Failed to fetch from Custom Endpoint. Clearing models.'); // Make log generic or remove
-        console.log(`[useUpdateModels] Fetch failed for host: ${service.host}. Clearing models.`);
-        updateModels([], service.host); // Clear models on fetch failure
-        if (service.onFetchFail) {
-          service.onFetchFail(config, updateConfig);
-        } // Add logging inside onFetchFail callbacks if further debugging needed
+        if (data) {
+          const parsedModels = service.parseFn(data, service.host);
+          return { host: service.host, models: parsedModels, status: 'success' as const };
+        } else {
+          // Note: service.onFetchFail might call updateConfig directly for connection flags.
+          // This is generally fine as it doesn't modify 'models' or 'selectedModel'.
+          if (service.onFetchFail) {
+            service.onFetchFail(currentConfig, updateConfig);
+          }
+          return { host: service.host, models: [], status: 'error' as const, error: 'Fetch failed' };
+        }
+      })
+    );
+
+    let newOverallModels: Model[] = [];
+    results.forEach(result => {
+      if (result.status === 'fulfilled' && result.value.status === 'success') {
+        newOverallModels.push(...result.value.models);
       }
+      // Models from disabled or errored services are implicitly excluded
     });
 
-    // Execute all fetches (consider Promise.allSettled for more granular error handling if needed)
-    await Promise.all(fetchPromises);
+    const originalConfigModels = currentConfig.models || [];
+
+    const haveModelsChanged = (newModelsList: Model[], existingModelsList: Model[]) => {
+      if (newModelsList.length !== existingModelsList.length) return true;
+      const sortById = (a: Model, b: Model) => a.id.localeCompare(b.id);
+      const sortedNew = [...newModelsList].sort(sortById);
+      const sortedExisting = [...existingModelsList].sort(sortById);
+      return JSON.stringify(sortedNew) !== JSON.stringify(sortedExisting);
+    };
+
+    const pendingConfigUpdates: Partial<Config> = {};
+
+    if (haveModelsChanged(newOverallModels, originalConfigModels)) {
+      console.log(`[useUpdateModels] Aggregated models changed. Updating config.`);
+      pendingConfigUpdates.models = newOverallModels;
+    }
+
+    // Determine selectedModel based on the newOverallModels list
+    const currentSelectedModel = currentConfig.selectedModel;
+    const finalModelsForSelection = pendingConfigUpdates.models || originalConfigModels;
+
+    const isSelectedStillAvailable = currentSelectedModel &&
+      finalModelsForSelection.some(m => m.id === currentSelectedModel);
+
+    const newSelectedModel = isSelectedStillAvailable ? currentSelectedModel : finalModelsForSelection[0]?.id;
+
+    // Update selectedModel if it changed or if models changed and it needs recalculation
+    if (newSelectedModel !== currentSelectedModel || pendingConfigUpdates.models) {
+        pendingConfigUpdates.selectedModel = newSelectedModel;
+    }
+
+    if (Object.keys(pendingConfigUpdates).length > 0) {
+      updateConfig(pendingConfigUpdates);
+    } else {
+      console.log(`[useUpdateModels] No changes to models or selectedModel needed.`);
+    }
 
     console.log('[useUpdateModels] Model fetch cycle complete.');
-
-  }, [config, updateModels, updateConfig, FETCH_INTERVAL]); // Removed serviceConfigs from dependencies
+  }, [config, updateConfig, FETCH_INTERVAL, serviceConfigs]);
 
   // Removed chatTitle and setChatTitle from return
   return { fetchAllModels };
