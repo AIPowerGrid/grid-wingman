@@ -670,7 +670,7 @@ export const Header: React.FC<HeaderProps> = ({
                       aria-label="Delete All History"
                       variant="ghost"
                       size="sm" // Kept as sm, or 'icon'
-                      className="text-[var(--text)] hover:bg-black/10 dark:hover:bg-black/10 rounded-md"
+                      className="text-[var(--text)] hover:bg-black/10 dark:hover:bg-white/10 rounded-md"
                       onClick={deleteAll}
                     >
                       <FiTrash2 size="18px" />
