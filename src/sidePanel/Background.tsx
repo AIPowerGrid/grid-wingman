@@ -1,16 +1,25 @@
 import { cn } from "@/src/background/util";
 import { useConfig } from './ConfigContext'; // Assuming this path is correct
 
-const personaImages = {
-  Agatha: 'assets/images/agatha.png',
+const personaImages: {
+  Agatha: string;
+  Spike: string;
+  Warren: string;
+  Jet: string;
+  Jan: string;
+  Sherlock: string;
+  Ein: string;
+  Faye: string;
+  default: string;
+  [key: string]: string | undefined;
+} = {  Agatha: 'assets/images/agatha.png',
   Spike: 'assets/images/spike.png',
   Warren: 'assets/images/warren.png',
-  Jet: 'assets/images/jet.png', 
+  Jet: 'assets/images/jet.png',
   Jan: 'assets/images/jan.png',
   Sherlock: 'assets/images/Cognito.png',
   Ein: 'assets/images/ein.png',
   Faye:'assets/images/faye.png',
-  // fallback/default
   default: 'assets/images/custom.png'
 };
 

@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area'; // Your custom ScrollArea
 import { FiTrash2 } from 'react-icons/fi';
 import localforage from 'localforage';
+import { Input } from '@/components/ui/input'; // Added for search
 
 const dateToString = (date: number | Date): string => new Date(date).toLocaleDateString('sv-SE');
 
@@ -38,39 +39,72 @@ declare global {
 export const ITEMS_PER_PAGE = 12;
 
 export const ChatHistory = ({ loadChat, onDeleteAll, className }: ChatHistoryProps) => {
-  const [allMessages, setAllMessages] = useState<ChatMessage[]>([]);
+  const [allMessagesFromServer, setAllMessagesFromServer] = useState<ChatMessage[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [hoverId, setHoverId] = useState<string | null>(null);
   const [removeId, setRemoveId] = useState<string | null>(null);
 
   const processAndSetMessages = useCallback((messages: ChatMessage[]) => {
     const sortedMessages = messages.sort((a, b) => b.last_updated - a.last_updated);
-    setAllMessages(sortedMessages);
+    setAllMessagesFromServer(sortedMessages);
   }, []);
 
   useEffect(() => {
     const fetchMessages = async () => {
       try {
         const keys = await localforage.keys();
-        const storedMessagesPromises = keys
-          .filter(key => !key.startsWith('localforage'))
-          .map(key => localforage.getItem(key));
+        // Filter for keys that specifically belong to chat messages (e.g., start with 'chat_')
+        const chatKeys = keys.filter(key => key.startsWith('chat_'));
+        if (chatKeys.length === 0) {
+          setAllMessagesFromServer([]);
+          setCurrentPage(1);
+          return;
+        }
+        const storedMessagesPromises = chatKeys.map(key => localforage.getItem(key));
+
         const storedItems = await Promise.all(storedMessagesPromises);
         const validMessages = storedItems.filter(
           item => item !== null && typeof item === 'object' && 'id' in item && 'last_updated' in item
         ) as ChatMessage[];
         processAndSetMessages(validMessages);
         setCurrentPage(1);
-      } catch (error) { console.error("Error fetching messages:", error); setAllMessages([]); }
+      } catch (error) { console.error("Error fetching messages:", error); setAllMessagesFromServer([]); }
     };
     fetchMessages();
   }, [processAndSetMessages]);
+  // Filter messages based on search query
+  const filteredMessages = useMemo(() => {
+    if (!searchQuery) {
+      return allMessagesFromServer;
+    }
+    const lowerCaseQuery = searchQuery.toLowerCase();
+    return allMessagesFromServer.filter(message => {
+      const titleMatch = message.title?.toLowerCase().includes(lowerCaseQuery);
+      const contentMatch = message.turns.some(turn => turn.rawContent.toLowerCase().includes(lowerCaseQuery));
+      return titleMatch || contentMatch;
+    });
+  }, [allMessagesFromServer, searchQuery]);
+
+  // Reset to page 1 when search query changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
+
+  const totalPages = useMemo(() => Math.max(1, Math.ceil(filteredMessages.length / ITEMS_PER_PAGE)), [filteredMessages]);
+
+  // Adjust currentPage if it becomes invalid after totalPages changes (e.g., due to deletion)
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [currentPage, totalPages]);
 
   const paginatedMessages = useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
     const endIndex = startIndex + ITEMS_PER_PAGE;
-    return allMessages.slice(startIndex, endIndex);
-  }, [allMessages, currentPage]);
+    return filteredMessages.slice(startIndex, endIndex);
+  }, [filteredMessages, currentPage]);
 
   const messagesWithDates = useMemo(() => {
     return paginatedMessages.map(m => ({ ...m, date: dateToString(m.last_updated) }));
@@ -84,27 +118,44 @@ export const ChatHistory = ({ loadChat, onDeleteAll, className }: ChatHistoryPro
     try {
       await localforage.removeItem(id);
       const keys = await localforage.keys();
-      const storedItems = await Promise.all(keys.filter(k => !k.startsWith('localforage')).map(k => localforage.getItem(k)));
-      const validMessages = storedItems.filter(item => item && typeof item === 'object' && 'id' in item && 'last_updated' in item) as ChatMessage[];
-      processAndSetMessages(validMessages);
-      const newTotalPages = Math.max(1, Math.ceil(validMessages.length / ITEMS_PER_PAGE));
-      if (currentPage > newTotalPages) {
-        setCurrentPage(newTotalPages);
-      } else {
-        const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-        if (validMessages.slice(startIndex, startIndex + ITEMS_PER_PAGE).length === 0 && currentPage > 1) {
-          setCurrentPage(currentPage - 1);
-        }
+      const chatKeys = keys.filter(key => key.startsWith('chat_'));
+      const storedItems = await Promise.all(chatKeys.map(k => localforage.getItem(k)));
+      const validMessagesAfterDelete = storedItems.filter(
+          item => item && typeof item === 'object' && 'id' in item && 'last_updated' in item && 'turns' in item
+      ) as ChatMessage[];
+      
+      processAndSetMessages(validMessagesAfterDelete); // This updates allMessagesFromServer, then filteredMessages recomputes
+
+      // Calculate new page based on what the filtered list *will be* after state update
+      const newFilteredAfterDelete = validMessagesAfterDelete.filter(message => {
+        if (!searchQuery) return true;
+        const lowerCaseQuery = searchQuery.toLowerCase();
+        const titleMatch = message.title?.toLowerCase().includes(lowerCaseQuery);
+        const contentMatch = message.turns.some(turn => turn.rawContent.toLowerCase().includes(lowerCaseQuery));
+        return titleMatch || contentMatch;
+      });
+
+      const newTotalPagesCalc = Math.max(1, Math.ceil(newFilteredAfterDelete.length / ITEMS_PER_PAGE));
+      let newCurrentPage = currentPage;
+
+      if (newCurrentPage > newTotalPagesCalc) {
+        newCurrentPage = newTotalPagesCalc;
       }
+      
+      const startIndex = (newCurrentPage - 1) * ITEMS_PER_PAGE;
+      if (newFilteredAfterDelete.slice(startIndex, startIndex + ITEMS_PER_PAGE).length === 0 && newCurrentPage > 1) {
+        newCurrentPage = newCurrentPage - 1;
+      }
+      setCurrentPage(newCurrentPage);
     } catch (e) { console.error("Error deleting message:", e); }
-  }, [processAndSetMessages, currentPage]);
+  }, [processAndSetMessages, currentPage, searchQuery]);
 
   const deleteAll = useCallback(async () => {
     try {
       const keys = await localforage.keys();
-      await Promise.all(keys.filter(k => !k.startsWith('localforage')).map(k => localforage.removeItem(k)));
-      setAllMessages([]);
-      setCurrentPage(1);
+      const chatKeys = keys.filter(key => key.startsWith('chat_'));
+      await Promise.all(chatKeys.map(k => localforage.removeItem(k)));
+      setAllMessagesFromServer([]); // This will also empty filteredMessages
       if (onDeleteAll) onDeleteAll();
     } catch (e) { console.error("Error deleting all messages:", e); }
   }, [onDeleteAll]);
@@ -116,29 +167,72 @@ export const ChatHistory = ({ loadChat, onDeleteAll, className }: ChatHistoryPro
     };
   }, [deleteAll]);
 
-  const totalPages = useMemo(() => Math.max(1, Math.ceil(allMessages.length / ITEMS_PER_PAGE)), [allMessages]);
   const handleNextPage = useCallback(() => setCurrentPage(p => Math.min(p + 1, totalPages)), [totalPages]);
   const handlePrevPage = useCallback(() => setCurrentPage(p => Math.max(p - 1, 1)), []);
   const rootComputedClassName = `flex flex-col w-full ${className || ''}`.trim();
 
 
-  if (allMessages.length === 0) {
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(event.target.value);
+  };
+
+  // Case: No messages at all and no search query
+  if (allMessagesFromServer.length === 0 && !searchQuery) {
     return (
       <div className={rootComputedClassName}>
-        <ScrollArea className="flex-1 w-full">
+        <div className="p-4 border-b border-border">
+          <Input
+            type="text"
+            placeholder="Search chat history..."
+            value={searchQuery}
+            onChange={handleSearchChange}
+            className="w-full bg-background text-foreground border-border placeholder:text-muted-foreground"
+          />
+        </div>
+        <ScrollArea className="flex-1 w-full min-h-0">
           <div className="px-4 pb-4 pt-5 text-center text-foreground/70 h-full flex items-center justify-center">
             No chat history found.
           </div>
         </ScrollArea>
-        {/* No pagination controls needed here, an empty div could reserve space if needed for layout consistency */}
-        {/* e.g., <div className="h-[50px]" /> if pagination has a fixed height and you want to maintain it */}
-      </div>    );
+      </div>
+    );
+  }
+
+  // Case: Active search query yields no results (but there might be messages on the server)
+  if (filteredMessages.length === 0 && searchQuery) {
+    return (
+      <div className={rootComputedClassName}>
+        <div className="p-4 border-b border-border">
+          <Input
+            type="text"
+            placeholder="Search chat history..."
+            value={searchQuery}
+            onChange={handleSearchChange}
+            className="w-full bg-background text-foreground border-border placeholder:text-muted-foreground"
+          />
+        </div>
+        <ScrollArea className="flex-1 w-full min-h-0">
+          <div className="px-4 pb-4 pt-5 text-center text-foreground/70 h-full flex items-center justify-center">
+            No results found for "{searchQuery}".
+          </div>
+        </ScrollArea>
+      </div>
+    );
   }
 
   return (
     <div className={rootComputedClassName}>
+       <div className="p-4 border-b border-border">
+        <Input
+          type="text"
+          placeholder="Search chat history (titles & content)..."
+          value={searchQuery}
+          onChange={handleSearchChange}
+          className="w-full bg-background text-foreground border-border placeholder:text-muted-foreground"
+        />
+      </div>     
       <ScrollArea
-        className="flex-1 w-full overflow-y-auto min-h-0" // Message area: scrolls, takes available vertical space
+        className="flex-1 w-full min-h-0" // Message area: scrolls, takes available vertical space
       >
         <div className="px-4 pb-4"> {/* Content wrapper for messages */}
           {uniqueDates.map(date => (

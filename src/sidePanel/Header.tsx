@@ -140,7 +140,6 @@ const Badge = ({ children }: { children: React.ReactNode }) => (
   </div>
 );
 
-// --- Persona Images Map (remains the same) ---
 const personaImages: {
   Agatha: string;
   Spike: string;
@@ -151,8 +150,6 @@ const personaImages: {
   Ein: string;
   Faye: string;
   default: string;
-  // Add a string index signature to allow indexing with any string.
-  // This resolves TS7053 when accessing personaImages[currentPersona].
   [key: string]: string | undefined;
 } = {  Agatha: 'assets/images/agatha.png',
   Spike: 'assets/images/spike.png',
@@ -165,8 +162,6 @@ const personaImages: {
   default: 'assets/images/custom.png'
 };
 
-// ++ DEFINITION for Theme Button (can be here or in themes.tsx if preferred) ++
-// Renamed to SheetThemeButton for clarity of its primary use case here.
 const SheetThemeButton = ({ theme, updateConfig, size = "h-7 w-7" }: { theme: AppTheme; updateConfig: (newConfig: Partial<Config>) => void; size?: string }) => (
   <Tooltip>
     <TooltipTrigger>
@@ -331,7 +326,7 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
              </div>
              <SheetTitle className="text-center font-['Orbitron',_sans-serif] tracking-tight -mt-10">
                <a href="https://github.com/3-ark/Cognito" target="_blank" rel="noopener noreferrer" className="text-xl font-semibold text-[var(--text)] bg-[var(--active)] inline-block px-3 py-1 rounded-md no-underline">
-                 COGNITO <sub className="italic contrast-200 text-[0.5em]">v3.1</sub>
+                 COGNITO <sub className="italic contrast-200 text-[0.5em]">me</sub>
                </a>
              </SheetTitle>
              <SheetDescription className="text-center text-xl font-bold text-[var(--text)] leading-tight mt-0">
