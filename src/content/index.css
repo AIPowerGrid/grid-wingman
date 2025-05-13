@@ -439,3 +439,7 @@ html[data-paper-texture="true"] #root::before {
   --tw-ring-offset-width: 0px !important;
   --tw-ring-width: 0px !important; /* This is often the key for rings */
 }
+
+.focus-visible\:ring-1.focus-visible\:ring-offset-0.focus-visible.AutoResizeTextarea {
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1); /* Adjust color and intensity */
+}

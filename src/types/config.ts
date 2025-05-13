@@ -89,6 +89,6 @@ export interface Config {
 }
 
 export interface ConfigContextType {
-  config: Config;
+  config: Config; // Or Config | null | undefined if it can be initially unset
   updateConfig: (newConfig: Partial<Config>) => void;
 }
