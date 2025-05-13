@@ -98,6 +98,14 @@ See the [documentation](DOCs.md) for a complete overview of each persona's capab
 3.  Enable Chrome Extensions > Developer mode.
 4.  Load the content of the `dist/chrome` folder with the "Load unpacked" button.
 
+or a updated version before installation:
+1. run `npm install -g npm-check-updates`
+2. then `ncu -u` or `npx ncu -u`
+3. load package
+
+
+
+
 ## Documentation
 
 For detailed usage instructions, persona guides, and troubleshooting, please refer to the [documentation page](DOCs.md).
