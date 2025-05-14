@@ -1,6 +1,6 @@
 {
   "name": "cognito",
-  "version": "3.1.1",
+  "version": "3.2.0",
   "description": "Cognito is a Chrome extension that allows you to communicate with your browser.",
   "main": "index.js",
   "scripts": {
@@ -13,8 +13,8 @@
   },
   "keywords": [
     "sidepanel",
-    "side",
-    "panel",
+    "LLM",
+    "AI",
     "chrome",
     "extension"
   ],

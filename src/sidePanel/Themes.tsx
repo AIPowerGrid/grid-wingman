@@ -3,8 +3,6 @@ import {
   AccordionContent,
   AccordionTrigger,
 } from '@/components/ui/accordion';
-// Button might not be needed anymore unless used for something else
-// import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import {
   Popover,
@@ -22,7 +20,6 @@ import { ColorPicker, useColor, IColor } from 'react-color-palette';
 import 'react-color-palette/css';
 import { cn } from "@/src/background/util";
 
-// Theme type definition (remains the same)
 export type Theme = {
   name: string;
   active: string;
@@ -42,7 +39,6 @@ export type Theme = {
   warning: string;
 };
 
-// themes array (remains the same)
 export const themes: Theme[] = [
   {
     name: 'paper',
@@ -143,13 +139,10 @@ export const themes: Theme[] = [
   },
 ];
 
-// setTheme function (remains the same)
 export const setTheme = (c: Theme, paperTextureEnabled: boolean = true) => {
   const root = document.documentElement;
   document.documentElement.dataset.paperTexture = String(paperTextureEnabled);
   if (c && c.name) {
-    // Storing the active theme name might still be useful for persistence
-    // storage.setItem('themeName', c.name); // Example if you stored it separately
   }
 
   if (!c) {
@@ -199,13 +192,11 @@ export const setTheme = (c: Theme, paperTextureEnabled: boolean = true) => {
   root.style.setProperty('--markdown-strong', bold);
   root.style.setProperty('--markdown-em', italic);
   root.style.setProperty('--markdown-link', link);
-  // Corrected markdown code variable names
   root.style.setProperty('--markdown-inline-code-foreground', codeFg);
   root.style.setProperty('--markdown-code-background', codeBg);
   root.style.setProperty('--markdown-pre-foreground', preFg);
   root.style.setProperty('--markdown-pre-background', preBg);
   root.style.setProperty('--markdown-table-border', tableBorder);
-  // Added markdown table head variables
   root.style.setProperty('--markdown-thead-background', active); // Using active (like secondary)
   root.style.setProperty('--markdown-thead-foreground', bg);     // Contrast with active
 
@@ -219,10 +210,6 @@ export const setTheme = (c: Theme, paperTextureEnabled: boolean = true) => {
   root.style.setProperty('--text', text);
   root.style.setProperty('--active', active);
 };
-
-// themes.tsx
-
-// ... (other code like Theme type, themes array, setTheme function) ...
 
 const PaletteColorPicker = ({
   initialColor,
@@ -244,12 +231,10 @@ const PaletteColorPicker = ({
     <ColorPicker
       color={color} // This is the state from useColor
       onChange={(newColor) => {
-        // THIS IS THE KEY LOG: Does this fire when you try to drag/click on the palette?
         console.log(`PaletteColorPicker INTERNAL onChange for key "${themeKey}":`, newColor.hex);
         setColor(newColor); // This updates the local state for the picker itself
       }}
       onChangeComplete={(finalColor) => {
-        // This should fire when you release the mouse after dragging, or after a click selection.
         console.log(`PaletteColorPicker INTERNAL onChangeComplete for key "${themeKey}":`, finalColor.hex);
         onColorChangeComplete(themeKey, finalColor); // This calls the function passed from Themes component
       }}
@@ -267,10 +252,8 @@ const DEFAULT_CUSTOM_THEME_FALLBACK: Theme = {
   error: '#fbd709', success: '#587bc5', warning: '#fbd709',
 };
 
-// No longer need CustomThemePicker or ThemeButton components here
 
 export const Themes = () => {
-  // ... (config, updateConfig, states like pickerVisibleForKey, customThemeColors) ...
   const { config, updateConfig } = useConfig();
   const currentFontSize = config?.fontSize || 14;
   const isDark = config?.theme === 'dark';
@@ -283,7 +266,6 @@ export const Themes = () => {
   const [pickerVisibleForKey, setPickerVisibleForKey] = useState<keyof Omit<Theme, 'name'> | null>(null);
   const [customThemeColors, setCustomThemeColors] = useState<Omit<Theme, 'name'>>(() => { /* ...initialization logic... */
     const baseDefault = themes.find((t) => t.name === 'custom') || DEFAULT_CUSTOM_THEME_FALLBACK;
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { name, ...restOfBaseDefault } = baseDefault;
 
     const configCustom = (typeof config?.customTheme === 'object' && config.customTheme !== null)
@@ -316,7 +298,6 @@ export const Themes = () => {
         ? config.customTheme
         : {};
       const baseDefault = themes.find((t) => t.name === 'custom') || DEFAULT_CUSTOM_THEME_FALLBACK;
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { name, ...restOfBaseDefault } = baseDefault;
       const newCustomColorsCandidate: Omit<Theme, 'name'> = {
         bg: configCustom.bg ?? restOfBaseDefault.bg,
@@ -342,7 +323,6 @@ export const Themes = () => {
   }, [config?.customTheme, config?.theme, customThemeColors]); // Added customThemeColors back to ensure re-check if it's modified externally, though unlikely here.
 
   const handleColorChange = useCallback((key: keyof Omit<Theme, 'name'>, colorResult: IColor) => {
-    // Log when this function (passed to PaletteColorPicker) is called
     console.log(`Themes: handleColorChange called for key "${key}" with color`, colorResult.hex);
     const value = colorResult.hex;
 
@@ -372,7 +352,6 @@ export const Themes = () => {
     });
   }, [updateConfig]); // Removed customThemeColors from deps, using functional update for setCustomThemeColors
 
-  // ... (editableColorKeys, effectiveCustomThemeForPickers, main useEffect for theme application) ...
   const editableColorKeys: Array<keyof Omit<Theme, 'name'>> = ['bg', 'text', 'active', 'bold', 'italic', 'link', 'mute'];
   const effectiveCustomThemeForPickers: Theme = { ...customThemeColors, name: 'custom' };
 
@@ -404,7 +383,6 @@ export const Themes = () => {
   }, [config?.theme, customThemeColors, config?.paperTexture, config?.fontSize]);
 
 
-  // ... (JSX for AccordionItem, toggles, slider) ...
   return (
     <AccordionItem
       value="themes" // This value should match the one used in the parent Accordion
@@ -422,7 +400,6 @@ export const Themes = () => {
           "data-[state=open]:border-b data-[state=open]:border-[var(--text)]/5"
         )}
       >
-        {/* Updated title to reflect its content better */}
         <SettingTitle icon="🖌️" text="Customize" />
       </AccordionTrigger>
       <AccordionContent className="px-3 pb-4 pt-2 text-[var(--text)]">

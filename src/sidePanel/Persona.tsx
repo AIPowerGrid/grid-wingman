@@ -1,5 +1,5 @@
 // src/sidePanel/Personas.tsx
-import { ForwardedRef, useEffect, useState, ChangeEvent, Dispatch, SetStateAction } from 'react';
+import { ForwardedRef, TextareaHTMLAttributes, useEffect, useState, ChangeEvent, Dispatch, SetStateAction } from 'react';
 import ResizeTextarea from 'react-textarea-autosize';
 import {
   AccordionItem,
@@ -26,7 +26,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { IoAdd, IoTrashOutline } from 'react-icons/io5';
-
+import React from 'react';
 import { useConfig } from './ConfigContext';
 import { SettingTitle } from './SettingsTitle';
 import { cn } from "@/src/background/util";
@@ -38,49 +38,56 @@ const commonItemShadow = 'shadow-md';
 const commonItemRounded = 'rounded-xl';
 const commonInputHeight = 'h-9';
 
-// --- AutoResizeTextarea component ---
-const AutoResizeTextarea = (
-  {
-    ref,
-    ...props
+interface AutoResizeTextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
+  isDark: boolean;
+  onTextAreaFocus?: () => void;
+  isEffectivelyReadOnly?: boolean;
+}
+
+const AutoResizeTextarea = React.forwardRef(
+  (
+    {
+      isDark,
+      onTextAreaFocus,
+      isEffectivelyReadOnly,
+      className,
+      ...rest
+    }: AutoResizeTextareaProps,
+    ref: ForwardedRef<HTMLTextAreaElement>
+  ) => {
+    const currentControlBg = commonControlBg(isDark ?? false);
+
+    return (
+      <ResizeTextarea
+        ref={ref}
+        minRows={3}
+        maxRows={8}
+        readOnly={isEffectivelyReadOnly}
+        onFocus={(e) => {
+          if (rest.onFocus) rest.onFocus(e);
+          if (onTextAreaFocus) onTextAreaFocus();
+        }}
+        className={cn(
+          "flex w-full min-h-[80px] px-3 py-2 text-sm ring-offset-[var(--bg)] placeholder:text-[var(--muted-foreground)]",
+          currentControlBg,
+          commonItemRounded,
+          commonItemShadow,
+          "text-[var(--text)]",
+          commonSubtleBorderClass,
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2",
+          isEffectivelyReadOnly
+            ? "opacity-75 cursor-default"
+            : "hover:border-[var(--active)] focus:border-[var(--active)]",
+          "disabled:cursor-not-allowed disabled:opacity-50",
+          className
+        )}
+        {...rest}
+      />
+    );
   }
-) => {
-  const { isDark, onTextAreaFocus, isEffectivelyReadOnly, className, ...rest } = props;
-  const currentControlBg = commonControlBg(isDark ?? false);
+);
 
-  return (
-    <ResizeTextarea
-      ref={ref}
-      minRows={3}
-      maxRows={8}
-      readOnly={isEffectivelyReadOnly} // HTML readOnly attribute
-      onFocus={(e) => {
-        if (props.onFocus) props.onFocus(e); // Pass through original onFocus
-        if (onTextAreaFocus) onTextAreaFocus(); // Custom handler to activate editing
-      }}
-      className={cn(
-        "flex w-full min-h-[80px] px-3 py-2 text-sm ring-offset-[var(--bg)] placeholder:text-[var(--muted-foreground)]",
-        currentControlBg,
-        commonItemRounded,
-        commonItemShadow,
-        "text-[var(--text)]",
-        commonSubtleBorderClass, // Default border
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2", // Standard Shadcn focus ring
-
-        // Conditional styles based on readOnly state
-        isEffectivelyReadOnly
-          ? "opacity-75 cursor-default" // Muted look when read-only
-          : "hover:border-[var(--active)] focus:border-[var(--active)]", // Interactive borders when editable
-
-        "disabled:cursor-not-allowed disabled:opacity-50",
-        className // Allow overriding or extending classes
-      )}
-      {...rest}
-    />
-  );
-};
 AutoResizeTextarea.displayName = 'AutoResizeTextarea';
-
 // --- SaveButtons component ---
 const SaveButtons = ({
   hasChange,

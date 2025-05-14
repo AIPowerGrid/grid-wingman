@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-import { createContext, use, useEffect, useState } from 'react';
+import React, { createContext, use, useEffect, useState } from 'react';
  
  // Make sure Config and ConfigContextType are correctly imported
  import { Config, ConfigContextType } from '../types/config';
@@ -55,6 +55,10 @@ const defaultConfig: Config = {
   persona: 'Ein',
   webMode: 'Google', // Now checked against Config['webMode']
   webLimit: 60,
+  serpMaxLinksToVisit: 3,
+  wikiNumBlocks: 3, // Default number of results for Wikipedia
+  wikiRerank: true, // Default to enable LLM reranking for Wikipedia
+  wikiNumBlocksToRerank: 10, // Default number of blocks to retrieve for reranking
   contextLimit: 60,
   maxTokens: 32480,
   temperature: 0.7,
@@ -78,7 +82,7 @@ const defaultConfig: Config = {
   }
 };
 
-export const ConfigProvider = ({ children }) => {
+export const ConfigProvider = ({ children }: { children: React.ReactNode }) => {
   const [config, setConfig] = useState<Config>(defaultConfig);
   const [loading, setLoading] = useState(true);
 
@@ -112,10 +116,10 @@ export const ConfigProvider = ({ children }) => {
     if (currentThemeName === 'custom') {
       const baseCustomOrDefault = themes.find(t => t.name === 'custom') || defaultConfig.customTheme!;
       themeToApply = {
-        ...baseCustomOrDefault, // Start with defaults from themes array or defaultConfig.customTheme
-        ...(config.customTheme || {}), // Overlay with specifics from config.customTheme if they exist
-        name: 'custom', // Ensure name is 'custom'
-      } as AppTheme; // Cast to the imported AppTheme type
+        ...baseCustomOrDefault, 
+        ...(config.customTheme || {}), 
+        name: 'custom', 
+      } as AppTheme;
     } else {
       themeToApply = themes.find(t => t.name === currentThemeName) ||
                      themes.find(t => t.name === defaultConfig.theme!) ||

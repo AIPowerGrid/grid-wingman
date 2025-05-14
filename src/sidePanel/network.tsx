@@ -1,7 +1,6 @@
 import { events } from 'fetch-event-stream';
 import '../types/config.ts';
 import type { Config, Model } from 'src/types/config';
-import { speakMessage } from '../background/ttsUtils';
 
 interface ApiMessage {
   role: 'user' | 'assistant' | 'system';
@@ -73,12 +72,12 @@ Output:
 
     const urlMap: Record<string, string> = {
       groq: 'https://api.groq.com/openai/v1/chat/completions',
-      ollama: `${config?.ollamaUrl || ''}/api/chat`, // Add default empty string
+      ollama: `${config?.ollamaUrl || ''}/api/chat`,
       gemini: 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions',
-      lmStudio: `${config?.lmStudioUrl || ''}/v1/chat/completions`, // Add default empty string
+      lmStudio: `${config?.lmStudioUrl || ''}/v1/chat/completions`,
       openai: 'https://api.openai.com/v1/chat/completions',
-      openrouter: 'https://openrouter.ai/api/v1/chat/completions',    // <-- Add this
-      custom: `${config?.customEndpoint}/v1/chat/completions` // <-- Corrected syntax
+      openrouter: 'https://openrouter.ai/api/v1/chat/completions',
+      custom: `${config?.customEndpoint || ''}/v1/chat/completions` // Ensure customEndpoint has a fallback
     };
     const apiUrl = urlMap[currentModel.host];
     if (!apiUrl) {
@@ -87,43 +86,38 @@ Output:
     }
 
     console.log(`processQueryWithAI: Using API URL: ${apiUrl} for host: ${currentModel.host}`);
-    // console.log('Chat history context:', contextMessages);
-    console.log('Formatted Context for Prompt:', formattedContext); // Debug log
+    console.log('Formatted Context for Prompt:', formattedContext);
 
     const requestBody: {
       model: string;
       messages: ApiMessage[];
       stream: boolean;
-      temperature?: number; // Temperature is optional in the request body
+      temperature?: number;
     } = {
-      model: config?.selectedModel || currentModel.id || '', // Use currentModel.id as a fallback
+      model: config?.selectedModel || currentModel.id || '',
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: query }
       ],
-      stream: false // Explicitly set stream to false
+      stream: false
     };
-        // Determine the effective temperature for the API call
+
     let effectiveTemperature: number | undefined = undefined;
     if (temperatureOverride !== undefined) {
       effectiveTemperature = temperatureOverride;
     } else if (config.temperature !== undefined) {
-      // Assuming config.temperature is the general setting.
-      // If temperature is nested, e.g., config.ModelSettingsPanel?.temperature, adjust accordingly.
       effectiveTemperature = config.temperature;
     }
 
-    // Add temperature to request body if it's defined
     if (effectiveTemperature !== undefined) {
       requestBody.temperature = effectiveTemperature;
     }
 
-    // Adjust fetch options based on host if necessary (e.g., Gemini might need different body/headers)
     const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            ...(authHeader || {}) // Spread authHeader if it exists
+            ...(authHeader || {})
         },
         body: JSON.stringify(requestBody)
     });
@@ -166,7 +160,7 @@ export const urlRewriteRuntime = async function (domain: string) {
           requestHeaders: [
             {
               header: 'Origin',
-              operation: 'set' as chrome.declarativeNetRequest.HeaderOperation, // Explicitly type as HeaderOperation
+              operation: 'set' as chrome.declarativeNetRequest.HeaderOperation,
               value: origin
             }
           ]
@@ -176,7 +170,7 @@ export const urlRewriteRuntime = async function (domain: string) {
 
     await chrome.declarativeNetRequest.updateDynamicRules({
       removeRuleIds: rules.map(r => r.id),
-      addRules: rules as chrome.declarativeNetRequest.Rule[] // Type assertion for addRules
+      addRules: rules as chrome.declarativeNetRequest.Rule[]
     });
   } catch (error) {
     console.debug('URL rewrite skipped:', error);
@@ -190,12 +184,10 @@ const extractMainContent = (htmlString: string): string => {
         const parser = new DOMParser();
         const doc = parser.parseFromString(htmlString, 'text/html');
 
-        // Remove common non-content elements
         doc.querySelectorAll(
             'script, style, nav, footer, header, svg, img, noscript, iframe, form, aside, .sidebar, .ad, .advertisement, .banner, .popup, .modal, .cookie-banner, link[rel="stylesheet"], button, input, select, textarea, [role="navigation"], [role="banner"], [role="contentinfo"], [aria-hidden="true"]'
         ).forEach(el => el.remove());
 
-        // Try to find common main content containers
         let contentElement = doc.querySelector('main')
             || doc.querySelector('article')
             || doc.querySelector('.content')
@@ -203,13 +195,10 @@ const extractMainContent = (htmlString: string): string => {
             || doc.querySelector('.main-content')
             || doc.querySelector('#main-content')
             || doc.querySelector('.post-content')
-            || doc.body; // Fallback to body
+            || doc.body;
 
-        // Get text content and clean up whitespace
         let text = contentElement?.textContent || '';
-        text = text.replace(/\s+/g, ' ').trim(); // Replace multiple spaces/newlines with single space
-
-        // Further cleanup (optional): remove lines that are very short or seem like menu items
+        text = text.replace(/\s+/g, ' ').trim();
         text = text.split('\n').filter(line => line.trim().length > 20).join('\n');
 
         return text;
@@ -219,222 +208,295 @@ const extractMainContent = (htmlString: string): string => {
     }
 };
 
+interface WikiSearchResultBlock {
+    document_title: string;
+    section_title: string;
+    content: string;
+    block_type: "text" | "table" | "infobox";
+    language: string;
+    url?: string | null;
+    last_edit_date?: string | null;
+    similarity_score: number;
+    probability_score: number;
+    summary?: string[];
+}
+
+interface WikiQueryResult {
+    results: WikiSearchResultBlock[];
+}
+
 
 // --- ENHANCED webSearch function ---
 export const webSearch = async (
     query: string,
-    webMode: string,
-    maxLinksToVisit: number = 3 // Configurable number of links to visit
+    config: Config // Pass the full config object
 ): Promise<string> => {
-    const baseUrl = webMode === 'Brave'
-        ? `https://search.brave.com/search?q=${encodeURIComponent(query)}`
-        : webMode === 'Google'
-            ? `https://www.google.com/search?q=${encodeURIComponent(query)}&hl=en&gl=us` // Added hl/gl for consistency
-            : `https://duckduckgo.com/html/?q=${encodeURIComponent(query)}`;
+    console.log('[webSearch] Received query:', query);
+    console.log('[webSearch] Web Mode from config:', config?.webMode);
+
+    const webMode = config.webMode;
+    const maxLinksToVisit = config.serpMaxLinksToVisit ?? 3;
 
     const serpAbortController = new AbortController();
-    const serpTimeoutId = setTimeout(() => serpAbortController.abort(), 15000); // Timeout for SERP fetch
+    const serpTimeoutId = setTimeout(() => serpAbortController.abort(), 15000);
 
     console.log(`Performing ${webMode} search for: "${query}"`);
+    if (webMode === 'Duckduckgo' || webMode === 'Brave' || webMode === 'Google') {
+        console.log(`[webSearch - ${webMode}] Max links to visit: ${maxLinksToVisit}`);
+    }
+
+
+    if (!webMode) {
+        console.error('[webSearch] Web search mode is undefined. Aborting search. Config was:', JSON.stringify(config));
+        return `Error: Web search mode is undefined. Please check your configuration.`;
+    }
 
     try {
-        // 1. Fetch Search Engine Results Page (SERP)
-        const response = await fetch(baseUrl, {
-            signal: serpAbortController.signal,
-            method: 'GET',
-            headers: {
-                // Using a realistic User-Agent is important
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36',
-                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
-                'Accept-Language': 'en-US,en;q=0.9', // Request English results
-                ...(webMode === 'Brave' ? { 'Referer': 'https://search.brave.com/' } : {}), // Referer specific to Brave
-                ...(webMode === 'Google' ? { 'Referer': 'https://www.google.com/' } : {}),
+        if (webMode === 'Duckduckgo' || webMode === 'Brave' || webMode === 'Google') {
+            const baseUrl = webMode === 'Brave'
+                ? `https://search.brave.com/search?q=${encodeURIComponent(query)}`
+                : webMode === 'Google'
+                    ? `https://www.google.com/search?q=${encodeURIComponent(query)}&hl=en&gl=us`
+                    : `https://duckduckgo.com/html/?q=${encodeURIComponent(query)}`;
+
+            const response = await fetch(baseUrl, {
+                signal: serpAbortController.signal,
+                method: 'GET',
+                headers: {
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36',
+                    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+                    'Accept-Language': 'en-US,en;q=0.9',
+                    ...(webMode === 'Brave' ? { 'Referer': 'https://search.brave.com/' } : {}),
+                    ...(webMode === 'Google' ? { 'Referer': 'https://www.google.com/' } : {}),
+                }
+            });
+            clearTimeout(serpTimeoutId);
+
+            if (!response.ok) {
+                throw new Error(`Web search failed (${webMode}) with status: ${response.status}`);
             }
-        });
-        clearTimeout(serpTimeoutId);
+            const htmlString = await response.text();
+            const parser = new DOMParser();
+            console.log(`[webSearch - ${webMode}] SERP HTML (first 500 chars):`, htmlString.substring(0, 500));
+            const htmlDoc = parser.parseFromString(htmlString, 'text/html');
 
-        if (!response.ok) {
-            throw new Error(`Web search failed (${webMode}) with status: ${response.status}`);
-        }
+            interface SearchResult {
+                title: string;
+                snippet: string;
+                url: string | null;
+            }
+            const searchResults: SearchResult[] = [];
 
-        const htmlString = await response.text();
-        const parser = new DOMParser();
-        const htmlDoc = parser.parseFromString(htmlString, 'text/html');
-
-        // Clean up SERP (optional, might remove some results)
-        // htmlDoc.querySelectorAll('script, style, nav, footer, header, svg, img, noscript').forEach(el => el.remove());
-
-        // 2. Parse SERP for results (Title, Snippet, URL)
-        interface SearchResult {
-            title: string;
-            snippet: string;
-            url: string | null;
-        }
-        const searchResults: SearchResult[] = [];
-
-        if (webMode === 'Duckduckgo') {
-            htmlDoc.querySelectorAll('.web-result').forEach(result => {
-                const titleEl = result.querySelector('.result__a');
-                const snippetEl = result.querySelector('.result__snippet');
-                const title = titleEl?.textContent?.trim() || '';
-                const url = titleEl?.getAttribute('href');
-                const snippet = snippetEl?.textContent?.trim() || '';
-                if (title && url) searchResults.push({ title, snippet, url: url.startsWith('http') ? url : `https://duckduckgo.com${url}` });
-            });
-        } else if (webMode === 'Google') {
-             // Google structure can change. Inspect elements if results are poor.
-            // Common structure: .MjjYud often wraps a result. h3 for title. div[data-sncf='1'] or similar for snippet.
-            htmlDoc.querySelectorAll('div.g, div.MjjYud, div.hlcw0c').forEach(result => { // Try common containers
-                const linkEl = result.querySelector('a[href]');
-                const url = linkEl?.getAttribute('href');
-                const titleEl = result.querySelector('h3');
-                const title = titleEl?.textContent?.trim() || '';
-
-                // Snippet extraction for Google (might need refinement)
-                let snippet = '';
-                const snippetEls = result.querySelectorAll('div[style="-webkit-line-clamp:2"], div[data-sncf="1"], .VwiC3b span, .MUxGbd span'); // Try multiple potential snippet selectors
-                if (snippetEls.length > 0) {
-                    snippet = Array.from(snippetEls).map(el => el.textContent).join(' ').replace(/\s+/g, ' ').trim();
-                } else {
-                     // Fallback if specific selectors fail
-                    const containerText = result.textContent || '';
-                    const titleIndex = title ? containerText.indexOf(title) : -1;
-                    if (titleIndex !== -1) {
-                       snippet = containerText.substring(titleIndex + title.length).replace(/\s+/g, ' ').trim().substring(0, 300); // Limit fallback snippet length
-                    }
-                }
-
-
-                if (title && url && url.startsWith('http')) { // Ensure it's a valid http/https URL
-                    searchResults.push({ title, snippet, url });
-                }
-            });
-        } else if (webMode === 'Brave') {
-            htmlDoc.querySelectorAll('#results .snippet[data-type="web"]').forEach(result => { // Target web results specifically
-                const linkEl = result.querySelector('a[href]');
-                const url = linkEl?.getAttribute('href');
-                const title = linkEl?.querySelector('.title')?.textContent?.trim() || '';
-                const snippet = result.querySelector('.snippet-description')?.textContent?.trim() || '';
-
-                if (title && url && url.startsWith('http')) {
-                    searchResults.push({ title, snippet, url });
-                }
-            });
-             // Brave Legacy fallback (unlikely needed now but kept for robustness)
-             if (searchResults.length === 0) {
-                 htmlDoc.querySelectorAll('.organic-result').forEach(result => {
+            if (webMode === 'Duckduckgo') {
+                htmlDoc.querySelectorAll('.web-result').forEach(result => {
+                    const titleEl = result.querySelector('.result__a');
+                    const snippetEl = result.querySelector('.result__snippet');
+                    const title = titleEl?.textContent?.trim() || '';
+                    const url = titleEl?.getAttribute('href');
+                    const snippet = snippetEl?.textContent?.trim() || '';
+                    if (title && url) searchResults.push({ title, snippet, url: url.startsWith('http') ? url : `https://duckduckgo.com${url}` });
+                });
+            } else if (webMode === 'Google') {
+                htmlDoc.querySelectorAll('div.g, div.MjjYud, div.hlcw0c').forEach(result => {
                     const linkEl = result.querySelector('a[href]');
                     const url = linkEl?.getAttribute('href');
-                    const title = result.querySelector('h3')?.textContent?.trim() || '';
-                    const snippet = result.querySelector('.snippet-content')?.textContent?.trim() || '';
-                     if (title && url && url.startsWith('http')) {
-                         searchResults.push({ title, snippet, url });
-                     }
-                 });
-             }
-        }
-
-
-        if (searchResults.length === 0) {
-            console.log("No search results found on SERP.");
-            return 'No results found.';
-        }
-
-        // 3. Select Top N links to visit
-        const linksToFetch = searchResults.slice(0, maxLinksToVisit).filter(r => r.url);
-        console.log(`Found ${searchResults.length} results. Attempting to fetch content from top ${linksToFetch.length} links.`);
-
-        // 4. Fetch content from links concurrently
-        const pageFetchPromises = linksToFetch.map(async (result) => {
-            if (!result.url) return { ...result, content: '[Invalid URL]', status: 'error' };
-
-            console.log(`Fetching content from: ${result.url}`);
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 12000); // 12s timeout per page fetch
-
-            try {
-                const pageResponse = await fetch(result.url, {
-                    signal: controller.signal,
-                    method: 'GET',
-                    headers: { // Send similar headers to reduce likelihood of blocks
-                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36',
-                        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
-                        'Accept-Language': 'en-US,en;q=0.9',
-                        // 'Referer': baseUrl // Maybe add referer from search engine? Optional.
+                    const titleEl = result.querySelector('h3');
+                    const title = titleEl?.textContent?.trim() || '';
+                    let snippet = '';
+                    const snippetEls = result.querySelectorAll('div[style="-webkit-line-clamp:2"], div[data-sncf="1"], .VwiC3b span, .MUxGbd span');
+                    if (snippetEls.length > 0) {
+                        snippet = Array.from(snippetEls).map(el => el.textContent).join(' ').replace(/\s+/g, ' ').trim();
+                    } else {
+                        const containerText = result.textContent || '';
+                        const titleIndex = title ? containerText.indexOf(title) : -1;
+                        if (titleIndex !== -1) {
+                           snippet = containerText.substring(titleIndex + title.length).replace(/\s+/g, ' ').trim().substring(0, 300);
+                        }
                     }
-                    // IMPORTANT: For extensions, ensure you have host permissions in manifest.json!
-                    // e.g., "host_permissions": ["<all_urls>"]
+                    if (title && url && url.startsWith('http')) {
+                        searchResults.push({ title, snippet, url });
+                    }
                 });
-                clearTimeout(timeoutId);
-
-                if (!pageResponse.ok) {
-                    throw new Error(`Failed to fetch ${result.url} - Status: ${pageResponse.status}`);
-                }
-
-                const contentType = pageResponse.headers.get('content-type');
-                if (!contentType || !contentType.includes('text/html')) {
-                     throw new Error(`Skipping non-HTML content (${contentType}) from ${result.url}`);
-                }
-
-                const pageHtml = await pageResponse.text();
-                const mainContent = extractMainContent(pageHtml); // Use the helper function
-                console.log(`Successfully fetched and extracted content from: ${result.url} (Length: ${mainContent.length})`);
-                return { ...result, content: mainContent, status: 'success' };
-
-            } catch (error: any) {
-                clearTimeout(timeoutId);
-                console.warn(`Failed to fetch or process ${result.url}:`, error.message);
-                return { ...result, content: `[Error fetching/processing: ${error.message}]`, status: 'error' };
-            }
-        });
-
-        // Wait for all fetches to settle (complete or fail)
-        const fetchedPagesResults = await Promise.allSettled(pageFetchPromises);
-
-        // 5. Combine Results into Final Output String
-        let combinedResultsText = `Search results for "${query}" using ${webMode}:\n\n`;
-        let pageIndex = 0;
-
-        searchResults.forEach((result, index) => {
-             combinedResultsText += `[Result ${index + 1}: ${result.title}]\n`;
-             combinedResultsText += `URL: ${result.url || '[No URL Found]'}\n`;
-             combinedResultsText += `Snippet: ${result.snippet || '[No Snippet]'}\n`;
-
-             // Check if this result was fetched and add its content
-             const correspondingFetch = fetchedPagesResults[pageIndex];
-             if (index < maxLinksToVisit && correspondingFetch?.status === 'fulfilled') {
-                 const fetchedData = correspondingFetch.value;
-                 // Ensure we're matching the right result in case of errors/skips, check URL
-                 if (fetchedData.url === result.url) {
-                    const contentPreview = fetchedData.content.substring(0, 1500); // Limit content length per result
-                    combinedResultsText += `Content:\n${contentPreview}${fetchedData.content.length > 1500 ? '...' : ''}\n\n`;
-                    pageIndex++; // Increment index only if we processed a fetched page
-                 } else {
-                     // This case shouldn't happen with current logic but good for robustness
-                     combinedResultsText += `Content: [Content fetch mismatch]\n\n`;
+            } else if (webMode === 'Brave') {
+                htmlDoc.querySelectorAll('#results .snippet[data-type="web"]').forEach(result => {
+                    const linkEl = result.querySelector('a[href]');
+                    const url = linkEl?.getAttribute('href');
+                    const title = linkEl?.querySelector('.title')?.textContent?.trim() || '';
+                    const snippet = result.querySelector('.snippet-description')?.textContent?.trim() || '';
+                    if (title && url && url.startsWith('http')) {
+                        searchResults.push({ title, snippet, url });
+                    }
+                });
+                 if (searchResults.length === 0) { // Fallback selector for Brave
+                     htmlDoc.querySelectorAll('.organic-result').forEach(result => {
+                        const linkEl = result.querySelector('a[href]');
+                        const url = linkEl?.getAttribute('href');
+                        const title = result.querySelector('h3')?.textContent?.trim() || '';
+                        const snippet = result.querySelector('.snippet-content')?.textContent?.trim() || '';
+                         if (title && url && url.startsWith('http')) {
+                             searchResults.push({ title, snippet, url });
+                         }
+                     });
                  }
+            }
+            console.log(`[webSearch - ${webMode}] Parsed SERP Results (${searchResults.length} found, showing first 5):`, JSON.stringify(searchResults.slice(0, 5)));
 
-             } else if (index < maxLinksToVisit && correspondingFetch?.status === 'rejected') {
-                 // Handle promises that were rejected (e.g., unexpected errors)
-                 combinedResultsText += `Content: [Error fetching: ${correspondingFetch.reason}]\n\n`;
-                 pageIndex++; // Increment index as we attempted this page
-             }
-             else if (index >= maxLinksToVisit) {
-                 // Indicate that content wasn't fetched for results beyond the limit
-                 // combinedResultsText += `Content: [Not fetched - beyond limit]\n\n`; // Optional: Add this line if you want to explicitly state it
-             } else {
-                 // Should not happen if maxLinksToVisit > 0 and searchResults exist
-                 combinedResultsText += `Content: [Not fetched]\n\n`;
-             }
-        });
+            if (searchResults.length === 0) {
+                console.log("No search results found on SERP.");
+                return 'No results found.';
+            }
 
+            const linksToFetch = searchResults.slice(0, maxLinksToVisit).filter(r => r.url);
+            console.log(`Found ${searchResults.length} results. Attempting to fetch content from top ${linksToFetch.length} links (maxLinksToVisit: ${maxLinksToVisit}).`);
 
-        console.log("Web search finished. Returning combined results.");
-        // console.log("Combined Results Text:", combinedResultsText); // For Debugging
-        return combinedResultsText.trim();
+            const pageFetchPromises = linksToFetch.map(async (result) => {
+                if (!result.url) return { ...result, content: '[Invalid URL]', status: 'error' };
+                console.log(`Fetching content from: ${result.url}`);
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 12000);
+                try {
+                    const pageResponse = await fetch(result.url, {
+                        signal: controller.signal,
+                        method: 'GET',
+                        headers: {
+                            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36',
+                            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
+                            'Accept-Language': 'en-US,en;q=0.9',
+                        }
+                    });
+                    clearTimeout(timeoutId);
+                    if (!pageResponse.ok) throw new Error(`Failed to fetch ${result.url} - Status: ${pageResponse.status}`);
+                    const contentType = pageResponse.headers.get('content-type');
+                    if (!contentType || !contentType.includes('text/html')) throw new Error(`Skipping non-HTML content (${contentType}) from ${result.url}`);
+                    const pageHtml = await pageResponse.text();
+                    const mainContent = extractMainContent(pageHtml);
+                    // Here you could potentially use config.webLimit to truncate mainContent if desired
+                    // e.g., if (config.webLimit && config.webLimit !== 128) mainContent = mainContent.substring(0, config.webLimit * 1000);
+                    console.log(`[webSearch - ${webMode}] Successfully fetched and extracted content from: ${result.url} (Extracted Length: ${mainContent.length})`);
+                    return { ...result, content: mainContent, status: 'success' };
+                } catch (error: any) {
+                    clearTimeout(timeoutId);
+                    console.warn(`Failed to fetch or process ${result.url}:`, error.message);
+                    return { ...result, content: `[Error fetching/processing: ${error.message}]`, status: 'error' };
+                }
+            });
 
+            const fetchedPagesResults = await Promise.allSettled(pageFetchPromises);
+            let combinedResultsText = `Search results for "${query}" using ${webMode}:\n\n`;
+            let pageIndex = 0; // To correctly map fetchedPagesResults to searchResults being iterated
+            searchResults.forEach((result, index) => {
+                 combinedResultsText += `[Result ${index + 1}: ${result.title}]\n`;
+                 combinedResultsText += `URL: ${result.url || '[No URL Found]'}\n`;
+                 combinedResultsText += `Snippet: ${result.snippet || '[No Snippet]'}\n`;
+
+                 // Only add content if this result was among those fetched (i.e., index < linksToFetch.length which is <= maxLinksToVisit)
+                 if (index < linksToFetch.length) {
+                     const correspondingFetch = fetchedPagesResults[pageIndex];
+                     if (correspondingFetch?.status === 'fulfilled') {
+                         const fetchedData = correspondingFetch.value;
+                         // Double check if the URL matches, as Promise.allSettled preserves order of original promises
+                         if (fetchedData.url === result.url) {
+                            const contentPreview = fetchedData.content.substring(0, 1500); // Current preview length
+                            combinedResultsText += `Content:\n${contentPreview}${fetchedData.content.length > 1500 ? '...' : ''}\n\n`;
+                         } else {
+                             // This case should ideally not happen if pageIndex is managed correctly
+                             combinedResultsText += `Content: [Content fetch mismatch - data for ${fetchedData.url} found, expected ${result.url}]\n\n`;
+                         }
+                     } else if (correspondingFetch?.status === 'rejected') {
+                         combinedResultsText += `Content: [Error fetching: ${correspondingFetch.reason}]\n\n`;
+                     } else {
+                         // Should not happen if fetchedPagesResults has an entry for each promise
+                         combinedResultsText += `Content: [Fetch status unknown]\n\n`;
+                     }
+                     pageIndex++; // Increment for the next fetched result
+                 } else {
+                     // This result was not in the linksToFetch list (beyond maxLinksToVisit)
+                     combinedResultsText += `Content: [Not fetched due to link limit]\n\n`;
+                 }
+            });
+            console.log("Web search finished. Returning combined results.");
+            return combinedResultsText.trim();
+
+        } else if (webMode === 'Wikipedia') {
+            const WIKIPEDIA_API_URL = 'https://search.genie.stanford.edu/wikipedia_20250320';
+            const requestBody: {
+                query: string[];
+                num_blocks: number;
+                rerank?: boolean;
+                num_blocks_to_rerank?: number;
+            } = {
+                query: [query],
+                // Use config values with defaults
+                num_blocks: config.wikiNumBlocks ?? 3,
+            };
+
+            if (config.wikiRerank) { // Default for wikiRerank is false if not in config
+                requestBody.rerank = true;
+                // Default for wikiNumBlocksToRerank, ensuring it's at least num_blocks or a sensible value like 10
+                requestBody.num_blocks_to_rerank = config.wikiNumBlocksToRerank ?? Math.max(requestBody.num_blocks, 10);
+            }
+
+            console.log(`Performing Wikipedia search for: "${query}" with params:`, requestBody);
+            try {
+                const response = await fetch(WIKIPEDIA_API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(requestBody),
+                    signal: serpAbortController.signal,
+                });
+                clearTimeout(serpTimeoutId);
+
+                if (!response.ok) {
+                    const errorBody = await response.text();
+                    throw new Error(`Wikipedia API request failed with status ${response.status}: ${errorBody}`);
+                }
+
+                const apiResponse: WikiQueryResult[] = await response.json();
+                console.log(`[webSearch - Wikipedia] Raw API Response (first result block if exists):`, apiResponse && apiResponse.length > 0 ? JSON.stringify(apiResponse[0]?.results?.slice(0,1)) : "Empty or unexpected response");
+                let combinedResultsText = `Wikipedia search results for "${query}":\n\n`;
+
+                if (apiResponse && apiResponse.length > 0 && apiResponse[0].results) {
+                    if (apiResponse[0].results.length === 0) {
+                        return `No Wikipedia results found for "${query}".`;
+                    }
+                    apiResponse[0].results.forEach((block, index) => {
+                      console.log(`[webSearch - Wikipedia] Processing result block ${index + 1}:`, {title: block.document_title, section: block.section_title, summary_length: block.summary?.length, content_length: block.content?.length});
+                        combinedResultsText += `[Wiki Result ${index + 1}: ${block.document_title}${block.section_title ? ` - ${block.section_title}` : ''}]\n`;
+                        
+                        if (block.summary && block.summary.length > 0) {
+                            combinedResultsText += 'Summary:\n' + block.summary.map(s => `  - ${s}`).join('\n') + '\n';
+                        } else {
+                            // Truncate content if no summary is available
+                            const contentPreview = block.content.substring(0, 700);
+                            combinedResultsText += `Content: ${contentPreview}${block.content.length > 700 ? '...' : ''}\n`;
+                        }
+                        
+                        combinedResultsText += `URL: ${block.url || 'N/A'}\n`;
+                        combinedResultsText += `Language: ${block.language}, Type: ${block.block_type}, Score: ${block.probability_score?.toFixed(3)}\n`;
+                        if (block.last_edit_date) {
+                            try {
+                                combinedResultsText += `Last Edited: ${new Date(block.last_edit_date).toLocaleDateString()}\n`;
+                            } catch (e) { /* ignore date parsing error */ }
+                        }
+                        combinedResultsText += '\n';
+                    });
+                } else {
+                    return `No Wikipedia results found or unexpected API response for "${query}".`;
+                }
+                return combinedResultsText.trim();
+            } catch (error: any) {
+                clearTimeout(serpTimeoutId);
+                console.error('Wikipedia search failed:', error);
+                return `Error performing Wikipedia search: ${error.message}`;
+            }
+          } else {
+            clearTimeout(serpTimeoutId); // Clear timeout if mode is unsupported early
+            return `Unsupported web search mode: ${webMode}`;
+        }
     } catch (error: any) {
-        clearTimeout(serpTimeoutId); // Ensure timeout is cleared on error too
+        clearTimeout(serpTimeoutId);
         console.error('Web search overall failed:', error);
         return `Error performing web search: ${error.message}`;
     }
@@ -446,17 +508,15 @@ export async function fetchDataAsStream(
     // ... (keep existing implementation)
       url: string,
       data: Record<string, unknown>,
-      onMessage: (message: string, done?: boolean, error?: boolean) => void, // Added optional error flag
+      onMessage: (message: string, done?: boolean, error?: boolean) => void,
       headers: Record<string, string> = {},
       host: string
     ) {
-      let streamFinished = false; // Flag to prevent multiple final calls
+      let streamFinished = false;
 
-      // Helper to call final message exactly once
       const finishStream = (message: unknown, isError: boolean = false) => {
         if (!streamFinished) {
           streamFinished = true;
-          // Ensure message is a string, even if error object is passed accidentally
           let finalMessage: string;
           if (typeof message === 'string') {
             finalMessage = message;
@@ -465,7 +525,7 @@ export async function fetchDataAsStream(
           } else {
             finalMessage = String(message);
           }
-          onMessage(finalMessage, true, isError); // Pass done=true and error status
+          onMessage(finalMessage, true, isError);
         }
       };
 
@@ -473,139 +533,111 @@ export async function fetchDataAsStream(
         if (url.endsWith('/')) {
           return url.slice(0, -1);
         }
-
         return url;
-        }
+      }
 
       if (url.startsWith('chrome://')) {
         console.log("fetchDataAsStream: Skipping chrome:// URL:", url);
-        // Optionally call finishStream with an appropriate message/error if needed
-        // finishStream("Skipped chrome:// URL", true); // Or perhaps just return void silently?
-        return; // Skip chrome:// URLs
+        return;
       }
 
       if (url.includes('localhost')) {
-        // Assuming cleanUrl is defined elsewhere
         await urlRewriteRuntime(cleanUrl(url));
       }
-      // --- End Original URL Checks ---
 
-      // --- Main Try/Catch for Fetch and Streaming ---
       try {
-        // --- Your Original Fetch Setup (Correct Placement) ---
         const response = await fetch(url, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', ...headers },
           body: JSON.stringify(data)
-          // Consider adding AbortController for timeouts if needed here too
         });
-        // --- End Original Fetch Setup ---
 
-        // Check if the fetch itself failed
         if (!response.ok) {
-          // Try to get error details from the body
           let errorBody = `Network response was not ok (${response.status})`;
           try {
              const text = await response.text();
              errorBody += `: ${text || response.statusText}`;
           } catch (_) {
-             // Ignore if reading body fails
              errorBody += `: ${response.statusText}`;
           }
           throw new Error(errorBody);
         }
 
-        // --- Start Stream Processing ---
-        let str = ''; // Accumulator for the response string
+        let str = '';
 
-        // --- Refined Host-Specific Stream Logic ---
         if (host === "ollama") {
             if (!response.body) throw new Error('Response body is null for Ollama');
             const reader = response.body.getReader();
             let done, value;
             while (true) {
               ({ value, done } = await reader.read());
-              if (done) break; // Exit loop if stream ends naturally
+              if (done) break;
               const chunk = new TextDecoder().decode(value);
-
-              // Split potential multiple JSON objects in one chunk (Ollama might do this)
               const jsonObjects = chunk.split('\n').filter(line => line.trim() !== '');
 
               for (const jsonObjStr of jsonObjects) {
-                 if (jsonObjStr.trim() === '[DONE]') { // Check for [DONE] marker if Ollama uses it
+                 if (jsonObjStr.trim() === '[DONE]') {
                     finishStream(str);
-                    return; // Exit function completely
+                    return;
                  }
                  try {
                     const parsed = JSON.parse(jsonObjStr);
                     if (parsed.message?.content) {
                       str += parsed.message.content;
-                      if (!streamFinished) onMessage(str); // Send intermediate update
+                      if (!streamFinished) onMessage(str);
                     }
-                    // Check for Ollama's own 'done' flag within the JSON
                     if (parsed.done === true && !streamFinished) {
                        finishStream(str);
-                       return; // Exit function completely
+                       return;
                     }
                  } catch (error) {
                     console.debug('Skipping invalid JSON chunk:', jsonObjStr);
                  }
               }
             }
-            // If loop finished naturally (done=true reading stream)
             finishStream(str);
 
           } else if (["lmStudio", "groq", "gemini", "openai", "openrouter", "custom"].includes(host)) {
-            // Using fetch-event-stream for SSE
-            const stream = events(response); // Assuming 'events' is correctly imported
+            const stream = events(response);
             for await (const event of stream) {
               if (streamFinished) continue;
               if (!event.data) continue;
 
-              // Handle [DONE] marker (relevant for non-OpenAI)
               if (event.data.trim() === '[DONE]') {
                 finishStream(str);
-                break; // Exit SSE loop
+                break;
               }
 
               try {
                 const received = JSON.parse(event.data);
-                let apiError = null; // Check for API-reported errors in payload
+                let apiError = null;
                 if (host === 'groq' && received?.x_groq?.error) apiError = received.x_groq.error;
-                else if (host === 'gemini' && received?.error) apiError = received.error.message || JSON.stringify(received.error); // Gemini might use standard 'error' field in OpenAI compat mode
-                else if (received?.error) apiError = received.error.message || JSON.stringify(received.error); // General OpenAI structure
+                else if (host === 'gemini' && received?.error) apiError = received.error.message || JSON.stringify(received.error);
+                else if (received?.error) apiError = received.error.message || JSON.stringify(received.error);
 
                 if (apiError) {
                    throw new Error(`API Error: ${apiError}`);
                 }
 
                 str += received?.choices?.[0]?.delta?.content || '';
-                if (!streamFinished) onMessage(str); // Send intermediate update
+                if (!streamFinished) onMessage(str);
 
               } catch (error) {
                 if (error instanceof Error && error.message.startsWith('API Error:')) {
-                   // If we already parsed an API error message, finish with error
-                   finishStream(error.message, true); // Mark as error
+                   finishStream(error.message, true);
                 } else {
-                   // Log JSON parse errors but potentially continue if minor
                    console.debug('Skipping invalid SSE chunk or parse error:', event.data, error);
                 }
-                // Decide if a parse error should terminate the stream or just be skipped
-                // continue; // Or: finishStream(`Parse Error: ${error}`, true); break;
               }
             }
-            // If SSE loop finished naturally (stream closed by server)
             finishStream(str);
 
           } else {
-             // Handle unknown host
              throw new Error(`Unsupported host specified: ${host}`);
           }
-          // --- End Stream Processing ---
 
       } catch (error) {
-        // Catch errors from fetch, response.ok check, or stream processing
         console.error('Error in fetchDataAsStream:', error);
-        finishStream(error instanceof Error ? error.message : String(error), true); // Finish with error state
+        finishStream(error instanceof Error ? error.message : String(error), true);
       }
     }

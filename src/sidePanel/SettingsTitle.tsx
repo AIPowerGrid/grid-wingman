@@ -27,21 +27,18 @@ export const SettingTitle = ({
           {icon}
         </span>)
       )}
-      {/* Span replacing Text for main text */}
       <span
         className={cn(
           "text-foreground", // color="var(--text)"
           "opacity-90",     // opacity={0.9}
           "text-base",      // fontSize="md" (Tailwind's base is 1rem, md is 1rem)
           "font-medium"     // fontWeight="medium"
-          // textTransform="none" is default
         )}
       >
         {text}
       </span>
     </div>
     {/* Right side: Widget */}
-    {/* Render widget directly if it exists, wrap in div for margin */}
     {widget && (
       <div className="ml-2"> {/* ml={2} */}
         {widget}

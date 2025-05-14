@@ -28,8 +28,12 @@ export interface Config {
   persona: string;
   generateTitle?: boolean;
   backgroundImage?: boolean;
-  webMode?: 'Duckduckgo' | 'Brave' | 'Google' | string;
+  webMode?: 'Duckduckgo' | 'Brave' | 'Google' | 'Wikipedia' | string;
   webLimit?: number;
+  serpMaxLinksToVisit?: number;
+  wikiNumBlocks?: number;
+  wikiRerank?: boolean;
+  wikiNumBlocksToRerank?: number;
   contextLimit: number;
   ModelSettingsPanel?: Record<string, unknown>;
   temperature: number;
