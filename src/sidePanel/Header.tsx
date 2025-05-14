@@ -95,12 +95,12 @@ const WelcomeModal: React.FC<WelcomeModalProps> = ({ isOpen, onClose, setSetting
       )}
       onInteractOutside={(e) => e.preventDefault()}
     >
-      <DialogHeader className="text-center font-bold p-2">
-        <DialogTitle className="text-base pt-2">👋 Welcome Detective 👋</DialogTitle>
+      <DialogHeader className="text-center font-['Bruno_Ace_SC'] font-bold p-2">
+        <DialogTitle className="text-base pt-2">Welcome</DialogTitle>
       </DialogHeader>
       <DialogDescription asChild>
         <div className="p-4 text-center">
-          <p className="text-[var(--text)] text-xl font-['Allura'] font-medium mb-4 -mt-7">
+          <p className="text-[var(--text)] text-xl font-['Allura'] font-medium mb-2 -mt-7">
             The game is afoot!<br />
           </p>
           <div className="flex justify-center">
@@ -108,7 +108,7 @@ const WelcomeModal: React.FC<WelcomeModalProps> = ({ isOpen, onClose, setSetting
               variant="outline"
               className={cn(
                   "bg-[var(--active)] text-[var(--text)] border-[var(--text)]",
-                  "rounded-md shadow-sm px-1 py-1 h-auto",
+                  "rounded-xl shadow-sm px-1 py-1 h-auto",
                   "text-sm",
                   "hover:brightness-95 hover:shadow-md active:brightness-90"
               )}
@@ -116,7 +116,7 @@ const WelcomeModal: React.FC<WelcomeModalProps> = ({ isOpen, onClose, setSetting
                   setSettingsMode(true);
               }}
             >
-              <FiSettings className="mr-1 h-4 w-4" /> Connect
+              <FiSettings className="size-3" /> Connect
             </Button>
           </div>
         </div>
@@ -131,9 +131,8 @@ const Badge = ({ children }: { children: React.ReactNode }) => (
     className={cn(
       "inline-block whitespace-nowrap overflow-hidden text-ellipsis w-full max-w-xs",
       "bg-transparent text-[var(--text)]",
-      "rounded-md px-3 py-0.5",
-      "font-['poppins',_sans-serif] text-md font-medium",
-      "shadow-xs"
+      "rounded-md py-0.5",
+      "font-['poppins',_sans-serif] text-md text-center font-medium",
     )}
   >
     {children}
@@ -326,7 +325,7 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
              </div>
              <SheetTitle className="text-center font-['Orbitron',_sans-serif] tracking-tight -mt-10">
                <a href="https://github.com/3-ark/Cognito" target="_blank" rel="noopener noreferrer" className="text-xl font-semibold text-[var(--text)] bg-[var(--active)] inline-block px-3 py-1 rounded-md no-underline">
-                 COGNITO <sub className="italic contrast-200 text-[0.5em]">v3.1</sub>
+                 COGNITO <sub className="italic contrast-200 text-[0.5em]">me</sub>
                </a>
              </SheetTitle>
              <SheetDescription className="text-center text-xl font-bold text-[var(--text)] leading-tight mt-0">
@@ -615,7 +614,7 @@ export const Header: React.FC<HeaderProps> = ({
           </Tooltip>
 
           {/* Center Section */}
-          <div className="flex-grow flex justify-center items-center overflow-hidden mx-3">
+          <div className="flex-grow flex justify-center items-center overflow-hidden">
             {visibleTitle && (
               <p className="text-lg font-semibold text-[var(--text)] italic whitespace-nowrap overflow-hidden text-ellipsis text-center">
                 {chatTitle}
@@ -628,7 +627,7 @@ export const Header: React.FC<HeaderProps> = ({
             )}
             {settingsMode && (
               <div className="flex items-center justify-center">
-                 <p className="relative top-1 text-lg font-['Allura'] font-semibold text-[var(--text)] whitespace-nowrap">
+                 <p className="relative top-0 text-lg font-['Bruno_Ace_SC'] font-semibold text-[var(--text)] whitespace-nowrap">
                    The game is afoot{' '}
                    <WiMoonWaxingCrescent1 className="inline-block align-middle text-[#f5eee4] text-[20px] ml-2" />
                  </p>
