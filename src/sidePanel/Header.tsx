@@ -404,7 +404,6 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
                   <div className="relative">
                     <Input
                        id="model-input"
-         c:\Users\first\Github\Cognito Personal\src\sidePanel\Header.tsx              value={inputFocused ? searchQuery : config?.selectedModel || ''}
                        placeholder={
                          inputFocused
                            ? 'Search models...'
