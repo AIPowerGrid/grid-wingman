@@ -111,11 +111,12 @@ or a updated version before installation:
 For detailed usage instructions, persona guides, and troubleshooting, please refer to the [documentation page](DOCs.md).
 It's outdated, so I deleted it. New Doc needs some time to complete.
 
-## Contributing
-
-Contributions are welcome!
+## Thanks
 
 https://github.com/stanford-oval/WikiChat
+[sidellama](https://github.com/gyopak/sidellama).
+https://github.com/AlexBefest/highCompute.py
+https://github.com/ken107/piper-browser-extension
 
 ## License
 
