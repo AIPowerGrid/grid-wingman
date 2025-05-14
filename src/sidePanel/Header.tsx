@@ -325,7 +325,7 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
              </div>
              <SheetTitle className="text-center font-['Orbitron',_sans-serif] tracking-tight -mt-10">
                <a href="https://github.com/3-ark/Cognito" target="_blank" rel="noopener noreferrer" className="text-xl font-semibold text-[var(--text)] bg-[var(--active)] inline-block px-3 py-1 rounded-md no-underline">
-                 COGNITO <sub className="italic contrast-200 text-[0.5em]">me</sub>
+                 COGNITO <sub className="italic contrast-200 text-[0.5em]">v3.1</sub>
                </a>
              </SheetTitle>
              <SheetDescription className="text-center text-xl font-bold text-[var(--text)] leading-tight mt-0">
@@ -404,7 +404,7 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
                   <div className="relative">
                     <Input
                        id="model-input"
-                       value={inputFocused ? searchQuery : config?.selectedModel || ''}
+         c:\Users\first\Github\Cognito Personal\src\sidePanel\Header.tsx              value={inputFocused ? searchQuery : config?.selectedModel || ''}
                        placeholder={
                          inputFocused
                            ? 'Search models...'
