@@ -6,13 +6,8 @@ import type { Config, Model } from 'src/types/config';
 import { normalizeApiEndpoint } from 'src/background/util';
 import { handleHighCompute, handleMediumCompute } from './computeHandlers';
 
-// Import pdf.js
 import * as pdfjsLib from 'pdfjs-dist';
 
-// Set the workerSrc for pdf.js
-// Make sure 'pdf.worker.mjs' is accessible at the root of your extension.
-// If you've placed it in a subdirectory (e.g., 'assets'), adjust the path.
-// e.g., chrome.runtime.getURL('assets/pdf.worker.mjs')
 try {
   const workerUrl = chrome.runtime.getURL('pdf.worker.mjs');
   // Check if the URL is valid before assigning, to prevent errors if the file is missing
@@ -105,7 +100,6 @@ const useSendMessage = (
     
     const message = overridedMessage || originalMessage;
 
-    // ... (initial checks for isLoading, message, config, completionGuard remain the same)
     if (isLoading) {
       console.log(`[${callId}] useSendMessage: Bailing out: isLoading is true.`);
       return;
@@ -227,8 +221,9 @@ const useSendMessage = (
     // ... (Step 2: Perform Web Search remains the same)
     if (performSearch) {
       console.log(`[${callId}] useSendMessage: Performing web search...`);
+
       try {
-        searchRes = await webSearch(queryForProcessing, config.webMode || 'Google');
+        searchRes = await webSearch(queryForProcessing, config, config.webLimit ? Math.round(config.webLimit / 20) : 3);
       } catch (searchError) {
         console.error(`[${callId}] Web search failed:`, searchError);
         searchRes = ''; 
@@ -262,10 +257,6 @@ const useSendMessage = (
         
         if (tab?.url && !tab.url.startsWith('chrome://')) {
           const tabUrl = tab.url;
-          // Check if the URL is likely a PDF
-          // More robust checking might involve looking at tab.mimeType if available and reliable,
-          // but URL extension is a good first pass.
-          // Assert mimeType if type definitions are problematic. Ideally, ensure @types/chrome is up-to-date.
           const tabMimeType = (tab as chrome.tabs.Tab & { mimeType?: string }).mimeType;
           const isPdfUrl = tabUrl.toLowerCase().endsWith('.pdf') ||
                            (tabMimeType && tabMimeType === 'application/pdf');
@@ -278,12 +269,8 @@ const useSendMessage = (
             } catch (pdfError) {
               console.error(`[${callId}] Failed to extract text from PDF ${tabUrl}:`, pdfError);
               currentPageContent = `Error extracting PDF content: ${pdfError instanceof Error ? pdfError.message : "Unknown PDF error"}. Falling back.`;
-              // Optionally, try to get storedPageString as a fallback if PDF extraction fails
-              // const storedPageString = await storage.getItem('pagestring');
-              // currentPageContent = storedPageString || `Failed to process PDF: ${tabUrl}`;
             }
           } else {
-            // Not a PDF, use existing logic for HTML/text content from storage
             console.log(`[${callId}] URL is not a PDF. Fetching from storage: ${tabUrl}`);
             const storedPageString = await storage.getItem('pagestring');
             currentPageContent = storedPageString || '';
@@ -329,7 +316,6 @@ const useSendMessage = (
 
     // --- Step 4: Execute based on Compute Level ---
     try {
-      // ... (rest of the try block for compute levels and fetchDataAsStream remains the same)
       if (config?.computeLevel === 'high' && currentModel) {
         console.log(`[${callId}] useSendMessage: Starting HIGH compute level.`);
         await handleHighCompute(
