@@ -13,25 +13,20 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { cn } from "@/src/background/util"; // For conditional classes
+import { cn } from "@/src/background/util";
 
 import { useConfig } from './ConfigContext';
 
 export const AddToChat = () => {
   const { config, updateConfig } = useConfig();
 
-  const currentMode = config?.chatMode; // Store current mode for easier comparison
+  const currentMode = config?.chatMode;
 
   return (
-    // TooltipProvider is needed for Tooltip
     (<TooltipProvider delayDuration={500}>
-      {/* DropdownMenu wraps the trigger and content */}
       <DropdownMenu>
-        {/* Tooltip wraps the DropdownMenuTrigger */}
         <Tooltip>
-          {/* TooltipTrigger wraps the actual button */}
           <TooltipTrigger asChild>
-            {/* DropdownMenuTrigger wraps the button that opens the menu */}
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
@@ -42,35 +37,29 @@ export const AddToChat = () => {
                   "px-2 not-focus-visible",
                 )}
               >
-                {/* Center content using flexbox */}
                 <div className="flex items-center justify-center h-full">
                   {!currentMode ? (
-                    // Use react-icon directly
-                    (<GoArrowSwitch className="h-5 w-5 text-foreground" />) // text-xl is ~1.25rem, h-5 w-5 is 1.25rem
+                    (<GoArrowSwitch className="h-5 w-5 text-foreground" />)
                   ) : (
-                    // Display uppercase mode text
-                    (<span className="text-sm">{currentMode.toUpperCase()}</span>) // Ensure text size matches button size context
+                    (<span className="text-sm">{currentMode.toUpperCase()}</span>)
                   )}
                 </div>
               </Button>
             </DropdownMenuTrigger>
           </TooltipTrigger>
-          {/* TooltipContent holds the tooltip text */}
           <TooltipContent
-            side="top" // Original placement="top"
-            className="bg-secondary/50 text-foreground" // Mimic original style
+            side="top"
+            className="bg-secondary/50 text-foreground"
           >
             <p>Switch Chat Mode</p>
           </TooltipContent>
         </Tooltip>
 
-        {/* DropdownMenuContent holds the menu items */}
         <DropdownMenuContent
           align="end" // Aligns the end of the menu with the end of the trigger (replaces mr)
           sideOffset={5} // Small offset from the trigger (replaces marginTop)
           className="bg-secondary text-primary-foreground rounded-md min-w-[80px] z-50" // Mimic original: bg, color, border, rounded, padding. Added z-index just in case. Adjust min-w as needed.
         >
-          {/* CHAT Item */}
           <DropdownMenuItem
             onClick={() => updateConfig({ chatMode: undefined })}
             className={cn(
@@ -82,10 +71,8 @@ export const AddToChat = () => {
             CHAT
           </DropdownMenuItem>
 
-          {/* Separator instead of border */}
           <DropdownMenuSeparator className="bg-border h-[1px] my-1" />
 
-          {/* PAGE Item */}
           <DropdownMenuItem
             onClick={() => updateConfig({ chatMode: 'page' })}
             className={cn(
@@ -97,10 +84,8 @@ export const AddToChat = () => {
             PAGE
           </DropdownMenuItem>
 
-          {/* Separator instead of border */}
           <DropdownMenuSeparator className="bg-border h-[1px] my-1" />
 
-          {/* WEB Item */}
           <DropdownMenuItem
             onClick={() => updateConfig({ chatMode: 'web' })}
             className={cn(

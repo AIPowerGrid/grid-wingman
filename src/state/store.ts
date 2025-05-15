@@ -5,12 +5,12 @@ import {
   Dispatch,
   Middleware,
   Slice,
-  UnknownAction // Changed from AnyAction for RTK 2.0
+  UnknownAction
 } from '@reduxjs/toolkit';
 import { logger } from 'redux-logger';
-import { thunk } from 'redux-thunk'; // Changed for redux-thunk v3
+import { thunk } from 'redux-thunk';
 import {
- alias, applyMiddleware, Store, createWrapStore // Changed for webext-redux v3
+ alias, applyMiddleware, Store, createWrapStore
 } from 'webext-redux';
 
 import * as contentSlice from 'src/state/slices/content';
@@ -21,19 +21,18 @@ type BuildStoreOptions = {
     reducers?: {
         [key in string]: Slice
     };
-    channelName?: string; // Changed from portName for webext-redux v3
+    channelName?: string;
 };
 
 const backgroundAliases = { ...sidePanelSlice.aliases, ...contentSlice.aliases };
 
 const middleware: Middleware[] = [
   alias(backgroundAliases) as Middleware,
-  thunk as Middleware, // Use named import
+  thunk as Middleware, 
   createSerializableStateInvariantMiddleware(),
   logger as Middleware
 ];
 
-// Middleware for createStoreProxy (needs all explicit middleware)
 const middlewareForProxy: Middleware[] = [
   alias(backgroundAliases) as Middleware,
   thunk as Middleware,
@@ -41,14 +40,13 @@ const middlewareForProxy: Middleware[] = [
   logger as Middleware,
 ];
 
-// Middleware to be added to getDefaultMiddleware for configureStore
 const additionalMiddlewareForConfigureStore: Middleware[] = [
   alias(backgroundAliases) as Middleware,
   logger as Middleware,
 ];
 
-const buildStoreWithDefaults = ({ channelName }: BuildStoreOptions = {}) => { // Changed from portName
-  const reducer = combineReducers<State, UnknownAction>({ // Changed from AnyAction
+const buildStoreWithDefaults = ({ channelName }: BuildStoreOptions = {}) => {
+  const reducer = combineReducers<State, UnknownAction>({
     sidePanel: sidePanelSlice.reducer,
     content: contentSlice.reducer
   });
@@ -56,11 +54,11 @@ const buildStoreWithDefaults = ({ channelName }: BuildStoreOptions = {}) => { //
   const store = configureStore({
     devTools: true,
     reducer,
-    middleware: (getDefaultMiddleware) => // Changed to callback for RTK 2.0
+    middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware().concat(additionalMiddlewareForConfigureStore),
   });
 
-  if (channelName) { // Changed from portName
+  if (channelName) {
     const specificWrapStore = createWrapStore({ channelName });
     specificWrapStore(store);
   }
@@ -70,10 +68,10 @@ const buildStoreWithDefaults = ({ channelName }: BuildStoreOptions = {}) => { //
 
 export default buildStoreWithDefaults;
 
-export const createStoreProxy = (channelName: string) => { // Changed from portName
-  const store = new Store<State, UnknownAction>({ channelName }); // Changed from portName and AnyAction
+export const createStoreProxy = (channelName: string) => {
+  const store = new Store<State, UnknownAction>({ channelName });
 
-  applyMiddleware(store, ...middlewareForProxy); // Use dedicated middleware array
+  applyMiddleware(store, ...middlewareForProxy); 
 
   return store;
 };
