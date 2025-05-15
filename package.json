@@ -1,5 +1,6 @@
 {
   "name": "cognito",
+  "displayName": "Cognito - AI Sidekick",
   "version": "3.2.0",
   "description": "Cognito is a Chrome extension that allows you to communicate with your browser.",
   "main": "index.js",
