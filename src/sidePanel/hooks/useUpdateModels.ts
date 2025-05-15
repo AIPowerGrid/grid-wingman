@@ -56,11 +56,6 @@ export const useUpdateModels = () => {
       getUrl: (cfg) => `${cfg.ollamaUrl}/api/tags`,
       parseFn: (data, host) => (data?.models as Model[] ?? []).map(m => ({ ...m, id: m.id ?? m.name, host })), // Use name if id missing
       onFetchFail: (_, updateCfg) => updateCfg({ ollamaConnected: false, ollamaUrl: '' }),
-      // Refined: Only update connected status on temporary failure
-      // onFetchFail: (_, updateCfg) => {
-      //   console.log(`[useUpdateModels] Ollama fetch failed, setting ollamaConnected: false`);
-      //   updateCfg({ ollamaConnected: false });
-      // },
     },
     {
       host: HOST_GEMINI,
