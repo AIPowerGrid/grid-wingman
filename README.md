@@ -10,6 +10,9 @@ Built on [sidellama](https://github.com/gyopak/sidellama).
 
 *   Bug fixes and improvements.
 *   Evaluate and integrate pull requests.
+
+---
+
 *   ~Migrate to Shadcn/ui from Chakra-UI V2,~ and ~React 19~. [20250509]
 *   ~Wiki Search ~with API~[20250514] and kiwix(zim-reader)~ [20250515] [^1]
 *   Search with API for Google
