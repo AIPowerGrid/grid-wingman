@@ -120,6 +120,8 @@ export const ConnectOpenAI = () => {
         <Button
           variant="ghost" size="sm" aria-label="Connected to OpenAI"
           className={cn(buttonHeightClass, "w-8 rounded-md text-[var(--success)]")}
+          onClick={onConnect}
+          disabled={isLoading}
         >
           <FaCheck className="h-5 w-5" />
         </Button>

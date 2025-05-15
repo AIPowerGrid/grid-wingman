@@ -104,6 +104,8 @@ export const ConnectLmStudio = () => {
         <Button
           variant="ghost" size="sm" aria-label="Connected to LM Studio"
           className={cn(buttonHeightClass, "w-8 rounded-md text-[var(--success)]")}
+          disabled={isLoading}
+          onClick={onConnect}
         >
           <FiCheck className="h-5 w-5" />
         </Button>

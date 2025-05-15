@@ -1,25 +1,21 @@
 import { useEffect, useState, useRef } from 'react';
 import { toast, Toaster } from 'react-hot-toast';
-// Removed Chakra UI imports: Box, Container, Tooltip, IconButton, HStack
 import localforage from 'localforage';
-import { TbWorldSearch, TbBrowserPlus } from "react-icons/tb"; // Keep icons
-import { BiBrain } from "react-icons/bi"; // Keep icons
+import { TbWorldSearch, TbBrowserPlus } from "react-icons/tb";
+import { BiBrain } from "react-icons/bi";
 
-// Shadcn/ui imports
 import { Button } from "@/components/ui/button"; // Shadcn Button
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/ui/tooltip"; // Shadcn Tooltip
+} from "@/components/ui/tooltip";
 import { cn } from "@/src/background/util"; // Utility for conditional classes
 
-// Keep existing custom component imports
 import { useChatTitle } from './hooks/useChatTitle';
 import useSendMessage from './hooks/useSendMessage';
 import { useUpdateModels } from './hooks/useUpdateModels';
-import { AddToChat } from './AddToChat';
 import { Background } from './Background';
 import { ChatHistory, ChatMessage, MessageTurn } from './ChatHistory';
 import { useConfig } from './ConfigContext';
@@ -59,9 +55,6 @@ function bridge() {
         if (document.body && document.body.innerHTML.length > MAX_BODY_CHARS_FOR_DIRECT_EXTRACTION) {
             console.warn(`[Cognito Bridge] Document body is very large (${document.body.innerHTML.length} chars). Attempting to use a cloned, simplified version for text extraction to improve performance/stability.`);
 
-            // Fallback to a light clone and minimal cleaning for very large pages
-            // This is a compromise: might lose some formatting innerText would preserve,
-            // but aims for stability.
             const clonedBody = document.body.cloneNode(true) as HTMLElement;
             clonedBody.querySelectorAll('script, style, noscript, iframe, embed, object').forEach(el => el.remove());
             textContent = (clonedBody.textContent || '').replace(/\s\s+/g, ' ').trim();
@@ -124,8 +117,6 @@ function bridge() {
         }
     };
 
-    // Simple truncation strategy: prioritize text, then HTML, then others.
-    // A more sophisticated strategy might be needed for extreme cases.
     if (JSON.stringify(responseCandidate).length > MAX_OUTPUT_STRING_LENGTH) {
         console.warn('[Cognito Bridge] Total extracted content is very large. Attempting to truncate.');
         const availableLength = MAX_OUTPUT_STRING_LENGTH - JSON.stringify({ ...responseCandidate, text: "", html: "" }).length;
@@ -181,7 +172,6 @@ async function injectBridge() {
     // Basic result checking
     if (!results || !Array.isArray(results) || results.length === 0 || !results[0] || typeof results[0].result !== 'string') {
         console.error('[Cognito:] Bridge function execution returned invalid or unexpected results structure:', results);
-        // No toast here in the reverted version, just log
         return;
     }
 
@@ -225,20 +215,16 @@ async function injectBridge() {
     }
   } catch (execError) {
     console.error('[Cognito:] Bridge function execution failed:', execError);
-    // Log specific errors if needed, but avoid user-facing toasts in reverted version
     if (execError instanceof Error && (execError.message.includes('Cannot access contents of url "chrome://') || execError.message.includes('Cannot access a chrome extension URL') || execError.message.includes('Cannot access contents of url "about:'))) {
         console.warn('[Cognito:] Cannot access restricted URL.');
     }
-    // Storage should have been cleared before the try block
   }
 }
 
 
 const generateChatId = () => `chat_${Math.random().toString(16).slice(2)}`;
 
-// --- MessageTemplate Component (Migrated) ---
 const MessageTemplate = ({ children, onClick }: { children: React.ReactNode, onClick: () => void }) => (
-  // Replace Box with div and Tailwind classes
   (<div
     className={cn(
       "bg-[var(--active)] border border-[var(--text)] rounded-[16px] text-[var(--text)]", // background, border, borderRadius, color
@@ -269,7 +255,6 @@ const Cognito = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const lastInjectedRef = useRef<{ id: number | null, url: string }>({ id: null, url: '' });
 
-  // Resize observer remains the same
   useEffect(() => {
     const resizeObserver = new ResizeObserver(() => {
       if (containerRef.current) {
@@ -285,7 +270,6 @@ const Cognito = () => {
     return () => resizeObserver.disconnect();
   }, []);
 
-  // Tab management useEffect remains the same (no Chakra UI)
   useEffect(() => {
     if (config?.chatMode !== 'page') return;
 
@@ -352,7 +336,6 @@ const Cognito = () => {
   const onSend = useSendMessage(isLoading, message, turns, webContent, config, setTurns, setMessage, setWebContent, setPageContent, setLoading);
   useUpdateModels();
 
-  // reset, onReload, loadChat, deleteAll functions remain the same (no Chakra UI)
   const reset = () => {
     console.log("[Cognito ] Resetting chat state.");
     setTurns([]);
@@ -429,7 +412,6 @@ const Cognito = () => {
     }
   }, [chatId, turns, isLoading, chatTitle, config?.selectedModel, historyMode, settingsMode]);
 
-  // Panel open/close useEffect remains the same (no Chakra UI)
   useEffect(() => {
     let cancelled = false;
 
@@ -486,10 +468,8 @@ const Cognito = () => {
       reset();
       lastInjectedRef.current = { id: null, url: '' };
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // handleEditTurn remains the same (no Chakra UI)
   const handleEditTurn = (index: number, newContent: string) => {
     setTurns(prevTurns => {
       const updatedTurns = [...prevTurns];
@@ -503,9 +483,6 @@ const Cognito = () => {
   const [isHovering, setIsHovering] = useState(false); // Keep state for hover effect
 
   return (
-    // Replace Container with div and Tailwind classes
-    // Wrap with TooltipProvider for Shadcn Tooltips
-    // Close TooltipProvider
     <TooltipProvider delayDuration={500}>
       <div
         ref={containerRef}
@@ -514,13 +491,11 @@ const Cognito = () => {
           "flex flex-col bg-[var(--bg)]" // display, flexDirection, bg
         )}
       >
-        {/* Replace Box with div */}
         <div
           className={cn(
             "flex flex-col justify-between min-h-dvh",
           )}
         >
-          {/* Header remains the same */}
           <Header
             chatTitle={chatTitle}
             deleteAll={deleteAll}
@@ -539,7 +514,6 @@ const Cognito = () => {
             </div>
           )}
 
-          {/* Replace Box with div */}
           <div className="flex flex-col min-h-0"> {/* display, flexDir, flex="1 1 0%", minHeight={0} */}
             {!settingsMode && !historyMode && turns.length > 0 && (
                   <Messages
@@ -551,12 +525,9 @@ const Cognito = () => {
                   />
                 )}
             {!settingsMode && !historyMode && turns.length === 0 && !config?.chatMode && (
-              // Replace Box with div for icon container
               (<div className="absolute bottom-16 left-8 flex flex-col gap-2"> {/* bottom, left, position, display, flexDirection, gap */}
-                {/* --- Compute Level Button (Migrated) --- */}
                 <Tooltip>
                   <TooltipTrigger>
-                    {/* Replace IconButton with Shadcn Button */}
                     <Button
                       aria-label="Cycle compute level"
                       variant="ghost" // variant="ghost"
@@ -568,7 +539,6 @@ const Cognito = () => {
                       }}
                       className={cn(
                         "hover:bg-secondary/70", // _hover.bg approximation
-                        // Conditional text color based on level
                         config.computeLevel === 'high' ? 'text-red-600' :
                         config.computeLevel === 'medium' ? 'text-orange-300' :
                         'text-[var(--text)]' // Default color
@@ -581,10 +551,8 @@ const Cognito = () => {
                     <p>{`Compute Level: ${config.computeLevel?.toUpperCase()}. Click to change. [Warning]: beta feature and resource costly.`}</p> {/* Map label */}
                   </TooltipContent>
                 </Tooltip>
-                {/* --- Web Search Button (Migrated) --- */}
                 <Tooltip>
                   <TooltipTrigger>
-                    {/* Replace IconButton with Shadcn Button */}
                     <Button
                       aria-label="Add Web Search Results to LLM Context"
                       variant="ghost"
@@ -599,10 +567,8 @@ const Cognito = () => {
                     <p>Add Web Search Results to LLM Context</p>
                   </TooltipContent>
                 </Tooltip>
-                {/* --- Page Context Button (Migrated) --- */}
                 <Tooltip>
                   <TooltipTrigger>
-                    {/* Replace IconButton with Shadcn Button */}
                     <Button
                       aria-label="Add Current Web Page to LLM Context"
                       variant="ghost"
@@ -620,7 +586,6 @@ const Cognito = () => {
               </div>)
                 )}
             {!settingsMode && !historyMode && config?.chatMode === "page" && (
-                   // Replace Box with div for page mode templates container
                    (<div
                       className={cn(
                         "fixed bottom-14 left-0 right-0", // bottom, left, right, position
@@ -634,9 +599,7 @@ const Cognito = () => {
                       onMouseEnter={() => setIsHovering(true)} // Keep event handlers
                       onMouseLeave={() => setIsHovering(false)}
                    >
-                     {/* Replace HStack with div and flex/spacing */}
                      <div className="flex items-center space-x-6 max-w-full overflow-x-auto px-4"> {/* spacing, maxW, overflowX, px */}
-                       {/* Use migrated MessageTemplate */}
                        <MessageTemplate onClick={() => onSend('Provide your summary.')}>
                          TLDR
                        </MessageTemplate>
@@ -656,7 +619,6 @@ const Cognito = () => {
 
           {/* Input Area */}
           {!settingsMode && !historyMode && (
-            // Replace Box with div
             (<div
               className={cn(
                 "bg-[var(--active)]/50 border-t border-[var(--text)]/50", // background, borderTop
@@ -680,11 +642,9 @@ const Cognito = () => {
             />
           )}
 
-          {/* Background remains the same */}
           {config?.backgroundImage ? <Background /> : null}
         </div>
 
-        {/* Toaster remains the same */}
         <Toaster
           containerStyle={{
             borderRadius: 16,

@@ -1,7 +1,6 @@
-// ConnectOllama.tsx
 import { useState } from 'react';
 import toast from 'react-hot-toast';
-import { FiCheck, FiWifi, FiWifiOff } from 'react-icons/fi'; // Added Wifi icons
+import { FiCheck, FiWifi, FiWifiOff } from 'react-icons/fi';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useConfig } from './ConfigContext';
@@ -12,7 +11,6 @@ export const ConnectOllama = () => {
   const [url, setUrl] = useState(config?.ollamaUrl || 'http://localhost:11434');
   const [isLoading, setIsLoading] = useState(false); // Added loading state
 
-  // Styling variables (can be moved to a shared constants file if used in many places)
   const isDark = config?.theme === 'dark'; // For controlBg, if needed, though direct vars are used below
   const controlBg = isDark ? 'bg-[rgba(255,255,255,0.1)]' : 'bg-[rgba(255,250,240,0.4)]';
   const subtleBorderClass = 'border-[var(--text)]/10';
@@ -74,10 +72,6 @@ export const ConnectOllama = () => {
   const isConnected = config?.ollamaConnected;
 
   return (
-    // The parent ConnectionSection provides px-4. This div provides vertical spacing for elements within.
-    // If ConnectionSection had pb-3, this mb-0 might be fine.
-    // If ConnectionSection has no bottom padding, this might need it.
-    // For now, assuming ConnectionSection handles its own py-3.
     <div className="flex items-center space-x-3"> {/* Increased space-x-2 to space-x-3 for more margin */}
       <Input
         id="ollama-url-input" // More specific ID
@@ -92,7 +86,7 @@ export const ConnectOllama = () => {
           "text-[var(--text)] rounded-md shadow-sm text-sm", // Consistent text, rounding, shadow, font size
           "focus:border-[var(--active)] focus:ring-1 focus:ring-[var(--active)] focus:ring-offset-0", // Consistent focus
           "hover:border-[var(--active)]", // Consistent hover
-          "px-2.5" // Horizontal padding for the input text (py is handled by h-8)
+          "px-2.5" 
         )}
         disabled={isLoading}
       />
@@ -100,9 +94,9 @@ export const ConnectOllama = () => {
         <Button
           onClick={onConnect}
           className={cn(
-            buttonHeightClass, // Match input height
+            buttonHeightClass, 
             "px-3", // Reduced horizontal padding for "Connect" button text
-            "text-sm font-medium whitespace-nowrap", // Ensure text doesn't wrap
+            "text-sm font-medium whitespace-nowrap",
             "bg-[var(--active)] text-[var(--bg)] hover:bg-[var(--active)]/90",
             "rounded-md shadow-sm",
             "focus-visible:ring-1 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--bg)]"
@@ -114,18 +108,15 @@ export const ConnectOllama = () => {
       )}
       {isConnected && (
         <Button
-          variant="ghost" // Use ghost for a less prominent connected indicator, or keep 'outline'
-          size="sm"
-          aria-label="Connected to Ollama"
+          variant="ghost" size="sm" aria-label="Connected to Ollama"
           className={cn(
-            buttonHeightClass, "w-8", // Explicit height and width
+            buttonHeightClass, "w-8",
             // "bg-green-500/10 text-green-700 dark:bg-green-700/20 dark:text-green-400", // Example success colors
-            // "border-green-500/30",
             "rounded-md", // Standard rounding
-            // No need for explicit bg/border if using an icon that shows status
             "text-[var(--success)]" // Use success color for the icon
           )}
-          // onClick={onConnect} // Optionally make it re-test connection
+          onClick={onConnect}
+          disabled={isLoading}
         >
           <FiCheck className="h-5 w-5" /> {/* Slightly larger check icon */}
         </Button>

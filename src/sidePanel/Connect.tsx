@@ -5,8 +5,6 @@ import {
   AccordionContent,
   AccordionTrigger,
 } from '@/components/ui/accordion';
-// buttonVariants might not be needed if we style the link directly with Tailwind
-// import { buttonVariants } from '@/components/ui/button';
 import { ConnectGemini } from './ConnectGemini';
 import { ConnectGroq } from './ConnectGroq';
 import { ConnectLmStudio } from './ConnectLmStudio';
@@ -52,7 +50,6 @@ const ConnectionSection: FC<ConnectionProps> = ({
         </a>
       )}
     </div>
-    {/* The actual connection component (e.g., ConnectOllama) */}
     <Component />
   </div>)
 );
@@ -60,7 +57,6 @@ const ConnectionSection: FC<ConnectionProps> = ({
 export const Connect: FC = () => {
   const { config } = useConfig(); // Get config to determine theme for styling variables
 
-  // Consistent styling variables
   const isDark = config?.theme === 'dark';
   const subtleBorderClass = 'border-[var(--text)]/10'; // For the main accordion item
   const controlBg = isDark ? 'bg-[rgba(255,255,255,0.1)]' : 'bg-[rgba(255,250,240,0.4)]';

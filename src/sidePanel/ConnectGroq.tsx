@@ -1,15 +1,15 @@
 import { useState } from 'react';
 import toast from 'react-hot-toast';
-import { FaEye, FaEyeSlash, FaCheck } from 'react-icons/fa'; // Added FaCheck
+import { FaEye, FaEyeSlash, FaCheck } from 'react-icons/fa';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useConfig } from './ConfigContext';
-import { GROQ_URL } from './constants'; // Assuming this is defined
+import { GROQ_URL } from './constants';
 import { cn } from "@/src/background/util";
 
 export const ConnectGroq = () => {
   const { config, updateConfig } = useConfig();
-  const [apiKey, setApiKey] = useState(config?.groqApiKey || ''); // Ensure default is empty string
+  const [apiKey, setApiKey] = useState(config?.groqApiKey || '');
   const [visibleApiKey, setVisibleApiKey] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -28,7 +28,6 @@ export const ConnectGroq = () => {
     toast.dismiss();
     toast.loading('Connecting to Groq...');
 
-    // A common way to test an API key is to list models or a similar lightweight request
     fetch(`${GROQ_URL}`, { headers: { Authorization: `Bearer ${apiKey}` } })
       .then(res => {
         if (!res.ok) {
@@ -41,13 +40,11 @@ export const ConnectGroq = () => {
         return res.json();
       })
       .then(data => {
-        // Check for a 'data' array which is common for model listings
         if (Array.isArray(data.data) && data.data.length > 0) {
           updateConfig({
             groqApiKey: apiKey,
             groqConnected: true,
             groqError: undefined,
-            // Example: add a generic Groq model entry or parse from data.data
             models: (config?.models || []).filter(m => !m.id.startsWith('groq_')).concat(
               data.data.map((model: any) => ({ id: `groq_${model.id}`, name: model.id, host: 'groq', active: true }))
             ),
@@ -75,7 +72,6 @@ export const ConnectGroq = () => {
       });
   };
 
-  // Button should be enabled if API key is present and not currently loading
   const connectButtonDisabled = !apiKey || isLoading;
   const isConnected = config?.groqConnected;
 
@@ -90,12 +86,12 @@ export const ConnectGroq = () => {
           value={apiKey}
           onChange={e => setApiKey(e.target.value)}
           className={cn(
-            "w-full", // Ensure it takes full width of its container
+            "w-full", 
             inputHeightClass, controlBg, subtleBorderClass,
             "text-[var(--text)] rounded-md shadow-sm text-sm px-2.5",
             "focus:border-[var(--active)] focus:ring-1 focus:ring-[var(--active)] focus:ring-offset-0",
             "hover:border-[var(--active)]",
-            {"pr-8": true} // Add padding-right if eye icon is inside
+            {"pr-8": true} 
           )}
           disabled={isLoading}
         />
@@ -124,14 +120,15 @@ export const ConnectGroq = () => {
           )}
           disabled={connectButtonDisabled}
         >
-          {isLoading ? "..." : "Save"} {/* Changed to Save as it persists the key */}
+          {isLoading ? "..." : "Save"}
         </Button>
       )}
       {isConnected && (
         <Button
           variant="ghost" size="sm" aria-label="Connected to Groq"
           className={cn(buttonHeightClass, "w-8 rounded-md text-[var(--success)]")}
-          // onClick={onConnect} // Optionally allow re-saving/re-testing
+          onClick={onConnect}
+          disabled={isLoading}
         >
           <FaCheck className="h-5 w-5" />
         </Button>
