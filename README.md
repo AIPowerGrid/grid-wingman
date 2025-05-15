@@ -11,15 +11,15 @@ Built on [sidellama](https://github.com/gyopak/sidellama).
 *   Bug fixes and improvements.
 *   Evaluate and integrate pull requests.
 *   ~Migrate to Shadcn/ui from Chakra-UI V2,~ and ~React 19~. [20250509]
-*   Search ~with API~[20250514] for wikipedia/kiwix(zim-reader)
+*   Wiki Search ~with API~[20250514] and kiwix(zim-reader)
 *   Search with API for Google
 *   ~Simple tool use to enhance the current web search to reduce the cost of running LLM and get a better result.~ [20250512]
 *   Better local TTS/STT by API. [not important]
 *   Replace 'deep research' with local/basic API services (even free tier)
-*   "Memory" for the chat history with RAG and search.
-*   Comparison mode (RAG or hybrid search can do this).
+*   "Memory" for the chat history with RAG and ~search~[20250512].
+*   "Short Memory"(state) for web search and page parsing in the same task. Comparison mode (RAG or hybrid search can do this).
 *   ~File support from direct API from Chrome~ [20250512]
-*   Edit text content directly from sidepanel.Basically, I want to extend this to the "AI agent".
+*   Edit text content directly from sidepanel. Basically, I want to extend this to the "AI agent".
 ## Screenshot
 
 ![](docs/screenshot.png)
@@ -111,11 +111,12 @@ or a updated version before installation:
 For detailed usage instructions, persona guides, and troubleshooting, please refer to the [documentation page](DOCs.md).
 It's outdated, so I deleted it. New Doc needs some time to complete.
 
-## Contributing
-
-Contributions are welcome!
+## Thanks
 
 https://github.com/stanford-oval/WikiChat
+[sidellama](https://github.com/gyopak/sidellama).
+https://github.com/AlexBefest/highCompute.py
+https://github.com/ken107/piper-browser-extension
 
 ## License
 
