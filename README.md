@@ -11,7 +11,7 @@ Built on [sidellama](https://github.com/gyopak/sidellama).
 *   Bug fixes and improvements.
 *   Evaluate and integrate pull requests.
 *   ~Migrate to Shadcn/ui from Chakra-UI V2,~ and ~React 19~. [20250509]
-*   Search ~with API~[20250514] for wikipedia/kiwix(zim-reader)
+*   Wiki Search ~with API~[20250514] and kiwix(zim-reader)
 *   Search with API for Google
 *   ~Simple tool use to enhance the current web search to reduce the cost of running LLM and get a better result.~ [20250512]
 *   Better local TTS/STT by API. [not important]
