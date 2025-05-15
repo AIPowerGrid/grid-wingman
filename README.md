@@ -17,7 +17,7 @@ Built on [sidellama](https://github.com/gyopak/sidellama).
 *   Better local TTS/STT by API. [not important]
 *   Replace 'deep research' with local/basic API services (even free tier)
 *   "Memory" for the chat history with RAG and ~search~[20250512].
-*   "Short Memory"(state) for web search and page parsing in the same task. Comparison mode ~(RAG or hybrid search can do this)~.
+*   "Short Memory"(state) for web search and page parsing in the same task. Comparison mode.
 *   ~File support from direct API from Chrome~ [20250512]
 *   Edit text content directly from sidepanel. Basically, I want to extend this to the "AI agent".
 ## Screenshot
