@@ -5,12 +5,9 @@ import { IoMoonOutline, IoSunnyOutline } from 'react-icons/io5';
 import { WiMoonWaxingCrescent1 } from 'react-icons/wi';
 import { useConfig } from './ConfigContext';
 import { useUpdateModels } from './hooks/useUpdateModels';
-// Import themes array and Theme type from Themes.tsx
-// Alias Theme to AppTheme to avoid potential naming conflicts.
 import { themes as appThemes, type Theme as AppTheme } from './Themes'; // Corrected: themes was already imported in your original themes.tsx
 import { cn } from "@/src/background/util";
 
-// Shadcn/ui components
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -18,10 +15,7 @@ import {
   SheetHeader,
   SheetTitle,
   SheetDescription,
-  // SheetClose, // Not explicitly used if managing open state manually
-  // SheetTrigger, // Not explicitly used
   SheetOverlay,
-  // SheetPortal // Might not be needed
 } from "@/components/ui/sheet";
 import {
   Dialog,
@@ -29,9 +23,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
-  // DialogTrigger, // Not explicitly used
   DialogOverlay,
-  // DialogPortal // Might not be needed
 } from "@/components/ui/dialog";
 import {
   Select,
@@ -54,7 +46,6 @@ import {
   AvatarImage,
 } from "@/components/ui/avatar";
 
-// --- Interfaces (Model, Config, ConfigContextType) remain the same ---
 interface Model {
   id: string;
   active: boolean;
@@ -78,7 +69,6 @@ interface ConfigContextType {
   updateConfig: (newConfig: Partial<Config>) => void;
 }
 
-// --- WelcomeModal (remains the same) ---
 interface WelcomeModalProps {
   isOpen: boolean;
   onClose: (open: boolean) => void; // Matches Dialog's onOpenChange signature
@@ -125,7 +115,6 @@ const WelcomeModal: React.FC<WelcomeModalProps> = ({ isOpen, onClose, setSetting
   </Dialog>
 );
 
-// --- Badge (remains the same) ---
 const Badge = ({ children }: { children: React.ReactNode }) => (
   <div
     className={cn(
@@ -190,7 +179,6 @@ const SheetThemeButton = ({ theme, updateConfig, size = "h-7 w-7" }: { theme: Ap
     </TooltipContent>
   </Tooltip>
 );
-// -- END Theme Button Definition --
 
 
 // --- SettingsSheet ---
@@ -335,7 +323,6 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
            <div className={cn("flex flex-col h-full overflow-y-auto settings-drawer-body", "no-scrollbar")}>
               <div className={cn("flex flex-col space-y-5 flex-1", sectionPaddingX, "py-4",)}>
 
-                {/* ++ REVISED Persona Section ++ */}
                 <div>
                   {/* Row for Label, Avatar (left) and Theme Buttons (right) */}
                   <div className="flex items-center justify-between mb-2">
@@ -394,9 +381,7 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
                     </Select>
                   </div>
                 </div>
-                {/* -- END REVISED Persona Section -- */}
                 
-                {/* Model Section (remains the same) */}
                 <div>
                   <label htmlFor="model-input" className="block text-[var(--text)] opacity-80 text-lg font-medium uppercase">
                     Model
@@ -472,7 +457,6 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
                   </div>
                 </div>
 
-                 {/* Action Links Section (remains the same) */}
                  <div className="space-y-3">
                     <Button
                       variant="outline" size={controlSize} onClick={handleConfigClick}
@@ -500,7 +484,6 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
                     </Button>
                  </div>
 
-                 {/* Export Section (remains the same) */}
                  <div className="space-y-3">
                    <p className="text-[var(--text)] opacity-80 text-lg font-medium mb-2 uppercase">
                      Export Now
@@ -536,8 +519,6 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
 };
 
 
-// --- Header Component (Main Export) ---
-// Reverted to remove the incorrect avatar and theme button additions in the main header's right section.
 interface HeaderProps {
   chatTitle?: string | null;
   settingsMode: boolean;
@@ -683,12 +664,10 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
         </div>
 
-        {/* Welcome Modal (Dialog) */}
         {(!config?.models || config.models.length === 0) && !settingsMode && !historyMode && (
            <WelcomeModal isOpen={true} setSettingsMode={setSettingsMode} onClose={() => {}} />
         )}
 
-        {/* Settings Sheet */}
         <SettingsSheet
           isOpen={isSheetOpen}
           onOpenChange={handleSheetOpenChange}

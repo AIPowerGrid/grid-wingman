@@ -1,9 +1,6 @@
-// c/Users/first/Github/Cognito Personal/src/types/speech.d.ts
-
 interface SpeechRecognitionEvent extends Event {
   readonly resultIndex: number;
   readonly results: SpeechRecognitionResultList;
-  // Add other properties if needed, e.g., emma, interpretation
 }
 
 interface SpeechRecognitionResultList {
@@ -65,6 +62,4 @@ declare global {
   }
 }
 
-// This export is necessary to treat this file as a module,
-// ensuring 'declare global' works correctly.
 export {};

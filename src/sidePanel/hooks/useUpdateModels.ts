@@ -13,7 +13,6 @@ const HOST_OPENAI = 'openai';
 const HOST_OPENROUTER = 'openrouter';
 const HOST_CUSTOM = 'custom';
 
-// --- fetchDataSilently remains the same ---
 const fetchDataSilently = async (url: string, ModelSettingsPanel = {}) => {
   try {
     const res = await fetch(url, ModelSettingsPanel);
@@ -29,7 +28,6 @@ const fetchDataSilently = async (url: string, ModelSettingsPanel = {}) => {
   }
 };
 
-// --- Service Configuration Interface ---
 interface ServiceConfig {
   host: string;
   isEnabled: (config: Config) => boolean;
@@ -41,18 +39,15 @@ interface ServiceConfig {
 
 
 export const useUpdateModels = () => {
-  // Removed unused chatTitle state
-  // const [chatTitle, setChatTitle] = useState('');
   const { config, updateConfig } = useConfig();
 
   const FETCH_INTERVAL =  30 * 1000; // 30s
   const lastFetchRef = useRef(0);
 
-  // --- Service Configurations ---
   const serviceConfigs: ServiceConfig[] = [
     {
       host: HOST_OLLAMA,
-      isEnabled: (cfg) => !!cfg.ollamaUrl && cfg.ollamaConnected,
+      isEnabled: (cfg) => !!cfg.ollamaUrl && cfg.ollamaConnected === true,
       getUrl: (cfg) => `${cfg.ollamaUrl}/api/tags`,
       parseFn: (data, host) => (data?.models as Model[] ?? []).map(m => ({ ...m, id: m.id ?? m.name, host })), // Use name if id missing
       onFetchFail: (_, updateCfg) => updateCfg({ ollamaConnected: false, ollamaUrl: '' }),
@@ -66,10 +61,9 @@ export const useUpdateModels = () => {
     },
     {
       host: HOST_LMSTUDIO,
-      isEnabled: (cfg) => !!cfg.lmStudioUrl && cfg.lmStudioConnected,
+      isEnabled: (cfg) => !!cfg.lmStudioUrl && cfg.lmStudioConnected === true,
       getUrl: (cfg) => `${cfg.lmStudioUrl}/v1/models`,
       parseFn: (data, host) => (data?.data as Model[] ?? []).map(m => ({ ...m, id: m.id, host })),
-      // Refined: Only update connected status on temporary failure
       onFetchFail: (_, updateCfg) => {
         console.log(`[useUpdateModels] LM Studio fetch failed, setting lmStudioConnected: false`);
         updateCfg({ lmStudioConnected: false });
@@ -112,7 +106,6 @@ export const useUpdateModels = () => {
         }
         return [];
       },
-      // Optional: Add onFetchFail if you want to update a 'customConnected' flag
     },
   ];
 
@@ -151,8 +144,6 @@ export const useUpdateModels = () => {
           const parsedModels = service.parseFn(data, service.host);
           return { host: service.host, models: parsedModels, status: 'success' as const };
         } else {
-          // Note: service.onFetchFail might call updateConfig directly for connection flags.
-          // This is generally fine as it doesn't modify 'models' or 'selectedModel'.
           if (service.onFetchFail) {
             service.onFetchFail(currentConfig, updateConfig);
           }
@@ -166,7 +157,6 @@ export const useUpdateModels = () => {
       if (result.status === 'fulfilled' && result.value.status === 'success') {
         newOverallModels.push(...result.value.models);
       }
-      // Models from disabled or errored services are implicitly excluded
     });
 
     const originalConfigModels = currentConfig.models || [];
@@ -186,7 +176,6 @@ export const useUpdateModels = () => {
       pendingConfigUpdates.models = newOverallModels;
     }
 
-    // Determine selectedModel based on the newOverallModels list
     const currentSelectedModel = currentConfig.selectedModel;
     const finalModelsForSelection = pendingConfigUpdates.models || originalConfigModels;
 
@@ -195,7 +184,6 @@ export const useUpdateModels = () => {
 
     const newSelectedModel = isSelectedStillAvailable ? currentSelectedModel : finalModelsForSelection[0]?.id;
 
-    // Update selectedModel if it changed or if models changed and it needs recalculation
     if (newSelectedModel !== currentSelectedModel || pendingConfigUpdates.models) {
         pendingConfigUpdates.selectedModel = newSelectedModel;
     }
@@ -209,6 +197,5 @@ export const useUpdateModels = () => {
     console.log('[useUpdateModels] Model fetch cycle complete.');
   }, [config, updateConfig, FETCH_INTERVAL, serviceConfigs]);
 
-  // Removed chatTitle and setChatTitle from return
   return { fetchAllModels };
 };

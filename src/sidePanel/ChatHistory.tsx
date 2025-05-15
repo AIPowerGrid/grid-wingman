@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState, useCallback } from 'react';
 import { motion } from 'motion/react';
 import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area'; // Your custom ScrollArea
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { FiTrash2 } from 'react-icons/fi';
 import localforage from 'localforage';
-import { Input } from '@/components/ui/input'; // Added for search
+import { Input } from '@/components/ui/input';
 
 const dateToString = (date: number | Date): string => new Date(date).toLocaleDateString('sv-SE');
 
@@ -35,7 +35,6 @@ declare global {
   }
 }
 
-// Configurable: Maximum number of chat sessions to display per page.
 export const ITEMS_PER_PAGE = 12;
 
 export const ChatHistory = ({ loadChat, onDeleteAll, className }: ChatHistoryProps) => {
@@ -54,7 +53,6 @@ export const ChatHistory = ({ loadChat, onDeleteAll, className }: ChatHistoryPro
     const fetchMessages = async () => {
       try {
         const keys = await localforage.keys();
-        // Filter for keys that specifically belong to chat messages (e.g., start with 'chat_')
         const chatKeys = keys.filter(key => key.startsWith('chat_'));
         if (chatKeys.length === 0) {
           setAllMessagesFromServer([]);
@@ -73,7 +71,6 @@ export const ChatHistory = ({ loadChat, onDeleteAll, className }: ChatHistoryPro
     };
     fetchMessages();
   }, [processAndSetMessages]);
-  // Filter messages based on search query
   const filteredMessages = useMemo(() => {
     if (!searchQuery) {
       return allMessagesFromServer;
@@ -86,14 +83,12 @@ export const ChatHistory = ({ loadChat, onDeleteAll, className }: ChatHistoryPro
     });
   }, [allMessagesFromServer, searchQuery]);
 
-  // Reset to page 1 when search query changes
   useEffect(() => {
     setCurrentPage(1);
   }, [searchQuery]);
 
   const totalPages = useMemo(() => Math.max(1, Math.ceil(filteredMessages.length / ITEMS_PER_PAGE)), [filteredMessages]);
 
-  // Adjust currentPage if it becomes invalid after totalPages changes (e.g., due to deletion)
   useEffect(() => {
     if (currentPage > totalPages) {
       setCurrentPage(totalPages);
@@ -126,7 +121,6 @@ export const ChatHistory = ({ loadChat, onDeleteAll, className }: ChatHistoryPro
       
       processAndSetMessages(validMessagesAfterDelete); // This updates allMessagesFromServer, then filteredMessages recomputes
 
-      // Calculate new page based on what the filtered list *will be* after state update
       const newFilteredAfterDelete = validMessagesAfterDelete.filter(message => {
         if (!searchQuery) return true;
         const lowerCaseQuery = searchQuery.toLowerCase();
@@ -176,7 +170,6 @@ export const ChatHistory = ({ loadChat, onDeleteAll, className }: ChatHistoryPro
     setSearchQuery(event.target.value);
   };
 
-  // Case: No messages at all and no search query
   if (allMessagesFromServer.length === 0 && !searchQuery) {
     return (
       <div className={rootComputedClassName}>
@@ -198,7 +191,6 @@ export const ChatHistory = ({ loadChat, onDeleteAll, className }: ChatHistoryPro
     );
   }
 
-  // Case: Active search query yields no results (but there might be messages on the server)
   if (filteredMessages.length === 0 && searchQuery) {
     return (
       <div className={rootComputedClassName}>

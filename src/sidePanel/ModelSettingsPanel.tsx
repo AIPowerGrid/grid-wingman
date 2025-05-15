@@ -1,4 +1,3 @@
-// src/sidePanel/ModelSettingsPanel.tsx
 import { useConfig } from './ConfigContext';
 import {
   AccordionItem,
@@ -11,13 +10,11 @@ import { Input } from '@/components/ui/input';
 import { SettingTitle } from './SettingsTitle';
 import { cn } from "@/src/background/util"; // Ensure cn is imported
 
-// Define a type for the keys of model parameters that handleChange will manage
 type ModelParamKey = 'temperature' | 'maxTokens' | 'topP' | 'presencepenalty';
 
 export const ModelSettingsPanel = () => {
   const { config, updateConfig } = useConfig();
 
-  // Consistent styling variables (from TtsSettings.tsx)
   const isDark = config?.theme === 'dark';
   const subtleBorderClass = 'border-[var(--text)]/10';
   const controlBg = isDark ? 'bg-[rgba(255,255,255,0.1)]' : 'bg-[rgba(255,250,240,0.4)]';
@@ -75,7 +72,6 @@ export const ModelSettingsPanel = () => {
         className="px-3 pb-4 pt-2 text-[var(--text)]"
       >
         <div className="flex flex-col gap-6">
-          {/* Temperature */}
           <div className="space-y-3">
             <Label htmlFor="temperature" className="text-base font-medium text-foreground">
               Temperature ({temperature.toFixed(2)})
@@ -89,7 +85,6 @@ export const ModelSettingsPanel = () => {
             />
           </div>
 
-          {/* Max Output Tokens */}
           <div className="space-y-3">
             <Label htmlFor="maxTokens" className="text-base font-medium text-foreground">
               Max Tokens ({maxTokens})

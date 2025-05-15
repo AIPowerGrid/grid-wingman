@@ -9,10 +9,8 @@ import { useConfig } from './ConfigContext'; // Assuming this provides { config:
 import { SettingTitle } from './SettingsTitle';
 
 
-// Consistent Slider class string (copied from ModelSettingsPanel.tsx)
 const sliderClass = cn(
   "w-full",
-  // Track background (unfilled part)
   "[&>span:first-child]:bg-[var(--text)]/10",
   // Range (filled part)
   "[&>span:first-child>span:first-child]:bg-[var(--active)]",
@@ -25,8 +23,6 @@ const sliderClass = cn(
 
 interface ContextLimitSliderProps {
   size: number;
-  // This typing assumes useConfig() returns an object with an updateConfig method.
-  // Adjust if your useConfig hook has a more specific exported type for its return value or for updateConfig.
   updateConfig: ReturnType<typeof useConfig>['updateConfig'];
 }
 
@@ -49,7 +45,6 @@ const ContextLimitSlider = ({ size, updateConfig }: ContextLimitSliderProps) => 
 
 export const PageContext = () => {
   const { config, updateConfig } = useConfig();
-  // Ensure default for size is reasonable, 1 seems fine as slider min is 1.
   const size = config?.contextLimit || 1;
   const isDark = config?.theme === 'dark';
 

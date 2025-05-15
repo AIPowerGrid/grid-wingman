@@ -28,7 +28,6 @@ export const Background = () => {
   const persona = config?.persona || 'default';
   const src = personaImages[persona] || personaImages.default;
 
-  // Use cn utility, although no conditional classes are needed here yet
   const containerClasses = cn(
     "flex",           // display="flex"
     "items-center",   // alignItems="center"
@@ -43,9 +42,7 @@ export const Background = () => {
   const imageClasses = cn(
     "fixed",          // style: position: 'fixed'
     "opacity-[0.03]", // style: filter: 'opacity(0.03)' (using arbitrary value syntax for exact match)
-    // Alternatively use opacity-5 for a close standard value: "opacity-5"
     "z-[1]"           // style: zIndex: 1 (using arbitrary value syntax for exact match)
-    // Note: Tailwind's z-index scale starts at 10 (z-10), so z-[1] is needed for 1.
   );
 
   return (

@@ -46,7 +46,6 @@ export const useChatTitle = (isLoading: boolean, turns: MessageTurn[], message: 
       const currentModel = config?.models?.find((model) => model.id === config.selectedModel);
       if (!currentModel) return;
 
-      // Prepare messages for title generation (first 2 messages + instruction)
       const messagesForTitle: ApiMessage[] = [ // Explicitly type as ApiMessage[]
         ...turns.slice(0, 2).map((turn): ApiMessage => ({ // Map over the first two turns
           content: turn.rawContent || '', // Use rawContent from the turn
@@ -58,13 +57,11 @@ export const useChatTitle = (isLoading: boolean, turns: MessageTurn[], message: 
         }
       ];
 
-      // Define API endpoints for each provider (OpenAI-compatible)
       const getApiConfig = () => {
         const baseConfig = {
           body: { 
             model: currentModel.id, 
             messages: messagesForTitle,
-            // Set stream false for local models
             stream: !['ollama', 'lmStudio'].includes(currentModel.host || '')
           },
           headers: {} as Record<string, string>
@@ -132,7 +129,6 @@ export const useChatTitle = (isLoading: boolean, turns: MessageTurn[], message: 
       if (!apiConfig) return;
 
       if (['ollama', 'lmStudio'].includes(currentModel.host || '')) {
-        // Handle local models with regular fetch
         fetch(apiConfig.url, {
           method: 'POST',
           headers: {
@@ -152,7 +148,6 @@ export const useChatTitle = (isLoading: boolean, turns: MessageTurn[], message: 
         })
         .catch(err => console.error('Title generation failed:', err));
       } else {
-        // Handle streaming API models
         let accumulatedTitle = '';
         fetchDataAsStream(
           apiConfig.url,

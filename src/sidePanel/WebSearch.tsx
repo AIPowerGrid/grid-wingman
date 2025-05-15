@@ -57,14 +57,12 @@ const WebSearchModeSelector = ({ webMode, updateConfig }: WebSearchModeSelectorP
   </RadioGroup>
 );
 
-// --- NEW: Panel for SERP specific settings (DuckDuckGo, Brave, Google) ---
 interface SerpSettingsPanelProps {
   config: Config;
   updateConfig: (newConfig: Partial<Config>) => void;
 }
 
 const SerpSettingsPanel = ({ config, updateConfig }: SerpSettingsPanelProps) => {
-  // Default to 16k for charLimit if undefined, consistent with useEffect
   const charLimit = config?.webLimit ?? 16;
   // Default to 3 for maxLinks if undefined, consistent with useEffect
   const maxLinks = config?.serpMaxLinksToVisit ?? 3;
@@ -77,7 +75,7 @@ const SerpSettingsPanel = ({ config, updateConfig }: SerpSettingsPanelProps) => 
         </p>
         <Slider
           defaultValue={[maxLinks]}
-          max={10} // Sensible max, e.g., 10 links
+          max={10}
           min={1}
           step={1}
           className={sliderClass}
@@ -88,15 +86,15 @@ const SerpSettingsPanel = ({ config, updateConfig }: SerpSettingsPanelProps) => 
         </p>
       </div>
 
-      <div className="pt-2"> {/* Added pt-2 for spacing */}
+      <div className="pt-2">
         <p className="text-[var(--text)] text-base font-medium pb-2 text-left">
           Content Char Limit per Page:{' '}
           <span className="font-normal">{charLimit === 128 ? 'Unlimited' : `${charLimit}k`}</span>
         </p>
         <Slider
           defaultValue={[charLimit]}
-          max={128} // 128 means unlimited
-          min={1}   // e.g., 1k chars
+          max={128} 
+          min={1}   
           step={1}
           className={sliderClass}
           onValueChange={value => updateConfig({ webLimit: value[0] })}

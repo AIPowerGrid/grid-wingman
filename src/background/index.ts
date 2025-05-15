@@ -3,15 +3,12 @@ import buildStoreWithDefaults from 'src/state/store';
 import storage from 'src/background/storageUtil';
 import ChannelNames from '../types/ChannelNames';
 
-// Initialize store but don't start background processes
 buildStoreWithDefaults({ channelName: ChannelNames.ContentPort });
 
-// Configure panel behavior - only open on action click
 chrome.sidePanel
   .setPanelBehavior({ openPanelOnActionClick: true })
   .catch(console.error);
 
-// Handle panel connections
 chrome.runtime.onConnect.addListener(port => {
   if (port.name !== ChannelNames.SidePanelPort) return;
   
@@ -30,16 +27,13 @@ chrome.runtime.onConnect.addListener(port => {
     }
   };
 
-  // Handle panel open
   port.onMessage.addListener(async (msg) => {
     if (msg.type === 'init') {
-      // Inject into current tab when panel opens
       const tab = await getCurrentTab();
       if (tab?.id && tab.url && !tab.url.startsWith('chrome')) {
         injectContentScript(tab.id);
       }
 
-      // Add tab listeners only when panel is open
       if (!tabListenersActive) {
         chrome.tabs.onActivated.addListener(handleTabActivated);
         chrome.tabs.onUpdated.addListener(handleTabUpdated);
@@ -48,7 +42,6 @@ chrome.runtime.onConnect.addListener(port => {
     }
   });
 
-  // Clean up when panel closes
   port.onDisconnect.addListener(() => {
     if (tabListenersActive) {
       chrome.tabs.onActivated.removeListener(handleTabActivated);

@@ -28,7 +28,7 @@ const backgroundAliases = { ...sidePanelSlice.aliases, ...contentSlice.aliases }
 
 const middleware: Middleware[] = [
   alias(backgroundAliases) as Middleware,
-  thunk as Middleware, 
+  thunk as Middleware,
   createSerializableStateInvariantMiddleware(),
   logger as Middleware
 ];

@@ -16,17 +16,16 @@ export const Settings = () => {
 
   const subtleBorderClass = 'border-[var(--text)]/10'; // 1px semi-transparent border
   const controlBg = isDark
-    ? 'bg-[rgba(255,255,255,0.1)]' // Brighter solid color for dark theme
-    : 'bg-[rgba(255,250,240,0.4)]'; // Brighter solid color for light theme
-  const itemShadow = 'shadow-md'; // Consistent shadow, same as Header.tsx's floatingShadow
-  const itemRounded = 'rounded-xl'; // Consistent rounding
+    ? 'bg-[rgba(255,255,255,0.1)]' 
+    : 'bg-[rgba(255,250,240,0.4)]';
+  const itemShadow = 'shadow-md'; 
+  const itemRounded = 'rounded-xl'; 
 
   return (
     <div
       id="settings"
       className="relative z-[1] top-0 w-full h-full flex-1 flex-col overflow-y-auto overflow-x-hidden bg-transparent text-foreground px-6 pb-10 pt-[56px] scrollbar-hidden"
       >
-      {/* Accordion container */}
       <Accordion
         type="single" // Or "multiple" if you want multiple items open
         collapsible

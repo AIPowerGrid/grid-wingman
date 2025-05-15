@@ -1,4 +1,3 @@
-// src/sidePanel/TtsSettings.tsx
 import { useState, useEffect } from 'react';
 import {
   AccordionItem,
@@ -67,7 +66,6 @@ export const TtsSettings = () => {
       .finally(() => {
         setLoadingVoices(false);
       });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleVoiceChange = (selectedValue: string) => {

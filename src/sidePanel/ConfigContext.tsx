@@ -75,10 +75,9 @@ const defaultConfig: Config = {
   panelOpen: false,
   computeLevel: 'low', // Set default compute level
   paperTexture: true,
-  // ... add defaults for groq, gemini, openai etc.
-  tts: { // Add default TTS settings
+  tts: {
     selectedVoice: undefined,
-    rate: 1, // Default speech rate
+    rate: 1,
   }
 };
 
@@ -102,9 +101,7 @@ export const ConfigProvider = ({ children }: { children: React.ReactNode }) => {
     loadStoredConfig();
   }, []);
 
-  // Apply visual styles based on config
   useEffect(() => {
-    // Apply font size
     const baseSize = config?.fontSize || defaultConfig.fontSize;
     document.documentElement.style.setProperty('font-size', `${baseSize}px`);
 

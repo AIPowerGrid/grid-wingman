@@ -7,7 +7,6 @@ import ChannelNames from '../types/ChannelNames';
     if (
       window.location.protocol === 'chrome:' ||
       window.location.protocol === 'chrome-extension:'
-      // || window.location.href.includes('chrome.google.com')
     ) {
       console.debug('Skipping restricted URL:', window.location.protocol);
       return;
@@ -26,5 +25,4 @@ import ChannelNames from '../types/ChannelNames';
   }
 })();
 
-// Required for TypeScript module recognition
 export {};

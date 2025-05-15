@@ -46,7 +46,6 @@ export const getAuthHeader = (config: Config, currentModel: Model) => {
   return undefined;
 };
 
-// Helper function to extract text from a PDF URL
 async function extractTextFromPdf(pdfUrl: string, callId?: number): Promise<string> {
   try {
     console.log(`[${callId || 'PDF'}] Attempting to fetch PDF from URL: ${pdfUrl}`);
@@ -74,7 +73,6 @@ async function extractTextFromPdf(pdfUrl: string, callId?: number): Promise<stri
     return fullText.trim();
   } catch (error) {
     console.error(`[${callId || 'PDF'}] Error extracting text from PDF (${pdfUrl}):`, error);
-    // Optionally, rethrow or return a specific error message string
     throw error; // Rethrow to be caught by the caller
   }
 }
@@ -121,7 +119,6 @@ const useSendMessage = (
     completionGuard.current = callId;
     
     const updateAssistantTurn = (update: string, isFinished: boolean, isError?: boolean) => {
-      // ... (updateAssistantTurn remains the same as your corrected version)
       if (completionGuard.current !== callId && !isFinished && !(isError === true) ) {
         console.log(`[${callId}] updateAssistantTurn: Guard mismatch (current: ${completionGuard.current}), skipping non-final update.`);
         return;
@@ -223,7 +220,7 @@ const useSendMessage = (
       console.log(`[${callId}] useSendMessage: Performing web search...`);
 
       try {
-        searchRes = await webSearch(queryForProcessing, config, config.webLimit ? Math.round(config.webLimit / 20) : 3);
+        searchRes = await webSearch(queryForProcessing, config);
       } catch (searchError) {
         console.error(`[${callId}] Web search failed:`, searchError);
         searchRes = ''; 
@@ -324,7 +321,7 @@ const useSendMessage = (
           config,
           currentModel,
           authHeader,
-          (update, isFinished) => updateAssistantTurn(update, isFinished)
+          (update, isFinished) => updateAssistantTurn(update, Boolean(isFinished))
         );
         console.log(`[${callId}] useSendMessage: HIGH compute level finished.`);
       } else if (config?.computeLevel === 'medium' && currentModel) {
@@ -335,7 +332,7 @@ const useSendMessage = (
           config,
           currentModel,
           authHeader,
-          (update, isFinished) => updateAssistantTurn(update, isFinished)
+          (update, isFinished) => updateAssistantTurn(update, Boolean(isFinished))
         );
         console.log(`[${callId}] useSendMessage: MEDIUM compute level finished.`);
       } else {

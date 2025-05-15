@@ -1,5 +1,3 @@
-// useSafeAsyncEffect.ts
-
 import { useEffect, useRef } from 'react';
 
 export function useSafeAsyncEffect(effect: (isCancelled: () => boolean) => void | Promise<void>, deps: React.DependencyList) {
@@ -13,7 +11,6 @@ export function useSafeAsyncEffect(effect: (isCancelled: () => boolean) => void 
     return () => {
       cancelledRef.current = true;
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
 }
 

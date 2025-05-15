@@ -1,31 +1,25 @@
-import '../content/index.css'; // Import your markdown styles
+import '../content/index.css';
 import type { ComponentPropsWithoutRef, ReactElement, CSSProperties, FC } from 'react';
 import { Children, ClassAttributes, HTMLAttributes, ReactNode, useState } from 'react';
 import Markdown from 'react-markdown';
 import { FiCopy, FiCheck, FiX } from 'react-icons/fi';
 import AutosizeTextarea from 'react-textarea-autosize';
 
-// Shadcn/ui imports
 import { Button } from "@/components/ui/button";
-// We will use AutosizeTextarea and style it with Tailwind classes,
-// rather than ShadcnTextarea, to preserve the autosize functionality.
-import { cn } from "@/src/background/util"; // Your utility for conditional classes
+import { cn } from "@/src/background/util";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 
-// Markdown plugins
 import remarkGfm from 'remark-gfm';
 import remarkSupersub from 'remark-supersub';
 import remarkMath from 'remark-math';
 
-// Your application-specific imports
 import { useConfig } from './ConfigContext';
 import { MessageTurn } from './ChatHistory';
 
-// List components (kept as is with inline styles, as per "don't break it")
 type ListProps = {
   children?: ReactNode;
   ordered?: boolean;
@@ -49,7 +43,6 @@ const Ol = ({ children, ...rest }: ListProps) => (
   }} {...rest}>{children}</ol>
 );
 
-// Paragraph (kept as is)
 type ParagraphProps = { children?: ReactNode } & HTMLAttributes<HTMLParagraphElement>;
 const P = ({ children, ...rest }: ParagraphProps) => (
   <p style={{
@@ -60,7 +53,6 @@ const P = ({ children, ...rest }: ParagraphProps) => (
     whiteSpace: 'pre-wrap'
   }} {...rest}>{children}</p>
 );
-// Props for our custom Pre component, extending standard 'pre' props
 type CustomPreProps = ComponentPropsWithoutRef<'pre'>;
 
 const Pre = (props: CustomPreProps) => {
@@ -68,14 +60,11 @@ const Pre = (props: CustomPreProps) => {
 
   const [copied, setCopied] = useState(false);
   const [hovered, setHovered] = useState(false);
-  // react-markdown passes the <code> element as children to <pre>
-  // We need to extract the actual code string and language class from it.
   const codeElement = Children.only(children) as ReactElement<any> | null;
   let codeString = '';
   if (codeElement?.props?.children) {
-    // Ensure children of codeElement are treated as a flat string
     if (Array.isArray(codeElement.props.children)) {
-      codeString = codeElement.props.children.map(child => typeof child === 'string' ? child : '').join('');
+      codeString = codeElement.props.children.map((child: React.ReactNode) => typeof child === 'string' ? child : '').join('');
     } else {
       codeString = String(codeElement.props.children);
     }
@@ -112,7 +101,6 @@ const Pre = (props: CustomPreProps) => {
         {...restPreProps}       // Pass through other <pre> props
         
       >
-      {/* This is the <code> element, which will be handled by our Code component */}
       {children}
     </pre>
       {codeString && ( // Only show copy button if there's content
@@ -136,16 +124,14 @@ const Pre = (props: CustomPreProps) => {
   );
     };
 
-// Props for our custom Code component, extending standard 'code' props
 type CustomCodeProps = ComponentPropsWithoutRef<'code'> & {
-  inline?: boolean; // Provided by react-markdown
+  inline?: boolean;
 };
 
 const Code = (props: CustomCodeProps) => {
   const { children, className, inline, ...restCodeProps } = props;
 
   if (inline) {
-    // Styling for inline code: `code`
     return (
       <code
         style={{
@@ -162,9 +148,6 @@ const Code = (props: CustomCodeProps) => {
     );
   }
 
-  // For block code (rendered inside our <Pre> component)
-  // Just render the <code> tag; styling is handled by the parent <Pre>.
-  // className (e.g., language-js) is important for syntax highlighters.
         
 return (
 <code className={className} {...restCodeProps}>
@@ -173,7 +156,6 @@ return (
 );
 };
 
-// Anchor (kept as is)
 type AnchorProps = { children?: ReactNode; href?: string } & HTMLAttributes<HTMLAnchorElement>;
 const A = ({ children, href, ...rest }: AnchorProps) => (
   <a href={href}
@@ -191,7 +173,6 @@ const A = ({ children, href, ...rest }: AnchorProps) => (
   </a>
 );
 
-// Headings (kept as is)
 type HeadingProps = { children?: ReactNode } & HTMLAttributes<HTMLHeadingElement>;
 const H1 = ({ children, ...rest }: HeadingProps) => (
   <h1 style={{
@@ -226,7 +207,6 @@ const H3 = ({ children, ...rest }: HeadingProps) => (
   }} {...rest}>{children}</h3>
 );
 
-// Strong/Em (kept as is)
 type StrongProps = { children?: ReactNode } & HTMLAttributes<HTMLElement>;
 const Strong = ({ children, ...rest }: StrongProps) => (
   <strong style={{
@@ -244,7 +224,6 @@ const Em = ({ children, ...rest }: EmProps) => (
   }} {...rest}>{children}</em>
 );
 
-// Table components (kept as is, Tr simplified as CSS handles hover)
 type TableProps = { children?: ReactNode } & HTMLAttributes<HTMLTableElement>;
 const Table = ({ children, ...rest }: TableProps) => (
   <table style={{
@@ -268,7 +247,6 @@ const TBody = ({ children, ...rest }: TBodyProps) => (
 );
 
 type TrProps = { children?: ReactNode } & HTMLAttributes<HTMLTableRowElement>;
-// Simplified Tr: relies on .markdown-body tr:hover from index.css
 const Tr = (props: TrProps) => <tr {...props} />;
 
 type ThProps = { children?: ReactNode } & HTMLAttributes<HTMLTableCellElement>;
@@ -288,7 +266,6 @@ const Td = ({ children, ...rest }: TdProps) => (
   }} {...rest}>{children}</td>
 );
 
-// Blockquote (kept as is)
 type BlockquoteProps = { children?: ReactNode } & HTMLAttributes<HTMLElement>;
 const Blockquote = ({ children, ...rest }: BlockquoteProps) => (
   <blockquote
@@ -318,7 +295,6 @@ const ThinkingBlock = ({ content }: { content: string }) => {
             size="sm"
             className={cn(
               "mb-1", 
-              // Assuming var(--text) maps to foreground, var(--active) to accent
               "border-foreground text-foreground hover:bg-accent hover:text-accent-foreground"
             )}
           >
@@ -339,7 +315,6 @@ const ThinkingBlock = ({ content }: { content: string }) => {
                 remarkPlugins={[remarkGfm]}
                 components={{
                   ...markdownComponents, // Spread existing components
-                  // Override specific headings if needed, though they are already styled
                   h1: H1,
                   h2: H2,
                   h3: H3,
@@ -394,29 +369,16 @@ export const EditableMessage: FC<MessageProps> = ({
   const thinkRegex = /<think>([\s\S]*?)<\/think>/;
 
   return (
-    <div // Replaces Chakra Box
+    <div
       className={cn(
         "border rounded-2xl text-base font-semibold", // Chakra: border, borderRadius={16}, fontSize="md", fontWeight={600}
         "w-[calc(100%-2rem)] mx-1 my-2", // Adjusted width, ml/mr/my (Chakra uses different spacing scale)
-                                        // Original: width="calc(100% - 3rem)" ml={2} mr={2}
-                                        // Chakra ml={2} (0.5rem) -> mx-2. Let's use mx-1 (0.25rem) and my-2 (0.5rem) as example. Adjust as needed.
         "pb-1 pl-4 pr-4 pt-1", 
-        "shadow-lg text-left relative", // Chakra: boxShadow, textAlign, position
+        "shadow-lg text-left relative",
         turn.role === 'assistant' ? 'bg-accent border-accent-foreground' : 'bg-background border-foreground', // Chakra: background, borderColor
-        // Note: Original borderColor was var(--text) for both. If accent has different border, adjust.
-        // Using border-accent-foreground for assistant for contrast with bg-accent. Or stick to border-foreground.
-        // Let's stick to original: border-foreground for both.
-        // turn.role === 'assistant' ? 'bg-accent' : 'bg-background',
-        // 'border-foreground', // Common border color
         config?.paperTexture ? 'chat-message-bubble' : '',
         'chatMessage', isEditing ? 'editing' : ''  // Add "editing" class conditionally
       )}
-      style={{
-        // Apply conditional background and border color using style prop for CSS variables if preferred
-        // background: turn.role === 'assistant' ? 'var(--accent)' : 'var(--background)',
-        // borderColor: 'var(--foreground)',
-        // Or rely on Tailwind classes above, which is more standard for shadcn
-      }}
       onDoubleClick={() => {
         if (!isEditing) {
           onStartEdit(index, turn.rawContent);
@@ -431,15 +393,10 @@ export const EditableMessage: FC<MessageProps> = ({
             onChange={(e) => onSetEditText(e.target.value)}
             placeholder="Edit your message..."
             className={cn("autosize-textarea",
-              // Base shadcn textarea styles (adapted for AutosizeTextarea)
               "flex w-full rounded-md border bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground",
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-              // Original Chakra styles translated:
               "text-foreground", // color="var(--text)"
               "border-input", // Default shadcn border, original was var(--text) -> border-foreground
-                              // If you need border-foreground: "border-foreground hover:border-primary focus-visible:border-primary",
-                              // For consistency with shadcn forms, border-input is fine.
-                              // Let's use original intent:
               "border-foreground hover:border-primary focus-visible:border-primary focus-visible:ring-0",
               "min-h-[60px]" // Approximate minRows={3}
             )}
@@ -451,8 +408,6 @@ export const EditableMessage: FC<MessageProps> = ({
               size="sm"
               onClick={onSaveEdit}
               title="Save changes"
-              // Assuming default primary button is visually distinct (like green)
-              // className="bg-green-600 hover:bg-green-700 text-primary-foreground" // If specific green needed
             >
               <FiCheck className="h-4 w-4 mr-1" /> Save
             </Button>

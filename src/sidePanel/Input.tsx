@@ -1,7 +1,6 @@
-// input.tsx
 import type { TextareaHTMLAttributes, RefObject, FC } from 'react';
 import { AddToChat } from './AddToChat'; // Import AddToChat
-import { ForwardedRef, useEffect, useRef, useState, useCallback } from 'react';
+import { ForwardedRef, useEffect, useRef, useState, useCallback, Dispatch, SetStateAction } from 'react';
 import { FaRegStopCircle } from 'react-icons/fa';
 import { SlMicrophone } from "react-icons/sl";
 import { useConfig } from './ConfigContext'; // Assuming path is correct
@@ -70,7 +69,7 @@ AutoResizeTextarea.displayName = 'AutoResizeTextarea';
 interface InputProps {
     isLoading: boolean;
     message: string;
-    setMessage: (message: string) => void;
+    setMessage: Dispatch<SetStateAction<string>>; // This is the state setter function from useState
     onSend: () => void;
 }
 
@@ -78,10 +77,8 @@ export const Input: FC<InputProps> = ({ isLoading, message, setMessage, onSend }
   const { config } = useConfig();
   const ref = useRef<HTMLTextAreaElement>(null);
   const [isListening, setIsListening] = useState(false);
-  // const { toast } = useToast(); // Remove this line
 
-  // Refs and Effects for setMessage and focus (no changes needed)
-  const setMessageRef = useRef(setMessage);
+  const setMessageRef = useRef<Dispatch<SetStateAction<string>>>(setMessage);
   useEffect(() => {
     setMessageRef.current = setMessage;
   }, [setMessage]);
@@ -90,16 +87,13 @@ export const Input: FC<InputProps> = ({ isLoading, message, setMessage, onSend }
     ref.current?.focus();
   }, [message, config?.chatMode]);
 
-  // Placeholder logic (no changes needed)
   const placeholder = config?.chatMode === 'web' ? 'what to search?' : config?.chatMode === 'page' ? 'about the page..' : '';
 
-  // Speech Recognition Refs and Logic
   const recognitionRef = useRef<SpeechRecognition | null>(null);
 
   const handleListen = useCallback(async () => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
-        // Use sonner toast directly
         toast.error('Unsupported Browser', {
             description: 'Speech recognition is not supported in this browser.',
             duration: 3000,
@@ -119,7 +113,7 @@ export const Input: FC<InputProps> = ({ isLoading, message, setMessage, onSend }
         const transcript = Array.from(event.results)
           .map(result => result[0].transcript)
           .join('');
-        setMessageRef.current(prev => prev + transcript);
+        setMessageRef.current((prev: string) => prev + transcript);
       };
 
       recognition.onend = () => {
@@ -139,7 +133,6 @@ export const Input: FC<InputProps> = ({ isLoading, message, setMessage, onSend }
         } else {
             description = `Error: ${event.error}`;
         }
-        // Use sonner toast directly
         toast.error('Speech Error', {
           description: description,
           duration: 3000,
@@ -164,17 +157,14 @@ export const Input: FC<InputProps> = ({ isLoading, message, setMessage, onSend }
       } else if (err.name === 'NotFoundError') {
           description = 'No microphone found. Please ensure one is connected and enabled.';
       }
-      // Use sonner toast directly
       toast.error('Microphone Error', {
         description: description,
         duration: 3000,
       });
       setIsListening(false);
     }
-  // No need to include `toast` in dependency array as it's a direct import
   }, []);
 
-  // Cleanup effect (no changes needed)
   useEffect(() => {
     return () => {
       if (recognitionRef.current) {
@@ -184,7 +174,6 @@ export const Input: FC<InputProps> = ({ isLoading, message, setMessage, onSend }
     };
   }, []);
 
-  // Check for SpeechRecognition support (client-side check)
   const isSpeechRecognitionSupported = typeof window !== 'undefined' &&
     (window.SpeechRecognition || window.webkitSpeechRecognition);
 
