@@ -11,7 +11,7 @@ Built on [sidellama](https://github.com/gyopak/sidellama).
 *   Bug fixes and improvements.
 *   Evaluate and integrate pull requests.
 *   ~Migrate to Shadcn/ui from Chakra-UI V2,~ and ~React 19~. [20250509]
-*   Wiki Search ~with API~[20250514] and kiwix(zim-reader)
+*   ~Wiki Search ~with API~[20250514] and kiwix(zim-reader)~ [20250515]: Consider it's done. Kiwix search plan abandoned, because it's less useful when it comes to LLM search. Just use the Zim browser locally. LLM won't be helpful if there is no embedding process. For local search, the best/easiest solution I think is to set up a local search index based on https://github.com/stanford-oval/WikiChat option 2, then change the links inside the network.tsx to HTTP://localhost:[your_port_number]. 
 *   Search with API for Google
 *   ~Simple tool use to enhance the current web search to reduce the cost of running LLM and get a better result.~ [20250512]
 *   Better local TTS/STT by API. [not important]
