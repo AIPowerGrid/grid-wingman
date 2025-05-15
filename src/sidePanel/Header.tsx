@@ -404,6 +404,7 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
                   <div className="relative">
                     <Input
                        id="model-input"
+                       value={inputFocused ? searchQuery : config?.selectedModel || ''}
                        placeholder={
                          inputFocused
                            ? 'Search models...'
