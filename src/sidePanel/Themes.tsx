@@ -10,7 +10,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { Slider } from '@/components/ui/slider';
-import { Switch } from "@/components/ui/switch"; // Import Switch
+import { Switch } from "@/components/ui/switch";
 import { useConfig } from './ConfigContext';
 import { SettingTitle } from './SettingsTitle';
 import { useState, useEffect, useCallback } from 'react';
@@ -31,7 +31,7 @@ export type Theme = {
   codeBg: string;
   codeFg: string;
   preBg: string;
-  mute: string; // Added for dedicated muted text color
+  mute: string;
   preFg: string;
   tableBorder: string;
   error: string;
@@ -65,7 +65,7 @@ export const themes: Theme[] = [
     text: '#FCFAF2',
     bold: '#E9CD4C',
     italic: '#A8D8B9',
-    link: '#8aa8e8',
+    link: '#546485',
     codeBg: '#FCFAF2',
     codeFg: '#91989F',
     preBg: '#FCFAF2',
@@ -96,18 +96,18 @@ export const themes: Theme[] = [
   },
   {
     name: 'light',
-    active: '#E0EFFF',     // Light, clear blue (for active element backgrounds)
-    bg: '#FFFFFF',         // White (main background)
-    text: '#212529',       // Dark Gray/Off-Black (main text)
-    bold: '#004080',       // Darker blue (for bold text)
-    italic: '#555555',     // Dark Gray (for italic text)
-    link: '#0056b3',       // Accessible standard blue (for links)
-    codeBg: '#F8F9FA',     // Very light gray (background for inline code)
-    codeFg: '#212529',     // Dark gray/off-black (text for inline code)
-    preBg: '#F8F9FA',      // Very light gray (background for code blocks)
-    preFg: '#212529',      // Dark gray/off-black (text for code blocks)
-    mute: '#6C757D',       // Muted gray (for less prominent text)
-    tableBorder: '#DEE2E6', // Light gray (for table borders)
+    active: '#E0EFFF',
+    bg: '#FFFFFF', 
+    text: '#212529', 
+    bold: '#004080', 
+    italic: '#555555', 
+    link: '#0056b3', 
+    codeBg: '#F8F9FA',
+    codeFg: '#212529', 
+    preBg: '#F8F9FA',  
+    preFg: '#212529', 
+    mute: '#6C757D',    
+    tableBorder: '#DEE2E6', 
     error: '#d32f2f',
     success: '#388e3c',
     warning: '#fbc02d',
@@ -124,14 +124,14 @@ export const themes: Theme[] = [
     codeFg: '#373737',
     preBg: '#e3e3e3',
     preFg: '#373737',
-    mute: '#A9A9A9', // Lighter gray for dark themes
+    mute: '#A9A9A9',
     tableBorder: '#e3e3e3',
     error: '#d32f2f',
     success: '#388e3c',
     warning: '#fbc02d',
   },
   {
-    name: 'custom', // Base for custom theme
+    name: 'custom', 
     active: '#7473af', bg: '#393939', text: '#e3e3e3', bold: '#af1b1b',
     italic: '#09993e', link: '#003bb9', codeBg: '#e3e3e3', codeFg: '#393939',
     preBg: '#e3e3e3', preFg: '#393939', mute: '#A9A9A9', tableBorder: '#e3e3e3',
@@ -156,10 +156,10 @@ export const setTheme = (c: Theme, paperTextureEnabled: boolean = true) => {
   const bold = c.bold || '#000000';
   const italic = c.italic || '#000000';
   const link = c.link || '#007bff';
-  const codeBg = c.codeBg || text; // For --markdown-code-background (inline code bg) & --muted
-  const codeFg = c.codeFg || bg;   // For --markdown-inline-code-foreground & --muted-foreground
-  const preBg = c.preBg || text;   // For --markdown-pre-background (block code bg)
-  const preFg = c.preFg || bg;     // For --markdown-pre-foreground (block code fg)
+  const codeBg = c.codeBg || text;
+  const codeFg = c.codeFg || bg;
+  const preBg = c.preBg || text; 
+  const preFg = c.preFg || bg;  
   const mute = c.mute || (text === '#000000' ? '#757575' : '#A9A9A9'); // Fallback based on typical text color
   const tableBorder = c.tableBorder || text;
   const errorColor = c.error || '#d32f2f';
@@ -177,7 +177,7 @@ export const setTheme = (c: Theme, paperTextureEnabled: boolean = true) => {
   root.style.setProperty('--secondary', active);
   root.style.setProperty('--secondary-foreground', bg);
   root.style.setProperty('--muted', codeBg); // Use inline code's bg for muted
-  root.style.setProperty('--muted-foreground', mute); // CORRECTED: Use dedicated mute
+  root.style.setProperty('--muted-foreground', mute);
   root.style.setProperty('--accent', active);
   root.style.setProperty('--accent-foreground', bg);
   root.style.setProperty('--destructive', errorColor);
@@ -198,7 +198,7 @@ export const setTheme = (c: Theme, paperTextureEnabled: boolean = true) => {
   root.style.setProperty('--markdown-pre-background', preBg);
   root.style.setProperty('--markdown-table-border', tableBorder);
   root.style.setProperty('--markdown-thead-background', active); // Using active (like secondary)
-  root.style.setProperty('--markdown-thead-foreground', bg);     // Contrast with active
+  root.style.setProperty('--markdown-thead-foreground', bg);
 
   root.style.setProperty('--bold', bold);
   root.style.setProperty('--italic', italic);
@@ -229,10 +229,10 @@ const PaletteColorPicker = ({
 
   return (
     <ColorPicker
-      color={color} // This is the state from useColor
+      color={color} 
       onChange={(newColor) => {
         console.log(`PaletteColorPicker INTERNAL onChange for key "${themeKey}":`, newColor.hex);
-        setColor(newColor); // This updates the local state for the picker itself
+        setColor(newColor);
       }}
       onChangeComplete={(finalColor) => {
         console.log(`PaletteColorPicker INTERNAL onChangeComplete for key "${themeKey}":`, finalColor.hex);
@@ -243,7 +243,6 @@ const PaletteColorPicker = ({
   );
 };
 
-// DEFAULT_CUSTOM_THEME_FALLBACK (remains the same, ensure all keys are present)
 const DEFAULT_CUSTOM_THEME_FALLBACK: Theme = {
   name: 'custom',
   active: '#b5d4aa', bg: '#245612', text: '#efeaea', bold: '#fbd709',
@@ -292,7 +291,7 @@ export const Themes = () => {
     return mergedInitialState;
   });
 
-  useEffect(() => { /* ... sync logic ... */
+  useEffect(() => {
     if (config?.theme === 'custom') {
       const configCustom = (typeof config?.customTheme === 'object' && config.customTheme !== null)
         ? config.customTheme
@@ -328,7 +327,6 @@ export const Themes = () => {
 
     setCustomThemeColors(prevCustomColors => {
       let newThemeData = { ...prevCustomColors, [key]: value };
-      // ... (cascading logic)
       if (key === 'text') {
         newThemeData.codeBg = value; newThemeData.preBg = value; newThemeData.tableBorder = value;
         newThemeData.error = newThemeData.bold || value; newThemeData.warning = newThemeData.bold || value;
@@ -350,12 +348,12 @@ export const Themes = () => {
       });
       return newThemeData;
     });
-  }, [updateConfig]); // Removed customThemeColors from deps, using functional update for setCustomThemeColors
+  }, [updateConfig]);
 
   const editableColorKeys: Array<keyof Omit<Theme, 'name'>> = ['bg', 'text', 'active', 'bold', 'italic', 'link', 'mute'];
   const effectiveCustomThemeForPickers: Theme = { ...customThemeColors, name: 'custom' };
 
-  useEffect(() => { /* ... theme application logic ... */
+  useEffect(() => {
     const currentThemeName = config?.theme || 'paper';
     const isCustom = currentThemeName === 'custom';
     let themeToApply: Theme | undefined;
@@ -385,7 +383,7 @@ export const Themes = () => {
 
   return (
     <AccordionItem
-      value="themes" // This value should match the one used in the parent Accordion
+      value="themes"
       className={cn(
         controlBg, subtleBorderClass, itemRounded, itemShadow,
         "transition-all duration-150 ease-in-out",
@@ -404,9 +402,7 @@ export const Themes = () => {
       </AccordionTrigger>
       <AccordionContent className="px-3 pb-4 pt-2 text-[var(--text)]">
         <div className="flex flex-col gap-6">
-          {/* Settings Toggles */}
           <div className="flex flex-col gap-3">
-            {/* Create chat title */}
             <div className="flex items-center justify-between pr-3">
               <Label htmlFor="generateTitle-switch" className="text-base font-medium text-foreground cursor-pointer">Create chat title</Label>
               <Switch
@@ -415,7 +411,6 @@ export const Themes = () => {
                 onCheckedChange={(checked) => updateConfig({ generateTitle: checked })}
               />
             </div>
-            {/* Background illustration */}
             <div className="flex items-center justify-between pr-3">
               <Label htmlFor="backgroundImage-switch" className="text-base font-medium text-foreground cursor-pointer">Background illustration</Label>
               <Switch
@@ -424,7 +419,6 @@ export const Themes = () => {
                 onCheckedChange={(checked) => updateConfig({ backgroundImage: checked })}
               />
             </div>
-            {/* Paper texture */}
             <div className="flex items-center justify-between pr-3">
               <Label htmlFor="paperTexture-switch" className="text-base font-medium text-foreground cursor-pointer">Paper texture</Label>
               <Switch
@@ -435,13 +429,11 @@ export const Themes = () => {
             </div>
           </div>
 
-          {/* Font Size Slider */}
           <div>
             <p className="text-foreground text-base font-medium pb-3 text-left">Font Size: {currentFontSize}px</p>
             <Slider value={[currentFontSize]} max={20} min={7} step={1} className="w-full" onValueChange={(value) => { updateConfig({ fontSize: value[0] }); }} />
           </div>
 
-          {/* Custom Theme Color Editor Section */}
           <div className="pt-4 mt-4 border-t border-[var(--text)]/20">
             <div className="space-y-2 mb-4">
               <h4 className="font-medium leading-none text-foreground">Custom Theme Colors</h4>
