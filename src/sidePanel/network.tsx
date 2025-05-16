@@ -272,7 +272,7 @@ export const webSearch = async (
                 ? `https://search.brave.com/search?q=${encodeURIComponent(query)}`
                 : webMode === 'Google'
                     ? `https://www.google.com/search?q=${encodeURIComponent(query)}&hl=en&gl=us`
-                    : `https://duckduckgo.com/html/?q=${encodeURIComponent(query)}`;
+                    : `https://html.duckduckgo.com/html/?q=${encodeURIComponent(query)}`;
 
             const response = await fetch(baseUrl, {
                 signal: serpAbortController.signal,
