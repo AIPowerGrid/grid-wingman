@@ -21,8 +21,8 @@ import useSendMessage from './hooks/useSendMessage';
 import { useUpdateModels } from './hooks/useUpdateModels';
 import { Background } from './Background';
 import { ChatHistory, ChatMessage, MessageTurn } from './ChatHistory';
-import { useConfig } from './ConfigContext'; // Assuming Config type is accessible or part of this
-import type { Config } from '../types/config'; // Make sure Config type is imported
+import { useConfig } from './ConfigContext';
+import type { Config } from '../types/config'; 
 import { Header } from './Header';
 import { Input } from './Input';
 import { Messages } from './Messages';
@@ -367,7 +367,7 @@ const Cognito = () => {
     setPageContent('');
     setWebContent('');
     setLoading(false);
-    updateConfig({ chatMode: undefined, webMode: undefined, computeLevel: 'low' }); // Also reset webMode
+    updateConfig({ chatMode: undefined, computeLevel: 'low' });
     setMessage('');
     setChatTitle('');
     setChatId(generateChatId());
