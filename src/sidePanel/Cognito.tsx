@@ -1,24 +1,28 @@
 import { useEffect, useState, useRef } from 'react';
 import { toast, Toaster } from 'react-hot-toast';
 import localforage from 'localforage';
-import { TbWorldSearch, TbBrowserPlus } from "react-icons/tb";
+import { TbWorldSearch, TbBrowserPlus, TbApi } from "react-icons/tb"; // TbApi was already here
 import { BiBrain } from "react-icons/bi";
+import { FaWikipediaW, FaGoogle, FaBrave } from "react-icons/fa6";
+import { SiDuckduckgo } from "react-icons/si";
 
-import { Button } from "@/components/ui/button"; // Shadcn Button
+
+import { Button } from "@/components/ui/button";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { cn } from "@/src/background/util"; // Utility for conditional classes
+import { cn } from "@/src/background/util";
 
 import { useChatTitle } from './hooks/useChatTitle';
 import useSendMessage from './hooks/useSendMessage';
 import { useUpdateModels } from './hooks/useUpdateModels';
 import { Background } from './Background';
 import { ChatHistory, ChatMessage, MessageTurn } from './ChatHistory';
-import { useConfig } from './ConfigContext';
+import { useConfig } from './ConfigContext'; // Assuming Config type is accessible or part of this
+import type { Config } from '../types/config'; // Make sure Config type is imported
 import { Header } from './Header';
 import { Input } from './Input';
 import { Messages } from './Messages';
@@ -31,10 +35,6 @@ import storage from '../background/storageUtil';
 
 function bridge() {
     // --- Safety Measure 1: Basic DOM readiness check (optional, usually not an issue for content scripts) ---
-    // if (document.readyState !== 'complete' && document.readyState !== 'interactive') {
-    //     console.warn('[Cognito Bridge] DOM not fully ready. Content might be incomplete.');
-    //     // You could return an error or empty data here if critical
-    // }
 
     let title = '';
     let textContent = '';
@@ -48,7 +48,6 @@ function bridge() {
         title = document.title || '';
 
         // --- Safety Measure 2: Limit the scope for innerText/innerHTML if body is enormous ---
-        // This is a heuristic. You might need to adjust MAX_CHARS or disable.
         const MAX_BODY_CHARS_FOR_DIRECT_EXTRACTION = 5_000_000; // Approx 5MB of text
         let bodyElement = document.body;
 
@@ -58,12 +57,7 @@ function bridge() {
             const clonedBody = document.body.cloneNode(true) as HTMLElement;
             clonedBody.querySelectorAll('script, style, noscript, iframe, embed, object').forEach(el => el.remove());
             textContent = (clonedBody.textContent || '').replace(/\s\s+/g, ' ').trim();
-            // For HTML, you might still want the original or decide to send the cleaned one
-            htmlContent = document.body.innerHTML.replace(/\s\s+/g, ' '); // Or clonedBody.innerHTML
-            // Or, if even clonedBody.innerHTML is too big, send a truncated version or placeholder
-            // if (htmlContent.length > MAX_BODY_CHARS_FOR_DIRECT_EXTRACTION * 1.5) { // HTML can be larger
-            //    htmlContent = `HTML content too large (length: ${htmlContent.length}). Truncated.`;
-            // }
+            htmlContent = document.body.innerHTML.replace(/\s\s+/g, ' ');
 
         } else if (document.body) {
             textContent = (document.body.innerText || '').replace(/\s\s+/g, ' ').trim();
@@ -72,8 +66,6 @@ function bridge() {
             console.warn('[Cognito Bridge] document.body is not available.');
         }
 
-
-        // --- Alt Texts and Table Data (generally safe as is) ---
         altTexts = Array.from(document.images)
             .map(img => img.alt)
             .filter(alt => alt && alt.trim().length > 0)
@@ -83,7 +75,6 @@ function bridge() {
             .map(table => (table.innerText || '').replace(/\s\s+/g, ' '))
             .join('\n');
 
-        // --- Meta Tags (generally safe as is) ---
         const descElement = document.querySelector('meta[name="description"]');
         metaDescription = descElement ? descElement.getAttribute('content') || '' : '';
 
@@ -92,7 +83,6 @@ function bridge() {
 
     } catch (error) {
         console.error('[Cognito Bridge] Error during content extraction:', error);
-        // Return a structured error or partial data if possible
         return JSON.stringify({
             error: `Extraction failed: ${error.message}`,
             title: document.title || 'Error extracting title', // Try to get title anyway
@@ -130,7 +120,6 @@ function bridge() {
         if (responseCandidate.html.length > remainingLength * 0.8) { // Then HTML
              responseCandidate.html = responseCandidate.html.substring(0, Math.floor(remainingLength * 0.8)) + "... (truncated)";
         }
-        // Could add more truncation for altTexts, tableData if still too large
         console.warn('[Cognito Bridge] Content truncated. Final approx length:', JSON.stringify(responseCandidate).length);
     }
 
@@ -145,7 +134,6 @@ async function injectBridge() {
   // Add early return for restricted URLs
   if (!tab?.id || tab.url?.startsWith('chrome://') || tab.url?.startsWith('chrome-extension://') || tab.url?.startsWith('about:')) { // Added about:
     console.debug('[Cognito:] Skipping injection for restricted URL:', tab?.url);
-    // Clear storage if activating/navigating to a restricted tab
     storage.deleteItem('pagestring');
     storage.deleteItem('pagehtml');
     storage.deleteItem('alttexts');
@@ -155,7 +143,6 @@ async function injectBridge() {
 
   console.debug(`[Cognito:] Attempting injection into tab ${tab.id} (${tab.url})`);
 
-  // Clear storage before injection attempt
   storage.deleteItem('pagestring');
   storage.deleteItem('pagehtml');
   storage.deleteItem('alttexts');
@@ -176,7 +163,7 @@ async function injectBridge() {
     }
 
     const rawResult = results[0].result;
-    let res: any; // Use 'any' for simplicity in reverted version or define a simple interface
+    let res: any;
     try {
         res = JSON.parse(rawResult);
     } catch (parseError) {
@@ -184,13 +171,12 @@ async function injectBridge() {
         return;
     }
 
-    // Check for error field from bridge (added basic error handling)
     if (res.error) {
         console.error('[Cognito:] Bridge function reported an error:', res.error, 'Title:', res.title);
         return;
     }
 
-    console.debug('[Cognito:] Bridge function parsed result:', { // Log subset
+    console.debug('[Cognito:] Bridge function parsed result:', {
         title: res?.title,
         textLength: res?.text?.length,
         htmlLength: res?.html?.length
@@ -198,16 +184,14 @@ async function injectBridge() {
     console.log(`[Cognito:] Extracted Content: Text=${res?.text?.length}, HTML=${res?.html?.length}`);
 
 
-    // Store the extracted content (reverted version)
     try {
-      storage.setItem('pagestring', res?.text ?? ''); // Use nullish coalescing
+      storage.setItem('pagestring', res?.text ?? '');
       storage.setItem('pagehtml', res?.html ?? '');
       storage.setItem('alttexts', res?.altTexts ?? '');
       storage.setItem('tabledata', res?.tableData ?? '');
       console.debug('[Cognito:] Stored extracted content.');
     } catch (storageError) {
         console.error('[Cognito:] Storage error after successful extraction:', storageError);
-        // Attempt to clear storage again on error
         storage.deleteItem('pagestring');
         storage.deleteItem('pagehtml');
         storage.deleteItem('alttexts');
@@ -227,18 +211,55 @@ const generateChatId = () => `chat_${Math.random().toString(16).slice(2)}`;
 const MessageTemplate = ({ children, onClick }: { children: React.ReactNode, onClick: () => void }) => (
   (<div
     className={cn(
-      "bg-[var(--active)] border border-[var(--text)] rounded-[16px] text-[var(--text)]", // background, border, borderRadius, color
-      "cursor-pointer flex items-center justify-center", // cursor, display, alignItems, justifyContent
-      "text-md font-extrabold p-0.5 place-items-center relative text-center", // fontSize, fontWeight, p, placeItems, position, textAlign
-      "w-16 flex-shrink-0", // width="4rem", flexShrink=0
-      "transition-colors duration-200 ease-in-out", // transition
-      "hover:bg-[rgba(var(--text-rgb),0.1)]" // _hover.background
+      "bg-[var(--active)] border border-[var(--text)] rounded-[16px] text-[var(--text)]",
+      "cursor-pointer flex items-center justify-center",
+      "text-md font-extrabold p-0.5 place-items-center relative text-center",
+      "w-16 flex-shrink-0",
+      "transition-colors duration-200 ease-in-out",
+      "hover:bg-[rgba(var(--text-rgb),0.1)]"
     )}
-    onClick={onClick} // Keep onClick
+    onClick={onClick}
   >
     {children}
   </div>)
 );
+
+// Define constants and WebSearchIconButton component (outside Cognito functional component)
+const WEB_SEARCH_MODES = [
+  { id: 'Google', icon: FaGoogle, label: 'Google Search' },
+  { id: 'Duckduckgo', icon: SiDuckduckgo, label: 'DuckDuckGo Search' },
+  { id: 'Brave', icon: FaBrave, label: 'Brave Search' },
+  { id: 'Wikipedia', icon: FaWikipediaW, label: 'Wikipedia Search' },
+  { id: 'GoogleCustomSearch', icon: TbApi, label: 'Google API Search' },
+] as const;
+
+// Helper component for web search icon buttons
+const WebSearchIconButton = ({ children, onClick, isActive, title }: { children: React.ReactNode, onClick: () => void, isActive?: boolean, title: string }) => (
+  <Tooltip>
+    <TooltipTrigger>
+      <div
+        className={cn(
+          "border rounded-lg text-[var(--text)]",
+          "cursor-pointer flex items-center justify-center",
+          "p-2 place-items-center relative",
+          "w-10 h-10 flex-shrink-0",
+          "transition-colors duration-200 ease-in-out",
+          isActive 
+            ? "bg-[var(--active)] text-[var(--bg)] border-[var(--active)] hover:brightness-95" 
+            : "bg-transparent border-[var(--text)]/50 hover:bg-[rgba(var(--text-rgb),0.1)]",
+        )}
+        onClick={onClick}
+        aria-label={title}
+      >
+        {children}
+      </div>
+    </TooltipTrigger>
+    <TooltipContent side="top" className="bg-[var(--active)]/80 text-[var(--text)] border-[var(--text)]/50">
+      <p>{title}</p>
+    </TooltipContent>
+  </Tooltip>
+);
+
 
 const Cognito = () => {
   const [turns, setTurns] = useState<MessageTurn[]>([]);
@@ -255,10 +276,14 @@ const Cognito = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const lastInjectedRef = useRef<{ id: number | null, url: string }>({ id: null, url: '' });
 
+  // Hover states for button groups
+  const [isPageActionsHovering, setIsPageActionsHovering] = useState(false);
+  const [isWebSearchHovering, setIsWebSearchHovering] = useState(false);
+
   useEffect(() => {
     const resizeObserver = new ResizeObserver(() => {
       if (containerRef.current) {
-        containerRef.current.style.minHeight = '100dvh'; // Use 100dvh
+        containerRef.current.style.minHeight = '100dvh';
         requestAnimationFrame(() => {
           if (containerRef.current) {
             containerRef.current.style.minHeight = '';
@@ -342,7 +367,7 @@ const Cognito = () => {
     setPageContent('');
     setWebContent('');
     setLoading(false);
-    updateConfig({ chatMode: undefined, computeLevel: 'low' });
+    updateConfig({ chatMode: undefined, webMode: undefined, computeLevel: 'low' }); // Also reset webMode
     setMessage('');
     setChatTitle('');
     setChatId(generateChatId());
@@ -373,7 +398,7 @@ const Cognito = () => {
     setChatId(chat.id);
     setHistoryMode(false);
     setSettingsMode(false);
-    updateConfig({ chatMode: undefined });
+    updateConfig({ chatMode: undefined, webMode: chat.webMode || config?.webMode }); // Load webMode if saved with chat
     storage.deleteItem('pagestring');
     storage.deleteItem('pagehtml');
     storage.deleteItem('alttexts');
@@ -395,7 +420,6 @@ const Cognito = () => {
     }
   };
 
-  // Chat saving useEffect remains the same (no Chakra UI)
   useEffect(() => {
     if (turns.length > 0 && !isLoading && !historyMode && !settingsMode) {
       const savedChat: ChatMessage = {
@@ -403,14 +427,15 @@ const Cognito = () => {
         title: chatTitle || `Chat ${new Date(Date.now()).toLocaleString()}`,
         turns,
         last_updated: Date.now(),
-        model: config?.selectedModel
+        model: config?.selectedModel,
+        webMode: config?.webMode, // Save webMode with chat
       };
       console.log(`[Cognito ] Saving chat ${chatId} (Turns: ${turns.length})`);
       localforage.setItem(chatId, savedChat).catch(err => {
         console.error(`[Cognito ] Error saving chat ${chatId}:`, err);
       });
     }
-  }, [chatId, turns, isLoading, chatTitle, config?.selectedModel, historyMode, settingsMode]);
+  }, [chatId, turns, isLoading, chatTitle, config?.selectedModel, config?.webMode, historyMode, settingsMode]);
 
   useEffect(() => {
     let cancelled = false;
@@ -480,15 +505,13 @@ const Cognito = () => {
     });
   };
 
-  const [isHovering, setIsHovering] = useState(false); // Keep state for hover effect
-
   return (
-    <TooltipProvider delayDuration={500}>
+    <TooltipProvider delayDuration={300}> {/* Adjusted delayDuration for quicker tooltips */}
       <div
         ref={containerRef}
         className={cn(
-          "w-full min-h-dvh p-0 relative overflow-hidden", // maxWidth, minHeight, padding, position, overflow
-          "flex flex-col bg-[var(--bg)]" // display, flexDirection, bg
+          "w-full min-h-dvh p-0 relative overflow-hidden",
+          "flex flex-col bg-[var(--bg)]"
         )}
       >
         <div
@@ -509,12 +532,12 @@ const Cognito = () => {
             settingsMode={settingsMode}
           />
           {settingsMode && (
-            <div id="settings" className="relative flex-grow overflow-auto"> {/* Added wrapper with ID and relative positioning */}
+            <div id="settings" className="relative flex-grow overflow-auto">
               <Settings />
             </div>
           )}
 
-          <div className="flex flex-col min-h-0"> {/* display, flexDir, flex="1 1 0%", minHeight={0} */}
+          <div className="flex flex-col min-h-0">
             {!settingsMode && !historyMode && turns.length > 0 && (
                   <Messages
                     isLoading={isLoading}
@@ -525,40 +548,45 @@ const Cognito = () => {
                   />
                 )}
             {!settingsMode && !historyMode && turns.length === 0 && !config?.chatMode && (
-              (<div className="absolute bottom-16 left-8 flex flex-col gap-2"> {/* bottom, left, position, display, flexDirection, gap */}
+              (<div className="absolute bottom-16 left-8 flex flex-col gap-2">
                 <Tooltip>
-                  <TooltipTrigger>
+                  <TooltipTrigger asChild>
                     <Button
                       aria-label="Cycle compute level"
-                      variant="ghost" // variant="ghost"
-                      size="icon" // size="lg" -> maps to h-11 w-11 in Shadcn default
-                      onClick={() => { // Keep onClick
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => {
                         const currentLevel = config.computeLevel;
                         const nextLevel = currentLevel === 'low' ? 'medium' : currentLevel === 'medium' ? 'high' : 'low';
                         updateConfig({ computeLevel: nextLevel });
                       }}
                       className={cn(
-                        "hover:bg-secondary/70", // _hover.bg approximation
+                        "hover:bg-secondary/70",
                         config.computeLevel === 'high' ? 'text-red-600' :
                         config.computeLevel === 'medium' ? 'text-orange-300' :
-                        'text-[var(--text)]' // Default color
+                        'text-[var(--text)]'
                       )}
                     >
-                      <BiBrain /> {/* Keep icon */}
+                      <BiBrain />
                     </Button>
                   </TooltipTrigger>
-                  <TooltipContent side="right" className="bg-[var(--active)]/50 text-[var(--text)] border-[var(--text)] max-w-80"> {/* Map placement, bg, color */}
-                    <p>{`Compute Level: ${config.computeLevel?.toUpperCase()}. Click to change. [Warning]: beta feature and resource costly.`}</p> {/* Map label */}
+                  <TooltipContent side="right" className="bg-[var(--active)]/50 text-[var(--text)] border-[var(--text)] max-w-80">
+                    <p>{`Compute Level: ${config.computeLevel?.toUpperCase()}. Click to change. [Warning]: beta feature and resource costly.`}</p>
                   </TooltipContent>
                 </Tooltip>
                 <Tooltip>
-                  <TooltipTrigger>
+                  <TooltipTrigger asChild>
                     <Button
                       aria-label="Add Web Search Results to LLM Context"
                       variant="ghost"
                       size="icon"
-                      onClick={() => { updateConfig({ chatMode: 'web' }); }}
-                      className="text-[var(--text)] hover:bg-secondary/70" // color, _hover.bg
+                      onClick={() => { 
+                        updateConfig({ 
+                          chatMode: 'web',
+                          webMode: config.webMode || (WEB_SEARCH_MODES[0].id as Config['webMode'])
+                        }); 
+                      }}
+                      className="text-[var(--text)] hover:bg-secondary/70"
                     >
                       <TbWorldSearch />
                     </Button>
@@ -568,7 +596,7 @@ const Cognito = () => {
                   </TooltipContent>
                 </Tooltip>
                 <Tooltip>
-                  <TooltipTrigger>
+                  <TooltipTrigger asChild>
                     <Button
                       aria-label="Add Current Web Page to LLM Context"
                       variant="ghost"
@@ -585,55 +613,113 @@ const Cognito = () => {
                 </Tooltip>
               </div>)
                 )}
+            {/* Page Mode Action Buttons */}
             {!settingsMode && !historyMode && config?.chatMode === "page" && (
                    (<div
                       className={cn(
-                        "fixed bottom-14 left-0 right-0", // bottom, left, right, position
-                        "flex flex-row justify-center", // display, flexDirection, justifyContent
-                        "w-full h-12 z-[2]", // maxWidth, height, zIndex
-                        "transition-all duration-200 ease-in-out", // transition
-                        isHovering ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2.5", // opacity, transform based on state
-                        "bg-transparent px-0 py-0" // sx background, padding
+                        "fixed bottom-14 left-0 right-0",
+                        "flex flex-row justify-center",
+                        "w-full h-12 z-[2]",
+                        "transition-all duration-200 ease-in-out",
+                        isPageActionsHovering ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2.5",
+                        "bg-transparent px-0 py-0"
                       )}
-                      style={{ backdropFilter: 'blur(10px)' }} // Keep backdropFilter from sx
-                      onMouseEnter={() => setIsHovering(true)} // Keep event handlers
-                      onMouseLeave={() => setIsHovering(false)}
+                      style={{ backdropFilter: 'blur(10px)' }}
+                      onMouseEnter={() => setIsPageActionsHovering(true)}
+                      onMouseLeave={() => setIsPageActionsHovering(false)}
                    >
-                     <div className="flex items-center space-x-6 max-w-full overflow-x-auto px-4"> {/* spacing, maxW, overflowX, px */}
-                       <MessageTemplate onClick={() => onSend('Provide your summary.')}>
-                         TLDR
-                       </MessageTemplate>
-                       <MessageTemplate onClick={() => onSend('Extract all key figures, names, locations, and dates mentioned on this page and list them.')}>
-                         Facts
-                       </MessageTemplate>
-                       <MessageTemplate onClick={() => onSend('Find positive developments, achievements, or opportunities mentioned on this page.')}>
-                         Yay!
-                       </MessageTemplate>
-                       <MessageTemplate onClick={() => onSend('Find concerning issues, risks, or criticisms mentioned on this page.')}>
-                         Oops
-                       </MessageTemplate>
+                     <div className="flex items-center space-x-6 max-w-full overflow-x-auto px-4">
+                        <Tooltip>
+                          <TooltipTrigger>
+                            <MessageTemplate onClick={() => onSend('Provide your summary.')}>
+                              TLDR
+                            </MessageTemplate>
+                          </TooltipTrigger>
+                          <TooltipContent side="top" className="bg-[var(--active)]/80 text-[var(--text)] border-[var(--text)]/50">
+                            <p>Quick Summary</p>
+                          </TooltipContent>
+                        </Tooltip>
+                       <Tooltip>
+                          <TooltipTrigger>
+                            <MessageTemplate onClick={() => onSend('Extract all key figures, names, locations, and dates mentioned on this page and list them.')}>
+                              Facts
+                            </MessageTemplate>
+                          </TooltipTrigger>
+                          <TooltipContent side="top" className="bg-[var(--active)]/80 text-[var(--text)] border-[var(--text)]/50">
+                            <p>Numbers, events, names</p>
+                          </TooltipContent>
+                        </Tooltip>
+                       <Tooltip>
+                          <TooltipTrigger>
+                            <MessageTemplate onClick={() => onSend('Find positive developments, achievements, or opportunities mentioned on this page.')}>
+                              Yay!
+                            </MessageTemplate>
+                          </TooltipTrigger>
+                          <TooltipContent side="top" className="bg-[var(--active)]/80 text-[var(--text)] border-[var(--text)]/50">
+                            <p>Good news</p>
+                          </TooltipContent>
+                        </Tooltip>
+                       <Tooltip>
+                          <TooltipTrigger>
+                            <MessageTemplate onClick={() => onSend('Find concerning issues, risks, or criticisms mentioned on this page.')}>
+                              Oops
+                            </MessageTemplate>
+                          </TooltipTrigger>
+                          <TooltipContent side="top" className="bg-[var(--active)]/80 text-[var(--text)] border-[var(--text)]/50">
+                            <p>Bad news</p>
+                          </TooltipContent>
+                        </Tooltip>
                      </div>
                    </div>)
             )}
+            {/* Web Search Mode Selection Buttons */}
+            {!settingsMode && !historyMode && config?.chatMode === "web" && (
+              <div
+                className={cn(
+                  "fixed bottom-14 left-0 right-0",
+                  "flex flex-row justify-center",
+                  "w-full h-12 z-[2]",
+                  "transition-all duration-200 ease-in-out",
+                  isWebSearchHovering ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2.5",
+                  "bg-transparent px-0 py-0"
+                )}
+                style={{ backdropFilter: 'blur(10px)' }}
+                onMouseEnter={() => setIsWebSearchHovering(true)}
+                onMouseLeave={() => setIsWebSearchHovering(false)}
+              >
+                <div className="flex items-center space-x-3 max-w-full overflow-x-auto px-4 py-1">
+                  {WEB_SEARCH_MODES.map((mode) => (
+                    <WebSearchIconButton
+                      key={mode.id}
+                      onClick={() => {
+                        updateConfig({ webMode: mode.id as Config['webMode'], chatMode: 'web' }); 
+                      }}
+                      isActive={config.webMode === mode.id}
+                      title={mode.label}
+                    >
+                      <mode.icon size={18} />
+                    </WebSearchIconButton>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
-          {/* Input Area */}
           {!settingsMode && !historyMode && (
             (<div
               className={cn(
-                "bg-[var(--active)]/50 border-t border-[var(--text)]/50", // background, borderTop
-                "flex justify-between items-center", // display, justifyContent, alignItems (added for vertical alignment)
+                "bg-[var(--active)]/50 border-t border-[var(--text)]/50",
+                "flex justify-between items-center",
                 "pb-1 pt-1 relative z-[2]",
-                "not-focus-visible" // pb, pt, position, zIndex
+                "not-focus-visible"
               )}
-              style={{ opacity: settingsMode ? 0 : 1 }} // Keep inline style for opacity
+              style={{ opacity: settingsMode ? 0 : 1 }}
             >
               <Input isLoading={isLoading} message={message} setMessage={setMessage} onSend={onSend} />
               <Send isLoading={isLoading} onSend={() => onSend(message)} />
             </div>)
           )}
 
-          {/* History Area */}
           {historyMode && (
             <ChatHistory
             className="flex-1 w-full overflow-y-auto min-h-0"

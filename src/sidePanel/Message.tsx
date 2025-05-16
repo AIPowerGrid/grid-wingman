@@ -68,7 +68,7 @@ const Pre = (props: CustomPreProps) => {
     } else {
       codeString = String(codeElement.props.children);
     }
-    codeString = codeString.trim(); // Trim for cleaner copying
+    codeString = codeString.trim(); 
   }
   const languageClass = codeElement?.props?.className || ''; // e.g., "language-js"
 
@@ -83,8 +83,8 @@ const Pre = (props: CustomPreProps) => {
     overflow: 'auto',
     padding: '1rem', // Consistent padding for all code blocks
     margin: 0,       // Margin is handled by the outer div
-    background: 'var(--markdown-pre-background)', // Corrected: Use pre-specific background
-    color: 'var(--markdown-pre-foreground)',       // Corrected: Use pre-specific foreground
+    background: 'var(--markdown-pre-background)',
+    color: 'var(--markdown-pre-foreground)', 
     borderRadius: '8px',
     maxWidth: '100%'
   };
@@ -103,7 +103,7 @@ const Pre = (props: CustomPreProps) => {
       >
       {children}
     </pre>
-      {codeString && ( // Only show copy button if there's content
+      {codeString && ( 
           (<Button
             variant="ghost"
             size="sm"
@@ -136,7 +136,7 @@ const Code = (props: CustomCodeProps) => {
       <code
         style={{
           color: 'var(--markdown-inline-code-foreground, var(--foreground))', // Use specific inline var
-          background: 'var(--markdown-code-background, var(--muted))',    // Use consolidated code bg var
+          background: 'var(--markdown-code-background, var(--muted))',
           padding: '0.2rem 0.4rem',
           borderRadius: '4px'
         }}
@@ -160,10 +160,10 @@ type AnchorProps = { children?: ReactNode; href?: string } & HTMLAttributes<HTML
 const A = ({ children, href, ...rest }: AnchorProps) => (
   <a href={href}
     style={{
-      color: 'var(--markdown-link, var(--primary))', // Assuming --link maps to --primary
+      color: 'var(--markdown-link, var(--primary))', 
       textDecoration: 'underline',
       padding: '2px 7px',
-      borderRadius: '6px' // rounded-md is 0.375rem (6px)
+      borderRadius: '6px' 
     }}
     target="_blank"
     rel="noopener noreferrer"
@@ -179,7 +179,7 @@ const H1 = ({ children, ...rest }: HeadingProps) => (
     fontSize: '1.5rem', // text-2xl
     fontWeight: 800,    // font-extrabold
     margin: '1rem 0 1rem', // my-4
-    borderBottom: '2px solid var(--markdown-h1, var(--foreground))', // Assuming --text maps to --foreground
+    borderBottom: '2px solid var(--markdown-h1, var(--foreground))',
     paddingBottom: '0.5rem', // pb-2
     color: 'var(--markdown-h1, var(--foreground))'
   }} {...rest}>{children}</h1>
@@ -198,9 +198,9 @@ const H2 = ({ children, ...rest }: HeadingProps) => (
 
 const H3 = ({ children, ...rest }: HeadingProps) => (
   <h3 style={{
-    fontSize: '1.1rem', // ~text-lg
-    fontWeight: 600,    // font-semibold
-    margin: '0.75rem 0 0.5rem', // mt-3 mb-2
+    fontSize: '1.1rem',
+    fontWeight: 600,
+    margin: '0.75rem 0 0.5rem',
     borderBottom: '1px dashed var(--markdown-h3, var(--foreground))',
     paddingBottom: '0.3rem', // ~pb-1
     color: 'var(--markdown-h3, var(--foreground))'
@@ -212,7 +212,7 @@ const Strong = ({ children, ...rest }: StrongProps) => (
   <strong style={{
     color: 'var(--markdown-strong, var(--foreground))', // Assuming --bold (if a color) maps to --foreground or a specific theme color
     fontWeight: 700, // font-bold
-    fontFamily: 'Poppins, sans-serif' // Ensure Poppins is loaded if used
+    fontFamily: 'Poppins, sans-serif'
   }} {...rest}>{children}</strong>
 );
 
@@ -252,7 +252,7 @@ const Tr = (props: TrProps) => <tr {...props} />;
 type ThProps = { children?: ReactNode } & HTMLAttributes<HTMLTableCellElement>;
 const Th = ({ children, ...rest }: ThProps) => (
   <th style={{
-    padding: '0.5rem', // p-2
+    padding: '0.5rem',
     border: `1px solid var(--markdown-table-border, var(--foreground))`,
     fontWeight: 700 // font-bold
   }} {...rest}>{children}</th>
@@ -261,7 +261,7 @@ const Th = ({ children, ...rest }: ThProps) => (
 type TdProps = { children?: ReactNode } & HTMLAttributes<HTMLTableCellElement>;
 const Td = ({ children, ...rest }: TdProps) => (
   <td style={{
-    padding: '0.5rem', // p-2
+    padding: '0.5rem',
     border: `1px solid var(--markdown-table-border, var(--foreground))`
   }} {...rest}>{children}</td>
 );
@@ -272,7 +272,7 @@ const Blockquote = ({ children, ...rest }: BlockquoteProps) => (
     style={{
       borderLeft: '4px solid var(--markdown-h2, var(--foreground))',
       margin: '1em 0', // my-4 (approx)
-      padding: '0.5em 1em', // py-2 px-4 (approx)
+      padding: '0.5em 1em',
       background: 'rgba(0,0,0,0.03)', // e.g. bg-black/5 dark:bg-white/5 or bg-muted/30
       color: 'var(--markdown-h2, var(--foreground))'
     }}
@@ -304,17 +304,17 @@ const ThinkingBlock = ({ content }: { content: string }) => {
         <CollapsibleContent>
           <div
             className={cn(
-              "p-3 rounded-md border border-dashed", // Chakra p={3}, borderRadius='md', border='1px dashed'
-              "bg-muted", // Use muted background for the block
-              "border-muted-foreground", // Use muted-foreground color for the border
-              "text-muted-foreground"  // Use muted-foreground for the text inside the block
+              "p-3 rounded-md border border-dashed",
+              "bg-muted",
+              "border-muted-foreground",
+              "text-muted-foreground" 
             )}
           >
             <div className="markdown-body">
               <Markdown
                 remarkPlugins={[remarkGfm]}
                 components={{
-                  ...markdownComponents, // Spread existing components
+                  ...markdownComponents,
                   h1: H1,
                   h2: H2,
                   h3: H3,
@@ -377,7 +377,7 @@ export const EditableMessage: FC<MessageProps> = ({
         "shadow-lg text-left relative",
         turn.role === 'assistant' ? 'bg-accent border-accent-foreground' : 'bg-background border-foreground', // Chakra: background, borderColor
         config?.paperTexture ? 'chat-message-bubble' : '',
-        'chatMessage', isEditing ? 'editing' : ''  // Add "editing" class conditionally
+        'chatMessage', isEditing ? 'editing' : '' 
       )}
       onDoubleClick={() => {
         if (!isEditing) {
@@ -387,7 +387,7 @@ export const EditableMessage: FC<MessageProps> = ({
       title={"Double-click to edit"}
     >
       {isEditing ? (
-        <div className="flex flex-col space-y-2 items-stretch w-full p-1"> {/* VStack equivalent */}
+        <div className="flex flex-col space-y-2 items-stretch w-full p-1">
           <AutosizeTextarea
             value={editText}
             onChange={(e) => onSetEditText(e.target.value)}
@@ -395,15 +395,15 @@ export const EditableMessage: FC<MessageProps> = ({
             className={cn("autosize-textarea",
               "flex w-full rounded-md border bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground",
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-              "text-foreground", // color="var(--text)"
-              "border-input", // Default shadcn border, original was var(--text) -> border-foreground
+              "text-foreground",
+              "border-input",
               "border-foreground hover:border-primary focus-visible:border-primary focus-visible:ring-0",
-              "min-h-[60px]" // Approximate minRows={3}
+              "min-h-[60px]"
             )}
             minRows={3}
             autoFocus
           />
-          <div className="flex justify-end space-x-2"> {/* HStack equivalent */}
+          <div className="flex justify-end space-x-2">
             <Button
               size="sm"
               onClick={onSaveEdit}

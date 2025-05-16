@@ -21,6 +21,8 @@ export type ChatMessage = {
   title?: string;
   model?: string;
   turns: MessageTurn[];
+  chatMode?: string;
+  webMode?: string;
 };
 
 type ChatHistoryProps = {
