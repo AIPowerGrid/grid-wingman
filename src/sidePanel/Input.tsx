@@ -1,22 +1,21 @@
 import type { TextareaHTMLAttributes, RefObject, FC } from 'react';
 import { AddToChat } from './AddToChat'; // Import AddToChat
+import type { SpeechRecognition as SpeechRecognitionInstance, SpeechRecognitionEvent as SpeechRecognitionEventInstance, SpeechRecognitionErrorEvent as SpeechRecognitionErrorEventInstance } from '../types/speech';
 import { ForwardedRef, useEffect, useRef, useState, useCallback, Dispatch, SetStateAction } from 'react';
 import { FaRegStopCircle } from 'react-icons/fa';
 import { SlMicrophone } from "react-icons/sl";
-import { useConfig } from './ConfigContext'; // Assuming path is correct
+import { useConfig } from './ConfigContext';
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner"; // Import toast from sonner
+import { toast } from "sonner";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { cn } from "@/src/background/util"; // Use your cn path
+import { cn } from "@/src/background/util";
 
-// (Make sure AutoResizeTextarea component from the previous step is included)
 interface AutoResizeTextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
-    // Add any specific props if needed, like minRows/maxRows if not standard HTML attributes
     minRows?: number;
     maxRows?: number;
 }
@@ -32,8 +31,6 @@ export const AutoResizeTextarea = (
     ref: RefObject<HTMLTextAreaElement | null>;
   }
 ) => {
-  // Use react-textarea-autosize if needed, otherwise style a normal textarea
-  // Assuming react-textarea-autosize is still desired:
   const ReactTextareaAutosize = require('react-textarea-autosize').default; // Dynamic import if needed
 
   return (
@@ -42,18 +39,15 @@ export const AutoResizeTextarea = (
       minRows={minRows}
       maxRows={maxRows}
       className={cn(
-        // Base shadcn textarea styles
         "flex w-full rounded-xl bg-background px-3 py-1 text-sm ring-offset-background",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1",
         "disabled:cursor-not-allowed disabled:opacity-50",
-        // Original specific styles mapped to Tailwind:
         "min-h-[unset]",
         "overflow-y-auto",
         "resize-none",
         "text-foreground",
         "text-sm placeholder:text-muted-foreground/75", // More prominent placeholder
         "font-semibold",
-        // Custom focus/hover (overriding shadcn focus ring)
         "hover:border-foreground hover:shadow-none",
         className,
         "shadow-sm shadow-muted/20" // Add a subtle shadow
@@ -63,7 +57,6 @@ export const AutoResizeTextarea = (
   );
 };
 AutoResizeTextarea.displayName = 'AutoResizeTextarea';
-// --- End of AutoResizeTextarea ---
 
 
 interface InputProps {
@@ -89,7 +82,7 @@ export const Input: FC<InputProps> = ({ isLoading, message, setMessage, onSend }
 
   const placeholder = config?.chatMode === 'web' ? 'what to search?' : config?.chatMode === 'page' ? 'about the page..' : '';
 
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
 
   const handleListen = useCallback(async () => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -104,24 +97,24 @@ export const Input: FC<InputProps> = ({ isLoading, message, setMessage, onSend }
     try {
       await navigator.mediaDevices.getUserMedia({ audio: true });
 
-      const recognition = new SpeechRecognition();
+      const recognition: SpeechRecognitionInstance = new SpeechRecognition();
       recognition.lang = 'en-US';
       recognition.continuous = false;
       recognition.interimResults = false;
 
-      recognition.onresult = (event) => {
+      recognition.onresult = (event: SpeechRecognitionEventInstance) => {
         const transcript = Array.from(event.results)
           .map(result => result[0].transcript)
           .join('');
         setMessageRef.current((prev: string) => prev + transcript);
       };
 
-      recognition.onend = () => {
+      recognition.onend = (_event: Event) => { // Standard Event type for onend
         setIsListening(false);
         recognitionRef.current = null;
       };
 
-      recognition.onerror = (event) => {
+      recognition.onerror = (event: SpeechRecognitionErrorEventInstance) => {
         console.error('Speech recognition error:', event.error);
         let description = 'An unknown error occurred.';
         if (event.error === 'no-speech') {

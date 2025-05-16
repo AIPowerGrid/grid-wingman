@@ -1,22 +1,22 @@
-interface SpeechRecognitionEvent extends Event {
+export interface SpeechRecognitionEvent extends Event {
   readonly resultIndex: number;
   readonly results: SpeechRecognitionResultList;
 }
 
-interface SpeechRecognitionResultList {
+export interface SpeechRecognitionResultList {
   readonly length: number;
   item(index: number): SpeechRecognitionResult;
   [index: number]: SpeechRecognitionResult;
 }
 
-interface SpeechRecognitionResult {
+export interface SpeechRecognitionResult {
   readonly isFinal: boolean;
   readonly length: number;
   item(index: number): SpeechRecognitionAlternative;
   [index: number]: SpeechRecognitionAlternative;
 }
 
-interface SpeechRecognitionAlternative {
+export interface SpeechRecognitionAlternative {
   readonly transcript: string;
   readonly confidence: number;
 }
@@ -24,13 +24,12 @@ interface SpeechRecognitionAlternative {
 interface SpeechRecognitionStatic {
   new(): SpeechRecognition;
 }
-
-interface SpeechRecognitionErrorEvent extends Event {
+export interface SpeechRecognitionErrorEvent extends Event {
   readonly error: string; // DOMString representing the type of error, e.g., 'no-speech', 'audio-capture', 'not-allowed', 'network', 'aborted', 'language-not-supported', 'service-not-allowed', 'bad-grammar'
   readonly message: string; // DOMString containing a message describing the error
 }
 
-interface SpeechRecognition extends EventTarget {
+export interface SpeechRecognition extends EventTarget {
   grammars: any; // Actually SpeechGrammarList, but 'any' is simpler if not used
   lang: string;
   continuous: boolean;

@@ -15,8 +15,7 @@
     "module": "esnext",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "noEmit": false,
-    "outDir": "./dist/",
+    "noEmit": true,
     "noImplicitAny": true,
     "target": "ES2020",
     "jsx": "react-jsx",
@@ -27,7 +26,7 @@
     "paths": {
       "src/*": ["src/*"],
       "@/*": ["./*"], 
-      "@/utils": ["src/background/util"], // Add specific alias for utils
+      "@/utils": ["src/background/util"],
 
     }
   },
@@ -35,9 +34,9 @@
   "include": [
     "src",
     "config",
-    "components" // Add the components directory here
+    "components"
   ],
-  "exclude": [ // Corrected from 'ignore'
+  "exclude": [
     "test",
     "jest.config.js",
     "node_modules",

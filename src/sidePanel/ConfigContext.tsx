@@ -1,12 +1,9 @@
-/* eslint-disable max-len */
 import React, { createContext, use, useEffect, useState } from 'react';
  
- // Make sure Config and ConfigContextType are correctly imported
  import { Config, ConfigContextType } from '../types/config';
  
  import { setTheme, themes, type Theme as AppTheme } from './Themes'; // Import the Theme type as AppTheme
  
- // Add this import statement at the top of the file
  import storage from '../background/storageUtil';
 
 export const ConfigContext = createContext<ConfigContextType>({} as ConfigContextType);
