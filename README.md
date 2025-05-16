@@ -10,14 +10,13 @@ Built on [sidellama](https://github.com/gyopak/sidellama).
 
 *   Bug fixes and improvements.
 *   Evaluate and integrate pull requests.
-
+*   Better local TTS/STT by API. [not important]
 ---
 
 *   ~Migrate to Shadcn/ui from Chakra-UI V2,~ and ~React 19~. [20250509]
 *   ~Wiki Search ~with API~[20250514] and kiwix(zim-reader)~ [20250515] [^1]
 *   Search with API for Google
 *   ~Simple tool use to enhance the current web search to reduce the cost of running LLM and get a better result.~ [20250512]
-*   Better local TTS/STT by API. [not important]
 *   Replace 'deep research' with local/basic API services (even free tier)
 *   "Memory" for the chat history with RAG and ~search~[20250512].
 *   "Short Memory"(state) for web search and page parsing in the same task. Comparison mode.
