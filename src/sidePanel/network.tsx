@@ -314,7 +314,7 @@ export const webSearch = async (
                     const title = titleEl?.textContent?.trim() || '';
                     const url = titleEl?.getAttribute('href');
                     const snippet = snippetEl?.textContent?.trim() || '';
-                    if (title && url) searchResults.push({ title, snippet, url: url.startsWith('http') ? url : `https://duckduckgo.com${url}` });
+                    if (title && url) searchResults.push({ title, snippet, url: url.startsWith('http') ? url : `https:${url}` });
                 });
             } else if (webMode === 'Google') {
                 htmlDoc.querySelectorAll('div.g, div.MjjYud, div.hlcw0c').forEach(result => {
