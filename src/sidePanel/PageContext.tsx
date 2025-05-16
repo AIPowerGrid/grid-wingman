@@ -12,9 +12,7 @@ import { SettingTitle } from './SettingsTitle';
 const sliderClass = cn(
   "w-full",
   "[&>span:first-child]:bg-[var(--text)]/10",
-  // Range (filled part)
   "[&>span:first-child>span:first-child]:bg-[var(--active)]",
-  // Thumb styling
   "[&_button]:bg-[var(--active)]",
   "[&_button]:border-[var(--text)]/50",
   "[&_button]:ring-offset-[var(--bg)]",
@@ -27,7 +25,7 @@ interface ContextLimitSliderProps {
 }
 
 const ContextLimitSlider = ({ size, updateConfig }: ContextLimitSliderProps) => (
-  <div className="w-full"> {/* Changed from w-[45%] ml-auto to take full width */}
+  <div className="w-full">
     <p className="text-[var(--text)] text-base font-medium pb-6 text-left">
       Char Limit:{' '}
       <span className="font-normal">{size === 128 ? 'inf' : `${size}k`}</span>
@@ -37,7 +35,7 @@ const ContextLimitSlider = ({ size, updateConfig }: ContextLimitSliderProps) => 
       max={128}
       min={1}
       step={1}
-      className={sliderClass} // Apply consistent slider class
+      className={sliderClass}
       onValueChange={(value: number[]) => updateConfig({ contextLimit: value[0] })}
     />
   </div>

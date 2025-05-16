@@ -88,7 +88,6 @@ const AutoResizeTextarea = React.forwardRef(
 );
 
 AutoResizeTextarea.displayName = 'AutoResizeTextarea';
-// --- SaveButtons component ---
 const SaveButtons = ({
   hasChange,
   onSave,
@@ -145,7 +144,6 @@ const SaveButtons = ({
   );
 };
 
-// --- PersonaModal component ---
 const PersonaModal = ({
   isOpen, onOpenChange, personaPrompt, personas, updateConfig, onModalClose, isDark
 }: {
@@ -218,7 +216,6 @@ const PersonaModal = ({
   );
 };
 
-// --- DeleteModal component ---
 const DeleteModal = ({
   isOpen, onOpenChange, persona, personas, updateConfig, onModalClose
 }: {
@@ -245,7 +242,7 @@ const DeleteModal = ({
       <DialogContent
         className={cn(
           "sm:max-w-[425px]",
-          "bg-[var(--bg)]", // Use main background for opacity
+          "bg-[var(--bg)]",
           "border", commonSubtleBorderClass,
           commonItemRounded, commonItemShadow,
           "text-[var(--text)]"
@@ -271,7 +268,6 @@ const DeleteModal = ({
   );
 };
 
-// --- PersonaSelect component ---
 const PersonaSelect = ({
   personas, persona, updateConfig, isDark
 }: {
@@ -315,7 +311,6 @@ const PersonaSelect = ({
   );
 };
 
-// --- PersonaTextareaWrapper ---
 const PersonaTextareaWrapper = ({
   personaPrompt, setPersonaPrompt, isDark, isEditing, setIsEditing
 }: {
@@ -329,25 +324,24 @@ const PersonaTextareaWrapper = ({
     isDark={isDark}
     value={personaPrompt}
     onChange={(e: ChangeEvent<HTMLTextAreaElement>) => {
-        if (!isEditing) setIsEditing(true); // Auto-enable editing on change
+        if (!isEditing) setIsEditing(true);
         setPersonaPrompt(e.target.value);
     }}
     onTextAreaFocus={() => {
-        if (!isEditing) setIsEditing(true); // Enable editing on focus
+        if (!isEditing) setIsEditing(true);
     }}
-    isEffectivelyReadOnly={!isEditing} // Pass the read-only state for styling/behavior
+    isEffectivelyReadOnly={!isEditing}
     placeholder="Define the persona's characteristics and instructions here..."
   />
 );
 
-// --- Persona component (Main Accordion Item) ---
 export const Persona = () => {
   const { config, updateConfig } = useConfig();
   const isDark = config?.theme === 'dark';
 
   const [isPersonaModalOpen, setIsPersonaModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [isEditingPersona, setIsEditingPersona] = useState(false); // Controls textarea editability
+  const [isEditingPersona, setIsEditingPersona] = useState(false);
 
   const personas = config?.personas || { Ein: "You are Ein, a helpful AI assistant." };
   const currentPersonaName = config?.persona || 'Ein';
@@ -355,37 +349,29 @@ export const Persona = () => {
   const defaultPromptForCurrentPersona = personas?.[currentPersonaName] ?? personas?.Ein ?? "You are Ein, a helpful AI assistant.";
   const [personaPrompt, setPersonaPrompt] = useState(defaultPromptForCurrentPersona);
 
-  // Show Save/Cancel if textarea is being edited AND its content differs from the original
   const hasChange = isEditingPersona && personaPrompt !== defaultPromptForCurrentPersona;
 
   useEffect(() => {
-    // When currentPersonaName or the personas object itself changes:
-    // 1. Update the textarea content to the new persona's prompt.
-    // 2. Reset the editing state so the textarea is initially read-only/muted.
     const newDefaultPrompt = personas?.[currentPersonaName] ?? personas?.Ein ?? "";
     setPersonaPrompt(newDefaultPrompt);
     setIsEditingPersona(false);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPersonaName, JSON.stringify(personas)]); // Deep watch personas object
 
   const handlePersonaModalOpenChange = (open: boolean) => {
     setIsPersonaModalOpen(open);
     if (!open) {
-      // Reset prompt to the current selected persona's default when closing create/saveAs modal
       setPersonaPrompt(defaultPromptForCurrentPersona);
       setIsEditingPersona(false);
     }
   };
 
   const handleOpenPersonaModalForCreate = () => {
-    setPersonaPrompt(''); // Clear prompt for new persona
+    setPersonaPrompt('');
     setIsEditingPersona(true); // Allow immediate editing in the modal's context (though modal has its own input)
-                               // For the main textarea, it will reset via useEffect when new persona is saved & selected.
     setIsPersonaModalOpen(true);
   };
   
   const handleOpenPersonaModalForSaveAs = () => {
-    // Current personaPrompt is used for "Save As"
     setIsPersonaModalOpen(true);
   };
 

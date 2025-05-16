@@ -28,7 +28,7 @@ export interface Config {
   persona: string;
   generateTitle?: boolean;
   backgroundImage?: boolean;
-  webMode?: 'Duckduckgo' | 'Brave' | 'Google' | 'Wikipedia' | string;
+  webMode?: 'Duckduckgo' | 'Brave' | 'Google' | 'Wikipedia' | 'GoogleCustomSearch' | string; // Added GoogleCustomSearch
   webLimit?: number;
   serpMaxLinksToVisit?: number;
   wikiNumBlocks?: number;
@@ -62,6 +62,8 @@ export interface Config {
   customApiKey?: string;
   customConnected?: boolean;
   customError?: string | unknown;
+  googleApiKey?: string; // Added for Google Custom Search
+  googleCx?: string; // Added for Google Custom Search CX
   visibleApiKeys?: boolean;
   fontSize?: number;
   models?: Model[];
@@ -93,6 +95,6 @@ export interface Config {
 }
 
 export interface ConfigContextType {
-  config: Config; // Or Config | null | undefined if it can be initially unset
+  config: Config;
   updateConfig: (newConfig: Partial<Config>) => void;
 }

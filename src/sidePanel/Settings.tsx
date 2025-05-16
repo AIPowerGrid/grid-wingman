@@ -14,7 +14,7 @@ export const Settings = () => {
   const defaultIndex = (config?.models || [])?.length === 0 ? 1 : undefined;
   const isDark = config?.theme === 'dark';
 
-  const subtleBorderClass = 'border-[var(--text)]/10'; // 1px semi-transparent border
+  const subtleBorderClass = 'border-[var(--text)]/10';
   const controlBg = isDark
     ? 'bg-[rgba(255,255,255,0.1)]' 
     : 'bg-[rgba(255,250,240,0.4)]';

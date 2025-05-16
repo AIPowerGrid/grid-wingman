@@ -7,18 +7,14 @@ interface ApiMessage {
   content: string;
 }
 
-// --- Helper functions (keep existing ones) ---
 const cleanResponse = (response: string): string => {
-  // ... (keep existing cleanResponse)
   return response
-    .replace(/<think>[\s\S]*?<\/think>/g, '') // Remove thinking blocks with content
-    .replace(/["']/g, '') // Remove quotes
+    .replace(/<think>[\s\S]*?<\/think>/g, '')
+    .replace(/["']/g, '')
     .trim();
 };
 
-// --- processQueryWithAI (keep existing) ---
 export const processQueryWithAI = async (
-  // ... (keep existing implementation)
   query: string,
   config: Config,
   currentModel: Model,
@@ -26,19 +22,15 @@ export const processQueryWithAI = async (
   contextMessages: ApiMessage[] = [],
   temperatureOverride?: number
 ): Promise<string> => {
-  // ... (keep existing implementation)
   try {
-   // Ensure currentModel and host exist before trying to get the URL
    if (!currentModel?.host) {
     console.error('processQueryWithAI: currentModel or currentModel.host is undefined. Cannot determine API URL.');
-    return query; // Fallback to original query
+    return query;
   }
 
-  // --- CHANGE 2: Format context messages for the prompt ---
   const formattedContext = contextMessages
-      .map(msg => `{{${msg.role}}}: ${msg.content}`) // Format as {{role}}: content
+      .map(msg => `{{${msg.role}}}: ${msg.content}`)
       .join('\n');
-  // System prompt to optimize queries
   const systemPrompt = `You are a Google search query optimizer. Your task is to rewrite user's input [The user's raw input && chat history:${formattedContext}].
 \n
 Instructions:
@@ -77,12 +69,12 @@ Output:
       lmStudio: `${config?.lmStudioUrl || ''}/v1/chat/completions`,
       openai: 'https://api.openai.com/v1/chat/completions',
       openrouter: 'https://openrouter.ai/api/v1/chat/completions',
-      custom: `${config?.customEndpoint || ''}/v1/chat/completions` // Ensure customEndpoint has a fallback
+      custom: `${config?.customEndpoint || ''}/v1/chat/completions`
     };
     const apiUrl = urlMap[currentModel.host];
     if (!apiUrl) {
       console.error('processQueryWithAI: Could not determine API URL for host:', currentModel.host);
-      return query; // Fallback to original query
+      return query;
     }
 
     console.log(`processQueryWithAI: Using API URL: ${apiUrl} for host: ${currentModel.host}`);
@@ -140,9 +132,7 @@ Output:
   }
 };
 
-// --- urlRewriteRuntime (keep existing) ---
 export const urlRewriteRuntime = async function (domain: string) {
-  // ... (keep existing implementation)
   try {
     const url = new URL(domain);
     if (url.protocol === 'chrome:') return;
@@ -177,8 +167,6 @@ export const urlRewriteRuntime = async function (domain: string) {
   }
 };
 
-
-// --- NEW Helper function to extract main content from HTML ---
 const extractMainContent = (htmlString: string): string => {
     try {
         const parser = new DOMParser();
@@ -225,29 +213,56 @@ interface WikiQueryResult {
     results: WikiSearchResultBlock[];
 }
 
+// Define interfaces for Google Custom Search API response
+interface GoogleCustomSearchItem {
+  title: string;
+  link: string;
+  snippet: string;
+  htmlTitle?: string;
+  htmlSnippet?: string;
+  pagemap?: Record<string, any>;
+}
+
+interface GoogleCustomSearchResponse {
+  kind?: string;
+  items?: GoogleCustomSearchItem[];
+  error?: {
+    code: number;
+    message: string;
+    errors: Array<{ message: string; domain: string; reason: string; }>;
+  };
+  searchInformation?: {
+    totalResults?: string;
+  }
+}
+
 
 // --- ENHANCED webSearch function ---
 export const webSearch = async (
     query: string,
-    config: Config // Pass the full config object
+    config: Config
 ): Promise<string> => {
     console.log('[webSearch] Received query:', query);
     console.log('[webSearch] Web Mode from config:', config?.webMode);
 
     const webMode = config.webMode;
+    // Use serpMaxLinksToVisit for GoogleCustomSearch as well if we are scraping content
     const maxLinksToVisit = config.serpMaxLinksToVisit ?? 3;
+    // Use webLimit for GoogleCustomSearch content preview
+    const charLimitPerPage = config.webLimit ? config.webLimit * 1000 : 15000; // Default to 15k if webLimit (in k) is not set
 
     const serpAbortController = new AbortController();
     const serpTimeoutId = setTimeout(() => serpAbortController.abort(), 15000);
 
     console.log(`Performing ${webMode} search for: "${query}"`);
-    if (webMode === 'Duckduckgo' || webMode === 'Brave' || webMode === 'Google') {
-        console.log(`[webSearch - ${webMode}] Max links to visit: ${maxLinksToVisit}`);
+    if (webMode === 'Duckduckgo' || webMode === 'Brave' || webMode === 'Google' || webMode === 'GoogleCustomSearch') {
+        console.log(`[webSearch - ${webMode}] Max links to visit for content scraping: ${maxLinksToVisit}`);
     }
 
 
     if (!webMode) {
         console.error('[webSearch] Web search mode is undefined. Aborting search. Config was:', JSON.stringify(config));
+        clearTimeout(serpTimeoutId);
         return `Error: Web search mode is undefined. Please check your configuration.`;
     }
 
@@ -266,20 +281,16 @@ export const webSearch = async (
                     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36',
                     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
                     'Accept-Language': 'en-US,en;q=0.9',
-                        // Potentially try adding these, but they might not be enough
                     'sec-fetch-dest': 'document',
                     'sec-fetch-mode': 'navigate',
                     'sec-fetch-site': 'none',
                     'sec-fetch-user': '?1',
                     'upgrade-insecure-requests': '1',
-                    // 'sec-gpc': '1', // If you want to signal GPC
-                    // 'dnt': '1', // If you want to signal DNT
-                    // Cookie header would go here if you attempt it
                     ...(webMode === 'Brave' ? { 'Referer': 'https://search.brave.com/' } : {}),
                     ...(webMode === 'Google' ? { 'Referer': 'https://www.google.com/' } : {}),
                 }
             });
-            clearTimeout(serpTimeoutId);
+            clearTimeout(serpTimeoutId); 
 
             if (!response.ok) {
                 throw new Error(`Web search failed (${webMode}) with status: ${response.status}`);
@@ -336,7 +347,7 @@ export const webSearch = async (
                         searchResults.push({ title, snippet, url });
                     }
                 });
-                 if (searchResults.length === 0) { // Fallback selector for Brave
+                 if (searchResults.length === 0) { 
                      htmlDoc.querySelectorAll('.organic-result').forEach(result => {
                         const linkEl = result.querySelector('a[href]');
                         const url = linkEl?.getAttribute('href');
@@ -379,8 +390,6 @@ export const webSearch = async (
                     if (!contentType || !contentType.includes('text/html')) throw new Error(`Skipping non-HTML content (${contentType}) from ${result.url}`);
                     const pageHtml = await pageResponse.text();
                     const mainContent = extractMainContent(pageHtml);
-                    // Here you could potentially use config.webLimit to truncate mainContent if desired
-                    // e.g., if (config.webLimit && config.webLimit !== 128) mainContent = mainContent.substring(0, config.webLimit * 1000);
                     console.log(`[webSearch - ${webMode}] Successfully fetched and extracted content from: ${result.url} (Extracted Length: ${mainContent.length})`);
                     return { ...result, content: mainContent, status: 'success' };
                 } catch (error: any) {
@@ -392,34 +401,29 @@ export const webSearch = async (
 
             const fetchedPagesResults = await Promise.allSettled(pageFetchPromises);
             let combinedResultsText = `Search results for "${query}" using ${webMode}:\n\n`;
-            let pageIndex = 0; // To correctly map fetchedPagesResults to searchResults being iterated
+            let pageIndex = 0; 
             searchResults.forEach((result, index) => {
                  combinedResultsText += `[Result ${index + 1}: ${result.title}]\n`;
                  combinedResultsText += `URL: ${result.url || '[No URL Found]'}\n`;
                  combinedResultsText += `Snippet: ${result.snippet || '[No Snippet]'}\n`;
 
-                 // Only add content if this result was among those fetched (i.e., index < linksToFetch.length which is <= maxLinksToVisit)
                  if (index < linksToFetch.length) {
                      const correspondingFetch = fetchedPagesResults[pageIndex];
                      if (correspondingFetch?.status === 'fulfilled') {
                          const fetchedData = correspondingFetch.value;
-                         // Double check if the URL matches, as Promise.allSettled preserves order of original promises
                          if (fetchedData.url === result.url) {
-                            const contentPreview = fetchedData.content.substring(0, 1500); // Current preview length
-                            combinedResultsText += `Content:\n${contentPreview}${fetchedData.content.length > 1500 ? '...' : ''}\n\n`;
+                            const contentPreview = fetchedData.content.substring(0, charLimitPerPage); 
+                            combinedResultsText += `Content:\n${contentPreview}${fetchedData.content.length > charLimitPerPage ? '...' : ''}\n\n`;
                          } else {
-                             // This case should ideally not happen if pageIndex is managed correctly
                              combinedResultsText += `Content: [Content fetch mismatch - data for ${fetchedData.url} found, expected ${result.url}]\n\n`;
                          }
                      } else if (correspondingFetch?.status === 'rejected') {
                          combinedResultsText += `Content: [Error fetching: ${correspondingFetch.reason}]\n\n`;
                      } else {
-                         // Should not happen if fetchedPagesResults has an entry for each promise
                          combinedResultsText += `Content: [Fetch status unknown]\n\n`;
                      }
-                     pageIndex++; // Increment for the next fetched result
+                     pageIndex++;
                  } else {
-                     // This result was not in the linksToFetch list (beyond maxLinksToVisit)
                      combinedResultsText += `Content: [Not fetched due to link limit]\n\n`;
                  }
             });
@@ -435,13 +439,11 @@ export const webSearch = async (
                 num_blocks_to_rerank?: number;
             } = {
                 query: [query],
-                // Use config values with defaults
                 num_blocks: config.wikiNumBlocks ?? 3,
             };
 
-            if (config.wikiRerank) { // Default for wikiRerank is false if not in config
+            if (config.wikiRerank) { 
                 requestBody.rerank = true;
-                // Default for wikiNumBlocksToRerank, ensuring it's at least num_blocks or a sensible value like 10
                 requestBody.num_blocks_to_rerank = config.wikiNumBlocksToRerank ?? Math.max(requestBody.num_blocks, 10);
             }
 
@@ -477,7 +479,6 @@ export const webSearch = async (
                         if (block.summary && block.summary.length > 0) {
                             combinedResultsText += 'Summary:\n' + block.summary.map(s => `  - ${s}`).join('\n') + '\n';
                         } else {
-                            // Truncate content if no summary is available
                             const contentPreview = block.content.substring(0, 700);
                             combinedResultsText += `Content: ${contentPreview}${block.content.length > 700 ? '...' : ''}\n`;
                         }
@@ -500,8 +501,133 @@ export const webSearch = async (
                 console.error('Wikipedia search failed:', error);
                 return `Error performing Wikipedia search: ${error.message}`;
             }
-          } else {
-            clearTimeout(serpTimeoutId); // Clear timeout if mode is unsupported early
+
+        } else if (webMode === 'GoogleCustomSearch') {
+            if (!config.googleApiKey || !config.googleCx) {
+                clearTimeout(serpTimeoutId);
+                return 'Error: Google API Key or CX ID is not configured.';
+            }
+            const apiKey = config.googleApiKey;
+            const cx = config.googleCx;
+            const customSearchUrl = `https://www.googleapis.com/customsearch/v1?key=${apiKey}&cx=${cx}&q=${encodeURIComponent(query)}&num=${maxLinksToVisit > 10 ? 10 : maxLinksToVisit}`; // API max is 10, respect maxLinksToVisit up to 10
+
+            console.log(`Performing Google Custom Search API call for: "${query}"`);
+            let apiResponse: GoogleCustomSearchResponse;
+            try {
+                const response = await fetch(customSearchUrl, {
+                    signal: serpAbortController.signal, // Use the outer controller for the API call
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                    }
+                });
+                // Don't clear serpTimeoutId yet, it covers the whole GCS + scraping part
+
+                if (!response.ok) {
+                    const errorBody = await response.json().catch(() => response.text());
+                    console.error(`Google Custom Search API request failed with status ${response.status}:`, errorBody);
+                    const errorMessage = errorBody?.error?.message || `API request failed with status ${response.status}`;
+                    throw new Error(errorMessage);
+                }
+                apiResponse = await response.json();
+
+                if (apiResponse.error) {
+                     console.error('Google Custom Search API returned an error:', apiResponse.error);
+                     throw new Error(`API Error: ${apiResponse.error.message}`);
+                }
+                console.log(`[webSearch - GoogleCustomSearch] API Response (first item if exists):`, apiResponse?.items?.[0] ? JSON.stringify(apiResponse.items[0]) : "No items or unexpected response");
+
+            } catch (error: any) {
+                clearTimeout(serpTimeoutId); // Clear timeout if API call itself fails
+                console.error('Google Custom Search API call failed:', error);
+                return `Error during Google Custom Search API call: ${error.message}`;
+            }
+
+            if (!apiResponse.items || apiResponse.items.length === 0) {
+                clearTimeout(serpTimeoutId);
+                return `No Google Custom Search results found for "${query}". (Total results from API: ${apiResponse.searchInformation?.totalResults || '0'})`;
+            }
+
+            // Transform API results to the SearchResult structure for scraper
+            interface SearchResult { // Ensure this interface is defined
+                title: string;
+                snippet: string; // This will be the API snippet
+                url: string | null;
+            }
+            const searchResults: SearchResult[] = apiResponse.items.map(item => ({
+                title: item.htmlTitle || item.title,
+                snippet: item.htmlSnippet || item.snippet,
+                url: item.link
+            })).filter(item => item.url);
+
+            console.log(`[webSearch - GoogleCustomSearch] Mapped ${searchResults.length} API results to scraper format. Attempting to fetch content from top ${Math.min(searchResults.length, maxLinksToVisit)} links.`);
+
+            // Now, use the existing scraper logic for these URLs
+            const linksToFetch = searchResults.slice(0, maxLinksToVisit).filter(r => r.url); // Already sliced by API num, but good to be explicit
+
+            const pageFetchPromises = linksToFetch.map(async (result) => {
+                if (!result.url) return { ...result, content: '[Invalid URL]', status: 'error' };
+                console.log(`[GoogleCustomSearch - Scraper] Fetching content from: ${result.url}`);
+                const pageController = new AbortController(); // New controller for each page fetch
+                const pageTimeoutId = setTimeout(() => pageController.abort(), 12000); // Individual page fetch timeout
+                try {
+                    const pageResponse = await fetch(result.url, {
+                        signal: pageController.signal,
+                        method: 'GET',
+                        headers: { // Standard headers for scraping
+                            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36',
+                            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
+                            'Accept-Language': 'en-US,en;q=0.9',
+                        }
+                    });
+                    clearTimeout(pageTimeoutId);
+                    if (!pageResponse.ok) throw new Error(`Failed to fetch ${result.url} - Status: ${pageResponse.status}`);
+                    const contentType = pageResponse.headers.get('content-type');
+                    if (!contentType || !contentType.includes('text/html')) throw new Error(`Skipping non-HTML content (${contentType}) from ${result.url}`);
+                    const pageHtml = await pageResponse.text();
+                    const mainContent = extractMainContent(pageHtml);
+                    console.log(`[GoogleCustomSearch - Scraper] Successfully fetched and extracted content from: ${result.url} (Extracted Length: ${mainContent.length})`);
+                    return { ...result, scrapedContent: mainContent, status: 'success' };
+                } catch (error: any) {
+                    clearTimeout(pageTimeoutId);
+                    console.warn(`[GoogleCustomSearch - Scraper] Failed to fetch or process ${result.url}:`, error.message);
+                    return { ...result, scrapedContent: `[Error fetching/processing page: ${error.message}]`, status: 'error' };
+                }
+            });
+
+            const fetchedPagesResults = await Promise.allSettled(pageFetchPromises);
+            clearTimeout(serpTimeoutId); // Clear the main timeout after all scraping attempts
+
+            let combinedResultsText = `Google Custom Search results for "${query}" (with scraped content):\n\n`;
+            let pageIndex = 0;
+            searchResults.slice(0, maxLinksToVisit).forEach((result, index) => { // Iterate only over links we intended to fetch
+                 combinedResultsText += `[Result ${index + 1}: ${result.title}]\n`;
+                 combinedResultsText += `URL: ${result.url || '[No URL Found]'}\n`;
+                 combinedResultsText += `API Snippet: ${result.snippet || '[No API Snippet]'}\n`;
+
+                 // Find the corresponding fetched page data
+                 const correspondingFetch = fetchedPagesResults[pageIndex];
+                 if (correspondingFetch?.status === 'fulfilled') {
+                     const fetchedData = correspondingFetch.value as (typeof searchResults[0] & { scrapedContent: string }); // Cast for type safety
+                     if (fetchedData.url === result.url) { // Ensure we're matching the correct result
+                        const contentPreview = fetchedData.scrapedContent.substring(0, charLimitPerPage);
+                        combinedResultsText += `Scraped Content:\n${contentPreview}${fetchedData.scrapedContent.length > charLimitPerPage ? '...' : ''}\n\n`;
+                     } else {
+                        combinedResultsText += `Scraped Content: [Content fetch mismatch - data for ${fetchedData.url} found, expected ${result.url}]\n\n`;
+                     }
+                 } else if (correspondingFetch?.status === 'rejected') {
+                     combinedResultsText += `Scraped Content: [Error fetching page: ${correspondingFetch.reason}]\n\n`;
+                 } else {
+                     // This case should ideally not happen if we iterate correctly over linksToFetch
+                     combinedResultsText += `Scraped Content: [Not fetched or status unknown]\n\n`;
+                 }
+                 pageIndex++;
+            });
+            console.log("Google Custom Search with scraping finished. Returning combined results.");
+            return combinedResultsText.trim();
+
+        } else {
+            clearTimeout(serpTimeoutId);
             return `Unsupported web search mode: ${webMode}`;
         }
     } catch (error: any) {
@@ -512,9 +638,7 @@ export const webSearch = async (
 };
 
 
-// --- fetchDataAsStream (keep existing) ---
 export async function fetchDataAsStream(
-    // ... (keep existing implementation)
       url: string,
       data: Record<string, unknown>,
       onMessage: (message: string, done?: boolean, error?: boolean) => void,
