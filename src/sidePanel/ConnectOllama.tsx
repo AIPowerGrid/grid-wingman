@@ -4,7 +4,7 @@ import { FiCheck, FiWifi, FiWifiOff } from 'react-icons/fi';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useConfig } from './ConfigContext';
-import { cn } from "@/src/background/util"; // Import cn
+import { cn } from "@/src/background/util";
 
 export const ConnectOllama = () => {
   const { config, updateConfig } = useConfig();
@@ -25,7 +25,6 @@ export const ConnectOllama = () => {
     fetch(`${url}/api/tags`)
       .then(res => {
         if (!res.ok) { // Check for non-2xx responses
-          // Try to parse error from Ollama if possible, otherwise use status text
           return res.json().then(errData => {
             throw new Error(errData?.error || `Connection failed: ${res.status} ${res.statusText}`);
           }).catch(() => { // If res.json() fails (e.g. not JSON response)
@@ -41,7 +40,6 @@ export const ConnectOllama = () => {
             ollamaConnected: true,
             ollamaUrl: url,
             ollamaError: undefined,
-            // Optionally store models if your app uses them
             // models: config.models.filter(m => m.host !== 'ollama').concat(data.models.map(m => ({...m, host: 'ollama', active: true})))
           });
           toast.dismiss();
@@ -72,20 +70,20 @@ export const ConnectOllama = () => {
   const isConnected = config?.ollamaConnected;
 
   return (
-    <div className="flex items-center space-x-3"> {/* Increased space-x-2 to space-x-3 for more margin */}
+    <div className="flex items-center space-x-3">
       <Input
-        id="ollama-url-input" // More specific ID
+        id="ollama-url-input"
         value={url}
         onChange={e => setUrl(e.target.value)}
         placeholder="http://localhost:11434"
         className={cn(
-          "flex-grow", // Takes available space
+          "flex-grow",
           inputHeightClass,
-          controlBg, // Use consistent background
-          subtleBorderClass, // Use consistent border
+          controlBg,
+          subtleBorderClass,
           "text-[var(--text)] rounded-md shadow-sm text-sm", // Consistent text, rounding, shadow, font size
           "focus:border-[var(--active)] focus:ring-1 focus:ring-[var(--active)] focus:ring-offset-0", // Consistent focus
-          "hover:border-[var(--active)]", // Consistent hover
+          "hover:border-[var(--active)]",
           "px-2.5" 
         )}
         disabled={isLoading}
@@ -95,7 +93,7 @@ export const ConnectOllama = () => {
           onClick={onConnect}
           className={cn(
             buttonHeightClass, 
-            "px-3", // Reduced horizontal padding for "Connect" button text
+            "px-3",
             "text-sm font-medium whitespace-nowrap",
             "bg-[var(--active)] text-[var(--bg)] hover:bg-[var(--active)]/90",
             "rounded-md shadow-sm",
@@ -111,14 +109,13 @@ export const ConnectOllama = () => {
           variant="ghost" size="sm" aria-label="Connected to Ollama"
           className={cn(
             buttonHeightClass, "w-8",
-            // "bg-green-500/10 text-green-700 dark:bg-green-700/20 dark:text-green-400", // Example success colors
-            "rounded-md", // Standard rounding
-            "text-[var(--success)]" // Use success color for the icon
+            "rounded-md",
+            "text-[var(--success)]"
           )}
           onClick={onConnect}
           disabled={isLoading}
         >
-          <FiCheck className="h-5 w-5" /> {/* Slightly larger check icon */}
+          <FiCheck className="h-5 w-5" />
         </Button>
       )}
     </div>

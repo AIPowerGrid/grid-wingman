@@ -1,11 +1,10 @@
-// ConnectOpenAI.tsx
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { FaEye, FaEyeSlash, FaCheck } from 'react-icons/fa';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useConfig } from './ConfigContext';
-import { OPENAI_URL } from './constants'; // Ensure this is your OpenAI base URL for model listing
+import { OPENAI_URL } from './constants';
 import { cn } from "@/src/background/util";
 
 export const ConnectOpenAI = () => {

@@ -1,4 +1,3 @@
-// ConnectCustom.tsx
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { FaEye, FaEyeSlash, FaCheck, FaTimes } from 'react-icons/fa';
@@ -20,20 +19,17 @@ export const ConnectCustom = () => {
   const inputHeightClass = 'h-8';
   const buttonHeightClass = 'h-8';
 
-  // For custom, "connect" primarily means saving the settings.
-  // A true connection test would require knowing the endpoint structure.
   const onSaveSettings = () => {
     if (!endpoint) {
         toast.error("Custom endpoint URL is required.");
         return;
     }
-    setIsLoading(true); // Simulate loading for UX consistency
-    // Simulate a save operation
+    setIsLoading(true);
     setTimeout(() => {
       updateConfig({
         customApiKey: apiKey,
         customEndpoint: endpoint,
-        customConnected: true, // Assume connected once saved, actual test might be separate
+        customConnected: true,
         customError: undefined,
         models: (config?.models || []).filter(m => m.id !== 'custom_endpoint').concat([
           { id: 'custom_endpoint', host: 'custom', name: 'Custom Endpoint Model', active: true }
@@ -59,10 +55,10 @@ export const ConnectCustom = () => {
   };
 
   const saveButtonDisabled = (!endpoint && !apiKey) || isLoading; // Disable if both are empty or loading
-  const isConnected = config?.customConnected; // "Connected" means settings are saved
+  const isConnected = config?.customConnected; 
 
   return (
-    <div className="space-y-2"> {/* Vertical stacking of endpoint and api key row */}
+    <div className="space-y-2">
       <Input
         id="custom-endpoint-url"
         placeholder="Custom OpenAI-Compatible Endpoint URL"

@@ -226,9 +226,9 @@ export const ChatHistory = ({ loadChat, onDeleteAll, className }: ChatHistoryPro
         />
       </div>     
       <ScrollArea
-        className="flex-1 w-full min-h-0" // Message area: scrolls, takes available vertical space
+        className="flex-1 w-full min-h-0"
       >
-        <div className="px-4 pb-4"> {/* Content wrapper for messages */}
+        <div className="px-4 pb-4">
           {uniqueDates.map(date => (
             <div key={date} className="mb-3 mt-3">
               <p

@@ -1,4 +1,3 @@
-// ConnectLmStudio.tsx
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { FiCheck } from 'react-icons/fi';
@@ -23,7 +22,7 @@ export const ConnectLmStudio = () => {
     toast.dismiss();
     toast.loading('Connecting to LM Studio...');
 
-    fetch(`${url}/v1/models`) // LM Studio uses OpenAI compatible endpoint
+    fetch(`${url}/v1/models`)
       .then(res => {
         if (!res.ok) {
           return res.json().then(errData => {
@@ -35,14 +34,11 @@ export const ConnectLmStudio = () => {
         return res.json();
       })
       .then(data => {
-        // Check for data.data as OpenAI compatible endpoints often wrap models in a 'data' array
         if (Array.isArray(data.data)) {
           updateConfig({
             lmStudioConnected: true,
             lmStudioUrl: url,
             lmStudioError: undefined,
-            // Assuming you want to add a generic LM Studio entry
-            // You might want to parse actual model names from data.data if needed
             models: (config?.models || []).filter(m => m.id !== 'lmstudio_generic').concat([
               { id: 'lmstudio_generic', host: 'lmstudio', active: true, name: 'LM Studio Model' }
             ]),

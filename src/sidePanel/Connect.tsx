@@ -13,12 +13,12 @@ import { ConnectOpenAI } from './ConnectOpenAI';
 import { ConnectOpenRouter } from './ConnectOpenRouter';
 import { ConnectCustom } from './ConnectCustom';
 import { SettingTitle } from './SettingsTitle';
-import { useConfig } from './ConfigContext'; // Import useConfig to get theme status
-import { cn } from "@/src/background/util"; // Make sure cn is imported
+import { useConfig } from './ConfigContext';
+import { cn } from "@/src/background/util";
 
 type ConnectionProps = {
   title: string;
-  Component: FC<unknown>; // Assuming child components don't need specific props from here
+  Component: FC<unknown>;
   link?: string;
 };
 
@@ -27,8 +27,6 @@ const ConnectionSection: FC<ConnectionProps> = ({
   Component,
   link,
 }) => (
-  // Each ConnectionSection will be a distinct block within the accordion content
-  // Adding padding and a bottom border to each section for separation
   (<div className="px-4 py-3 border-b border-[var(--text)]/10 last:border-b-0">
     <div className="flex items-center justify-between mb-2"> {/* For title and link alignment */}
       <h4 className="text-base font-medium capitalize text-foreground"> {/* Consistent heading style */}
@@ -55,7 +53,7 @@ const ConnectionSection: FC<ConnectionProps> = ({
 );
 
 export const Connect: FC = () => {
-  const { config } = useConfig(); // Get config to determine theme for styling variables
+  const { config } = useConfig();
 
   const isDark = config?.theme === 'dark';
   const subtleBorderClass = 'border-[var(--text)]/10'; // For the main accordion item
@@ -87,7 +85,6 @@ export const Connect: FC = () => {
         <SettingTitle icon="♾️" text="Connect" />
       </AccordionTrigger>
       <AccordionContent className="p-0 text-[var(--text)]"> {/* Removed padding, set base text color */}
-        {/* The ConnectionSection components will now provide their own internal padding */}
         <ConnectionSection Component={ConnectOllama} title="Ollama" />
         <ConnectionSection Component={ConnectLmStudio} title="LM Studio" />
         <ConnectionSection
@@ -112,7 +109,7 @@ export const Connect: FC = () => {
         />
         <ConnectionSection
           Component={ConnectCustom}
-          title="OpenAI Compatible Endpoint" // More descriptive title
+          title="OpenAI Compatible Endpoint"
         />
       </AccordionContent>
     </AccordionItem>

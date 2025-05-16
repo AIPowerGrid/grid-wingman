@@ -46,12 +46,7 @@ import {
   AvatarImage,
 } from "@/components/ui/avatar";
 
-interface Model {
-  id: string;
-  active: boolean;
-  host?: string;
-  context_length?: number;
-}
+import { Model } from "@/src/types/config";
 interface Config {
   theme?: string;
   persona?: string;
@@ -62,13 +57,7 @@ interface Config {
   fontSize?: number;
   generateTitle?: boolean;
   backgroundImage?: boolean;
-  paperTexture?: boolean;
 }
-interface ConfigContextType {
-  config: Config;
-  updateConfig: (newConfig: Partial<Config>) => void;
-}
-
 interface WelcomeModalProps {
   isOpen: boolean;
   onClose: (open: boolean) => void; // Matches Dialog's onOpenChange signature
@@ -165,8 +154,7 @@ const SheetThemeButton = ({ theme, updateConfig, size = "h-7 w-7" }: { theme: Ap
           backgroundColor: theme.bg,
           borderColor: theme.text,
           borderWidth: '2px',
-          // Optional: subtle outer ring with active color for more definition
-          // boxShadow: `0 0 0 1px ${theme.active}`
+          boxShadow: `0 0 0 1px ${theme.active}`
         }}
         onClick={() => {
           updateConfig({ theme: theme.name });
@@ -181,7 +169,6 @@ const SheetThemeButton = ({ theme, updateConfig, size = "h-7 w-7" }: { theme: Ap
 );
 
 
-// --- SettingsSheet ---
 interface SettingsSheetProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
@@ -223,7 +210,6 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
   const toggleTheme = () => {
     const currentThemeName = config?.theme || 'paper';
     const nextThemeName = currentThemeName === 'dark' ? 'paper' : 'dark';
-    // Ensure appThemes is used here
     const nextTheme = appThemes.find((t) => t.name === nextThemeName);
     if (nextTheme) {
       updateConfig({ theme: nextThemeName });

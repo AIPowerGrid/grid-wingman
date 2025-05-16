@@ -1,11 +1,10 @@
-// ConnectOpenRouter.tsx
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { FaEye, FaEyeSlash, FaCheck } from 'react-icons/fa';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useConfig } from './ConfigContext';
-import { OPENROUTER_URL } from './constants'; // Ensure this is your OpenRouter base URL for model listing
+import { OPENROUTER_URL } from './constants';
 import { cn } from "@/src/background/util";
 
 export const ConnectOpenRouter = () => {
@@ -29,7 +28,6 @@ export const ConnectOpenRouter = () => {
     toast.dismiss();
     toast.loading('Connecting to OpenRouter...');
 
-    // OpenRouter also uses /models endpoint with Bearer token
     fetch(`${OPENROUTER_URL}`, { headers: { Authorization: `Bearer ${apiKey}` } })
       .then(res => {
         if (!res.ok) {
@@ -51,12 +49,12 @@ export const ConnectOpenRouter = () => {
             models: (config?.models || []).filter(m => !m.id.startsWith('openrouter_')).concat(
               data.data.map((model: any) => ({
                 id: `openrouter_${model.id}`, // OpenRouter model IDs are often like 'openai/gpt-3.5-turbo'
-                name: model.name || model.id, // Use 'name' if available, else 'id'
+                name: model.name || model.id,
                 host: 'openrouter',
                 active: true
               }))
             ),
-            // selectedModel: `openrouter_${data.data[0].id}`
+          selectedModel: `openrouter_${data.data[0].id}`
           });
           toast.dismiss();
           toast.success('Connected to OpenRouter');
