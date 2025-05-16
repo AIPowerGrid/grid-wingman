@@ -254,7 +254,7 @@ const GoogleCustomSearchSettingsPanel = ({ config, updateConfig }: GoogleCustomS
         <p className="text-[var(--text)]/70 text-xs pt-1">
           Your Programmable Search Engine ID.
           <a
-            href="https://programmablesearchengine.google.com/controlpanel/"
+            href="https://programmablesearchengine.google.com/controlpanel/all"
             target="_blank"
             rel="noopener noreferrer"
             className={cn(linkClass, "ml-1")}
