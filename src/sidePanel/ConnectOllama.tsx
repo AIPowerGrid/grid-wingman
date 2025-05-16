@@ -19,28 +19,26 @@ export const ConnectOllama = () => {
 
   const onConnect = () => {
     setIsLoading(true);
-    toast.dismiss(); // Dismiss any existing toasts
-    toast.loading('Connecting to Ollama...'); // Loading toast
+    toast.dismiss();
+    toast.loading('Connecting to Ollama...');
 
     fetch(`${url}/api/tags`)
       .then(res => {
-        if (!res.ok) { // Check for non-2xx responses
+        if (!res.ok) {
           return res.json().then(errData => {
             throw new Error(errData?.error || `Connection failed: ${res.status} ${res.statusText}`);
-          }).catch(() => { // If res.json() fails (e.g. not JSON response)
+          }).catch(() => {
             throw new Error(`Connection failed: ${res.status} ${res.statusText}`);
           });
         }
         return res.json();
       })
       .then(data => {
-        // data.models is an array in Ollama's /api/tags response
         if (Array.isArray(data.models)) {
           updateConfig({
             ollamaConnected: true,
             ollamaUrl: url,
             ollamaError: undefined,
-            // models: config.models.filter(m => m.host !== 'ollama').concat(data.models.map(m => ({...m, host: 'ollama', active: true})))
           });
           toast.dismiss();
           toast.success('Connected to Ollama');

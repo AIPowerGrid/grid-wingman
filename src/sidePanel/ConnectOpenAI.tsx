@@ -54,7 +54,7 @@ export const ConnectOpenAI = () => {
             openAiError: undefined,
             models: [
               ...(config?.models || []),
-              { id: 'openai', host: 'openai', active: true } // Add this model entry
+              { id: 'openai', host: 'openai', active: true }
             ],
             selectedModel: 'openai'
           });

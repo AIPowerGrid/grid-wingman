@@ -1,5 +1,5 @@
 import { cn } from "@/src/background/util";
-import { useConfig } from './ConfigContext'; // Assuming this path is correct
+import { useConfig } from './ConfigContext';
 
 const personaImages: {
   Agatha: string;
@@ -29,18 +29,18 @@ export const Background = () => {
   const src = personaImages[persona] || personaImages.default;
 
   const containerClasses = cn(
-    "flex",           // display="flex"
-    "items-center",   // alignItems="center"
-    "justify-center", // justifyContent="center"
-    "h-full",       // height="80vh" (using arbitrary value syntax)
-    "fixed",          // style: position: 'fixed'
-    "w-full",         // style: width: '100%'
-    "top-[10%]",      // style: top: '10%' (using arbitrary value syntax)
-    "pointer-events-none" // style: pointerEvents: 'none'
+    "flex",
+    "items-center",
+    "justify-center",
+    "h-full",
+    "fixed",
+    "w-full",
+    "top-[10%]",
+    "pointer-events-none"
   );
 
   const imageClasses = cn(
-    "fixed",          // style: position: 'fixed'
+    "fixed",
     "opacity-[0.03]", // style: filter: 'opacity(0.03)' (using arbitrary value syntax for exact match)
     "z-[1]"           // style: zIndex: 1 (using arbitrary value syntax for exact match)
   );
@@ -49,10 +49,10 @@ export const Background = () => {
     <div className={containerClasses}>
       <img
         src={src}
-        alt="" // Add alt attribute for accessibility, even if empty
+        alt=""
         className={imageClasses}
         style={{
-          zoom: '1.2', // Keep zoom as inline style as there's no direct Tailwind equivalent
+          zoom: '1.2',
         }}
       />
     </div>

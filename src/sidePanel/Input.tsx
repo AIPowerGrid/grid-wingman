@@ -1,5 +1,5 @@
 import type { TextareaHTMLAttributes, RefObject, FC } from 'react';
-import { AddToChat } from './AddToChat'; // Import AddToChat
+import { AddToChat } from './AddToChat';
 import type { SpeechRecognition as SpeechRecognitionInstance, SpeechRecognitionEvent as SpeechRecognitionEventInstance, SpeechRecognitionErrorEvent as SpeechRecognitionErrorEventInstance } from '../types/speech';
 import { ForwardedRef, useEffect, useRef, useState, useCallback, Dispatch, SetStateAction } from 'react';
 import { FaRegStopCircle } from 'react-icons/fa';
@@ -50,7 +50,7 @@ export const AutoResizeTextarea = (
         "font-semibold",
         "hover:border-foreground hover:shadow-none",
         className,
-        "shadow-sm shadow-muted/20" // Add a subtle shadow
+        "shadow-sm shadow-muted/20"
       )}
       {...props}
     />
@@ -109,7 +109,7 @@ export const Input: FC<InputProps> = ({ isLoading, message, setMessage, onSend }
         setMessageRef.current((prev: string) => prev + transcript);
       };
 
-      recognition.onend = (_event: Event) => { // Standard Event type for onend
+      recognition.onend = (_event: Event) => {
         setIsListening(false);
         recognitionRef.current = null;
       };
@@ -194,7 +194,7 @@ export const Input: FC<InputProps> = ({ isLoading, message, setMessage, onSend }
                 "not-focus",
                 isListening ? "text-red-500 hover:bg-destructive/10" : "text-foreground hover:bg-muted/50",
               )}
-              style={{ paddingLeft: '0.5rem', paddingRight: '0.5rem' }} // Override padding here
+              style={{ paddingLeft: '0.5rem', paddingRight: '0.5rem' }}
               disabled={isLoading || !isSpeechRecognitionSupported}
             >
               {isListening ? <FaRegStopCircle /> : <SlMicrophone />}
