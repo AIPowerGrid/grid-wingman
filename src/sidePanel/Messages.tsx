@@ -2,7 +2,7 @@ import { useState, useLayoutEffect, useRef, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { FiCopy, FiRepeat, FiPlay, FiPause, FiSquare } from 'react-icons/fi';
 import { MessageTurn } from './ChatHistory';
-import { EditableMessage } from './Message'; // Rename import for clarity if Message becomes EditableMessage internally
+import { EditableMessage } from './Message'; 
 import {
   speakMessage,
   stopSpeech,
@@ -12,8 +12,8 @@ import {
   isCurrentlyPaused,
 } from '../background/ttsUtils';
 import { useConfig } from './ConfigContext';
-import { Button } from "@/components/ui/button"; // Shadcn Button import
-import { cn } from "@/src/background/util"; // Optional: for conditional classes
+import { Button } from "@/components/ui/button";
+import { cn } from "@/src/background/util";
 
 // --- Helper Function to Clean Text for TTS ---
 const cleanTextForTTS = (text: string): string => {
@@ -125,13 +125,12 @@ export const Messages: React.FC<MessagesProps> = ({
           (<div
             key={turn.timestamp || `turn_${i}`}
             className={cn(
-              "flex items-start w-full mt-1 mb-1 px-2 relative", // Base styles
-              turn.role === 'user' ? 'justify-start' : 'justify-end' // Conditional alignment
+              "flex items-start w-full mt-1 mb-1 px-2 relative",
+              turn.role === 'user' ? 'justify-start' : 'justify-end'
             )}
             onMouseEnter={() => setHoveredIndex(i)}
             onMouseLeave={() => setHoveredIndex(-1)}
           >
-            {/* Assistant Controls (Left Side) */}
             {turn.role === 'assistant' && (
               (<div
                 className={cn(
@@ -180,17 +179,16 @@ export const Messages: React.FC<MessagesProps> = ({
               onSetEditText={setEditText}
               onSaveEdit={saveEdit}
               onCancelEdit={cancelEdit} />
-            {/* User Controls (Right Side) */}
             {turn.role === 'user' && (
               (<div
                  className={cn(
                   "flex flex-col items-center self-end space-y-0 ml-1 pb-1 transition-opacity duration-200",
-                  hoveredIndex === i ? 'opacity-100' : 'opacity-0' // Conditional opacity
+                  hoveredIndex === i ? 'opacity-100' : 'opacity-0'
                 )}
               >
                 {editingIndex !== i && (
                   <Button aria-label="Copy" variant="ghost" size="sm" onClick={() => copyMessage(turn.rawContent)} title="Copy message">
-                    <FiCopy className="h-4 w-4 text-[var(--text)]" /> {/* Adjust size/color if needed */}
+                    <FiCopy className="h-4 w-4 text-[var(--text)]" />
                   </Button>
                 )}
               </div>)

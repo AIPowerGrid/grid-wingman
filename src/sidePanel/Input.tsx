@@ -6,7 +6,7 @@ import { FaRegStopCircle } from 'react-icons/fa';
 import { SlMicrophone } from "react-icons/sl";
 import { useConfig } from './ConfigContext';
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
+import { toast } from "react-hot-toast";
 import {
   Tooltip,
   TooltipContent,
@@ -31,7 +31,7 @@ export const AutoResizeTextarea = (
     ref: RefObject<HTMLTextAreaElement | null>;
   }
 ) => {
-  const ReactTextareaAutosize = require('react-textarea-autosize').default; // Dynamic import if needed
+  const ReactTextareaAutosize = require('react-textarea-autosize').default; 
 
   return (
     <ReactTextareaAutosize
@@ -46,7 +46,7 @@ export const AutoResizeTextarea = (
         "overflow-y-auto",
         "resize-none",
         "text-foreground",
-        "text-sm placeholder:text-muted-foreground/75", // More prominent placeholder
+        "text-sm placeholder:text-muted-foreground/75", 
         "font-semibold",
         "hover:border-foreground hover:shadow-none",
         className,
@@ -62,7 +62,7 @@ AutoResizeTextarea.displayName = 'AutoResizeTextarea';
 interface InputProps {
     isLoading: boolean;
     message: string;
-    setMessage: Dispatch<SetStateAction<string>>; // This is the state setter function from useState
+    setMessage: Dispatch<SetStateAction<string>>; 
     onSend: () => void;
 }
 
@@ -87,10 +87,10 @@ export const Input: FC<InputProps> = ({ isLoading, message, setMessage, onSend }
   const handleListen = useCallback(async () => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
-        toast.error('Unsupported Browser', {
-            description: 'Speech recognition is not supported in this browser.',
-            duration: 3000,
-        });
+        toast.error(
+          'Speech recognition is not supported in this browser.',
+          { duration: 3000 } 
+        );
         return;
     }
 
@@ -126,10 +126,10 @@ export const Input: FC<InputProps> = ({ isLoading, message, setMessage, onSend }
         } else {
             description = `Error: ${event.error}`;
         }
-        toast.error('Speech Error', {
-          description: description,
-          duration: 3000,
-        });
+        toast.error(
+          `Speech Error: ${description}`,
+          { duration: 3000 }
+        );
         setIsListening(false);
         recognitionRef.current = null;
       };
@@ -150,10 +150,10 @@ export const Input: FC<InputProps> = ({ isLoading, message, setMessage, onSend }
       } else if (err.name === 'NotFoundError') {
           description = 'No microphone found. Please ensure one is connected and enabled.';
       }
-      toast.error('Microphone Error', {
-        description: description,
-        duration: 3000,
-      });
+      toast.error(
+        `Microphone Error: ${description}`,
+        { duration: 3000 }
+      );
       setIsListening(false);
     }
   }, []);
@@ -175,7 +175,7 @@ export const Input: FC<InputProps> = ({ isLoading, message, setMessage, onSend }
       <AddToChat /> 
       <TooltipProvider delayDuration={500}>
         <Tooltip>
-          <TooltipTrigger>
+          <TooltipTrigger asChild>
             <Button
               onClick={(e) => {
                 e.stopPropagation();

@@ -149,14 +149,6 @@
   @apply [scrollbar-width:none] [&::-webkit-scrollbar]:hidden;
 }
 
-/* Native scrollbar styling for #messages is no longer needed (or effective)
-   if using the Shadcn ScrollArea component for the #messages container,
-   as ScrollArea renders its own custom scrollbar.
-*/
-
-
-
-
 @utility scrollbar-hidden {
   &::-webkit-scrollbar {
     display: none;
@@ -277,7 +269,6 @@ white-space: pre-wrap;
 }
 
 /* Customizing scrollbar within elements (override by the previous setting */
-/* Because of the narrow area of sidebar */
 .markdown-body pre, textarea.autosize-textarea::-webkit-scrollbar {
     width: auto; /* Adjust as needed */
     height: auto;
@@ -296,7 +287,6 @@ white-space: pre-wrap;
     scrollbar-width: thin;
 }
 
-/* The name is autosize-textarea, right? */
 
 .markdown-body code {
 color: var(--markdown-inline-code-foreground);
@@ -381,13 +371,11 @@ bottom: -0.2em;
 
 
 /* --- Global Paper Texture Styles --- */
-/* Apply texture conditionally based on html[data-paper-texture="true"] */
-
 
 
 html[data-paper-texture="true"] #radix-\0000ab r2\0000bb ::before { /* Target DrawerBody, escaped for CSS validity */
   content: "";
-  position: fixed; /* Use absolute positioning relative to the component */
+  position: fixed; 
   width: 100%; height: 100%;
   top: 0; left: 0; right: 0; bottom: 0;
   background-image: url('~assets/images/paper-texture.png');
@@ -397,8 +385,8 @@ html[data-paper-texture="true"] #radix-\0000ab r2\0000bb ::before { /* Target Dr
   pointer-events: none;
   mix-blend-mode: multiply;
   filter: contrast(1) brightness(1);
-  z-index: 0; /* Behind component content (requires content position:relative) */
-  border-radius: inherit; /* Inherit border-radius from parent */
+  z-index: 0; 
+  border-radius: inherit; 
 }
 
 
@@ -410,12 +398,12 @@ html[data-paper-texture="true"] #root::before {
   top: 0; left: 0; right: 0; bottom: 0;
   width: 100%; height: 100%; /* Ensure this selector is correct for your #root element context */
   background-image: url('~assets/images/paper-texture.png');
-  background-size: 512px; /* Match other textures */
+  background-size: 512px;
   background-repeat: repeat;
-  opacity: 0.3; /* Match other textures */
-  pointer-events: none; /* Crucial: Let clicks pass through to the message */
-  mix-blend-mode: multiply; /* Match other textures */
-  filter: contrast(1) brightness(1); /* Match other textures */
+  opacity: 0.3;
+  pointer-events: none;
+  mix-blend-mode: multiply; 
+  filter: contrast(1) brightness(1);
   z-index: 1; /* Behind the message content */
   border-radius: inherit; /* Inherit the bubble's border-radius */
 }
@@ -432,7 +420,6 @@ html[data-paper-texture="true"] #root::before {
 .not-focus-visible:focus-visible {
   outline: none !important; /* Removes standard outline */
   box-shadow: none !important; /* Removes box-shadow based focus */
-  /* Specifically for Tailwind rings, you might need to override CSS variables or use utilities */
   --tw-ring-offset-shadow: 0 0 #0000 !important;
   --tw-ring-shadow: 0 0 #0000 !important;
   --tw-ring-opacity: 0 !important;

@@ -8,6 +8,8 @@ import { useUpdateModels } from './hooks/useUpdateModels';
 import { themes as appThemes, type Theme as AppTheme } from './Themes';
 import { cn } from "@/src/background/util";
 
+import { toast } from 'react-hot-toast';
+
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -47,6 +49,7 @@ import {
 } from "@/components/ui/avatar";
 
 import { Model } from "@/src/types/config";
+
 interface Config {
   theme?: string;
   persona?: string;
@@ -141,7 +144,7 @@ const personaImages: {
 
 const SheetThemeButton = ({ theme, updateConfig, size = "h-7 w-7" }: { theme: AppTheme; updateConfig: (newConfig: Partial<Config>) => void; size?: string }) => (
   <Tooltip>
-    <TooltipTrigger>
+    <TooltipTrigger asChild>
       <Button
         variant="ghost"
         className={cn(
@@ -505,7 +508,7 @@ interface HeaderProps {
   setSettingsMode: (mode: boolean) => void;
   historyMode: boolean;
   setHistoryMode: (mode: boolean) => void;
-  deleteAll: () => void;
+  deleteAll: () => void | Promise<void>; 
   reset: () => void;
   downloadImage: () => void;
   downloadJson: () => void;
@@ -543,6 +546,67 @@ export const Header: React.FC<HeaderProps> = ({
     } else {
       setIsSheetOpen(true);
     }
+  };
+
+  const handleDeleteAllWithConfirmation = () => {
+    toast.custom(
+      (t) => (
+        <div
+          className={cn(
+            "bg-[var(--bg)] text-[var(--text)] border border-[var(--text)]",
+            "p-4 rounded-lg shadow-xl max-w-sm w-full",
+            "flex flex-col space-y-3"
+          )}
+        >
+          <h4 className="text-lg font-semibold text-[var(--text)]">Confirm Deletion</h4>
+          <p className="text-sm text-[var(--text)] opacity-90">
+            Are you sure you want to delete all chat history? This action cannot be undone.
+          </p>
+          <div className="flex justify-end space-x-3 pt-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className={cn(
+                "bg-transparent text-[var(--text)] border-[var(--text)]",
+                "hover:bg-[var(--active)]/30 focus:ring-1 focus:ring-[var(--active)]"
+              )}
+              onClick={() => toast.dismiss(t.id)}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="default" 
+              size="sm"
+              className={cn(
+                "bg-red-600 text-white hover:bg-red-700", 
+                "focus:ring-1 focus:ring-red-400 focus:ring-offset-1 focus:ring-offset-[var(--bg)]"
+              )}
+              onClick={async () => {
+                try {
+                  if (typeof deleteAll === 'function') {
+                    await deleteAll(); 
+                  } else {
+                    console.error("Header: deleteAll prop is not a function or undefined.", deleteAll);
+                    toast.error("Failed to delete history: Operation not available.");
+                  }
+                } catch (error) {
+                  console.error("Error during deleteAll execution from header:", error);
+                  toast.error("An error occurred while deleting history.");
+                } finally {
+                  toast.dismiss(t.id);
+                }
+              }}
+            >
+              Delete All
+            </Button>
+          </div>
+        </div>
+      ),
+      {
+        duration: Infinity,
+        position: 'top-center',
+      }
+    );
   };
 
   return (
@@ -622,13 +686,13 @@ export const Header: React.FC<HeaderProps> = ({
              )}
              {historyMode && (
                 <Tooltip>
-                  <TooltipTrigger>
+                  <TooltipTrigger asChild> 
                     <Button
                       aria-label="Delete All History"
                       variant="ghost"
                       size="sm"
                       className="text-[var(--text)] hover:bg-black/10 dark:hover:bg-white/10 rounded-md"
-                      onClick={deleteAll}
+                      onClick={handleDeleteAllWithConfirmation} 
                     >
                       <FiTrash2 size="18px" />
                     </Button>
