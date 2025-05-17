@@ -5,7 +5,7 @@ import { IoMoonOutline, IoSunnyOutline } from 'react-icons/io5';
 import { WiMoonWaxingCrescent1 } from 'react-icons/wi';
 import { useConfig } from './ConfigContext';
 import { useUpdateModels } from './hooks/useUpdateModels';
-import { themes as appThemes, type Theme as AppTheme } from './Themes'; // Corrected: themes was already imported in your original themes.tsx
+import { themes as appThemes, type Theme as AppTheme } from './Themes';
 import { cn } from "@/src/background/util";
 
 import { Button } from "@/components/ui/button";
@@ -60,7 +60,7 @@ interface Config {
 }
 interface WelcomeModalProps {
   isOpen: boolean;
-  onClose: (open: boolean) => void; // Matches Dialog's onOpenChange signature
+  onClose: (open: boolean) => void;
   setSettingsMode: (mode: boolean) => void;
 }
 const WelcomeModal: React.FC<WelcomeModalProps> = ({ isOpen, onClose, setSettingsMode }) => (
@@ -168,7 +168,6 @@ const SheetThemeButton = ({ theme, updateConfig, size = "h-7 w-7" }: { theme: Ap
   </Tooltip>
 );
 
-
 interface SettingsSheetProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
@@ -240,7 +239,6 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
     onOpenChange(false);
   };
 
-  // Filter out the 'custom' theme for preset buttons
   const presetThemesForSheet = appThemes.filter(t => t.name !== 'custom' && t.name !== config?.customTheme?.name);
 
 
@@ -260,8 +258,8 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
             style={{ height: '100dvh' }}
             ref={sheetContentRef}
             onOpenAutoFocus={(e) => {
-              e.preventDefault(); // Prevent the default auto-focusing behavior
-              sheetContentRef.current?.focus({ preventScroll: true }); // Focus the sheet content area itself
+              e.preventDefault();
+              sheetContentRef.current?.focus({ preventScroll: true });
             }}
         >
           <SheetHeader className="px-4 pt-3 pb-3">
@@ -310,38 +308,34 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
               <div className={cn("flex flex-col space-y-5 flex-1", sectionPaddingX, "py-4",)}>
 
                 <div>
-                  {/* Row for Label, Avatar (left) and Theme Buttons (right) */}
                   <div className="flex items-center justify-between mb-2">
-                    {/* Left part: Label and Avatar */}
                     <div className="flex items-center space-x-2">
                       <label htmlFor="persona-select" className="text-[var(--text)] opacity-80 text-lg font-medium uppercase shrink-0">
                         Persona
                       </label>
-                      <Avatar className="h-7 w-7 border border-[var(--text)]"> {/* Adjusted size to h-7 w-7 */}
+                      <Avatar className="h-7 w-7 border border-[var(--text)]">
                         <AvatarImage src={personaImageSrc} alt={currentPersona} />
                         <AvatarFallback>{currentPersona.substring(0, 1).toUpperCase()}</AvatarFallback>
                       </Avatar>
                     </div>
-                  {/* Right part: Theme Buttons */}
                     <div className="flex items-center space-x-1.5">
                       {presetThemesForSheet.map(theme => (
                         <SheetThemeButton
                           key={theme.name}
                           theme={theme}
                           updateConfig={updateConfig}
-                          size="h-7 w-7" // Consistent size with Avatar
+                          size="h-7 w-7"
                         />
                       ))}
                     </div>
                   </div>
-                {/* Persona Select Dropdown (takes full width below the above row) */}
                     <div className="w-full">
                     <Select
                       value={currentPersona}
                       onValueChange={(value) => updateConfig({ persona: value })}
                     >
                       <SelectTrigger
-                        id="persona-select" // ID for the label's htmlFor
+                        id="persona-select"
                         className={cn(
                           controlBg,
                           subtleBorderClass,
@@ -529,7 +523,7 @@ export const Header: React.FC<HeaderProps> = ({
   downloadJson,
   downloadText,
 }) => {
-  const { config, updateConfig } = useConfig(); // updateConfig is available if needed by Header itself
+  const { config, updateConfig } = useConfig();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   const visibleTitle = chatTitle && !settingsMode && !historyMode;
@@ -560,7 +554,6 @@ export const Header: React.FC<HeaderProps> = ({
         )}
       >
         <div className="flex items-center justify-between h-auto py-0.5 px-5">
-          {/* Left Button */}
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
@@ -580,7 +573,6 @@ export const Header: React.FC<HeaderProps> = ({
             )}
           </Tooltip>
 
-          {/* Center Section */}
           <div className="flex-grow flex justify-center items-center overflow-hidden">
             {visibleTitle && (
               <p className="text-lg font-semibold text-[var(--text)] italic whitespace-nowrap overflow-hidden text-ellipsis text-center">
@@ -609,7 +601,6 @@ export const Header: React.FC<HeaderProps> = ({
             )}
           </div>
 
-          {/* Right Button(s) - Original structure */}
           <div className="min-w-[40px] flex justify-end">
              {!settingsMode && !historyMode && (
                <Tooltip>
@@ -617,7 +608,7 @@ export const Header: React.FC<HeaderProps> = ({
                    <Button
                      aria-label="Reset Chat"
                      variant="ghost"
-                     size="sm" // Kept as sm, or 'icon' if you prefer square
+                     size="sm"
                      className="text-[var(--text)] hover:bg-black/10 dark:hover:bg-white/10 rounded-md"
                      onClick={reset}
                    >
@@ -635,7 +626,7 @@ export const Header: React.FC<HeaderProps> = ({
                     <Button
                       aria-label="Delete All History"
                       variant="ghost"
-                      size="sm" // Kept as sm, or 'icon'
+                      size="sm"
                       className="text-[var(--text)] hover:bg-black/10 dark:hover:bg-white/10 rounded-md"
                       onClick={deleteAll}
                     >
@@ -658,7 +649,7 @@ export const Header: React.FC<HeaderProps> = ({
           isOpen={isSheetOpen}
           onOpenChange={handleSheetOpenChange}
           config={config}
-          updateConfig={updateConfig} // Pass updateConfig here
+          updateConfig={updateConfig}
           setSettingsMode={setSettingsMode}
           setHistoryMode={setHistoryMode}
           downloadText={downloadText}

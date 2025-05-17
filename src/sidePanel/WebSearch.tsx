@@ -68,7 +68,7 @@ const SerpSettingsPanel = ({ config, updateConfig }: SerpSettingsPanelProps) => 
   const maxLinks = config?.serpMaxLinksToVisit ?? 3;
 
   return (
-    <div className="w-full space-y-4"> {/* Changed w-[45%] to w-full as it's now nested */}
+    <div className="w-full space-y-4">
       <div>
         <p className="text-[var(--text)] text-base font-medium pb-2 text-left">
           Max Links to Visit: <span className="font-normal">{maxLinks}</span>
@@ -118,7 +118,7 @@ const WikipediaSettingsPanel = ({ config, updateConfig }: WikipediaSettingsPanel
   const numBlocksToRerank = config?.wikiNumBlocksToRerank ?? Math.max(numBlocks, 10);
 
   return (
-    <div className="w-full space-y-4"> {/* Changed w-[45%] to w-full */}
+    <div className="w-full space-y-4">
       <div>
         <p className="text-[var(--text)] text-base font-medium pb-2 text-left">
           Number of Results: <span className="font-normal">{numBlocks}</span>
@@ -200,7 +200,6 @@ const GoogleCustomSearchSettingsPanel = ({ config, updateConfig }: GoogleCustomS
     updateConfig({ googleCx: newCx });
   };
 
-  // Using the imported Input, but keeping CustomInput as a fallback if needed
   const CurrentInputComponent = Input || ( (props: React.InputHTMLAttributes<HTMLInputElement>) => (
     <input
       {...props}
@@ -216,7 +215,7 @@ const GoogleCustomSearchSettingsPanel = ({ config, updateConfig }: GoogleCustomS
   const linkClass = "text-[var(--active)] hover:underline text-xs";
 
   return (
-    <div className="w-full space-y-4"> {/* Changed w-[45%] to w-full */}
+    <div className="w-full space-y-4">
       <div>
         <Label htmlFor="googleApiKey" className="text-[var(--text)] text-base font-medium pb-1 block">
           Google API Key
@@ -321,7 +320,6 @@ export const WebSearch = () => {
   const itemRounded = 'rounded-xl';
   
   const renderRightPanel = () => {
-    // This div will contain the specific settings panels and take up the allocated space
     const panelWrapperClass = "w-[45%] pl-4 flex flex-col space-y-6"; 
 
     switch (config?.webMode) {

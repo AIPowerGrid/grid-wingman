@@ -26,7 +26,7 @@ export const Send = ({ isLoading, onSend }: SendProps) => {
           "ml-2",
           "mr-2",
           "z-10",
-          !isLoading && "hover:bg-muted/50" // _hover={{ bg: "rgba(0, 0, 0, 0.1)" }} -> hover:bg-muted/50 is a common ghost hover
+          !isLoading && "hover:bg-muted/50"
         )}
         onClick={onSend}
         disabled={isDisabled}

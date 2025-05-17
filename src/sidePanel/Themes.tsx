@@ -88,7 +88,7 @@ export const themes: Theme[] = [
     codeFg: '#EFD6AC',
     preBg: '#333333',
     preFg: '#EFD6AC',
-    mute: '#7F7F7F', // Mid-dark gray
+    mute: '#7F7F7F',
     tableBorder: '#6349b3',
     error: '#d32f2f',
     success: '#388e3c',
@@ -176,12 +176,12 @@ export const setTheme = (c: Theme, paperTextureEnabled: boolean = true) => {
   root.style.setProperty('--primary-foreground', bg);
   root.style.setProperty('--secondary', active);
   root.style.setProperty('--secondary-foreground', bg);
-  root.style.setProperty('--muted', codeBg); // Use inline code's bg for muted
+  root.style.setProperty('--muted', codeBg);
   root.style.setProperty('--muted-foreground', mute);
   root.style.setProperty('--accent', active);
   root.style.setProperty('--accent-foreground', bg);
   root.style.setProperty('--destructive', errorColor);
-  root.style.setProperty('--destructive-foreground', bg); // Assuming errorColor contrasts with bg
+  root.style.setProperty('--destructive-foreground', bg);
   root.style.setProperty('--border', text);
   root.style.setProperty('--input', text);
   root.style.setProperty('--ring', active);
@@ -197,7 +197,7 @@ export const setTheme = (c: Theme, paperTextureEnabled: boolean = true) => {
   root.style.setProperty('--markdown-pre-foreground', preFg);
   root.style.setProperty('--markdown-pre-background', preBg);
   root.style.setProperty('--markdown-table-border', tableBorder);
-  root.style.setProperty('--markdown-thead-background', active); // Using active (like secondary)
+  root.style.setProperty('--markdown-thead-background', active);
   root.style.setProperty('--markdown-thead-foreground', bg);
 
   root.style.setProperty('--bold', bold);
@@ -263,7 +263,7 @@ export const Themes = () => {
   const itemRounded = 'rounded-xl';
   
   const [pickerVisibleForKey, setPickerVisibleForKey] = useState<keyof Omit<Theme, 'name'> | null>(null);
-  const [customThemeColors, setCustomThemeColors] = useState<Omit<Theme, 'name'>>(() => { /* ...initialization logic... */
+  const [customThemeColors, setCustomThemeColors] = useState<Omit<Theme, 'name'>>(() => {
     const baseDefault = themes.find((t) => t.name === 'custom') || DEFAULT_CUSTOM_THEME_FALLBACK;
     const { name, ...restOfBaseDefault } = baseDefault;
 

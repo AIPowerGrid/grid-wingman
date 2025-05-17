@@ -32,14 +32,10 @@ export const TtsSettings = () => {
   const itemRounded = 'rounded-xl';
   const inputHeight = 'h-9';
 
-  // Consistent Slider class string
   const sliderClass = cn(
     "w-full",
-    // Track background (unfilled part) - use a subtle color
     "[&>span:first-child]:bg-[var(--text)]/10",
-    // Range (filled part) - use active color
     "[&>span:first-child>span:first-child]:bg-[var(--active)]",
-    // Thumb styling
     "[&_button]:bg-[var(--active)]",
     "[&_button]:border-[var(--text)]/50",
     "[&_button]:ring-offset-[var(--bg)]",
@@ -147,7 +143,7 @@ export const TtsSettings = () => {
                 </SelectTrigger>
                 <SelectContent
                   className={cn(
-                    "bg-[var(--bg)] text-[var(--text)] border-[var(--text)]", // Updated in previous step
+                    "bg-[var(--bg)] text-[var(--text)] border-[var(--text)]",
                     "rounded-md shadow-lg"
                   )}
                 >
@@ -156,7 +152,7 @@ export const TtsSettings = () => {
                       key={voice.name}
                       value={voice.name}
                       className={cn(
-                        "hover:brightness-95 focus:bg-[var(--active)] focus:text-[var(--bg)]", // Shadcn uses focus:text-accent-foreground
+                        "hover:brightness-95 focus:bg-[var(--active)] focus:text-[var(--bg)]",
                         "text-[var(--text)]"
                       )}
                     >
@@ -173,7 +169,7 @@ export const TtsSettings = () => {
           )}
 
           {!loadingVoices && !errorLoading && voices.length > 0 && (
-            <div className="mt-2"> {/* space-y-3 could also be used if preferred over mt-2 */}
+            <div className="mt-2">
               <Label className="text-base font-medium text-foreground pb-3 block">
                 Speech Rate: {currentRate.toFixed(1)}
               </Label>
@@ -183,7 +179,7 @@ export const TtsSettings = () => {
                 step={0.1}
                 value={[currentRate]}
                 onValueChange={handleRateChange}
-                className={sliderClass} // Apply consistent slider class
+                className={sliderClass}
               />
             </div>
           )}

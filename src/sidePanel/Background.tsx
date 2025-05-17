@@ -41,8 +41,8 @@ export const Background = () => {
 
   const imageClasses = cn(
     "fixed",
-    "opacity-[0.03]", // style: filter: 'opacity(0.03)' (using arbitrary value syntax for exact match)
-    "z-[1]"           // style: zIndex: 1 (using arbitrary value syntax for exact match)
+    "opacity-[0.03]",
+    "z-[1]"
   );
 
   return (

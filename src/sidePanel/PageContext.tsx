@@ -5,7 +5,7 @@ import {
 } from '@/components/ui/accordion';
 import { Slider } from '@/components/ui/slider';
 import { cn } from "@/src/background/util";
-import { useConfig } from './ConfigContext'; // Assuming this provides { config: Config, updateConfig: (updates: Partial<Config>) => void }
+import { useConfig } from './ConfigContext';
 import { SettingTitle } from './SettingsTitle';
 
 

@@ -1,4 +1,3 @@
-// src/sidePanel/Personas.tsx
 import { ForwardedRef, TextareaHTMLAttributes, useEffect, useState, ChangeEvent, Dispatch, SetStateAction } from 'react';
 import ResizeTextarea from 'react-textarea-autosize';
 import {
@@ -14,7 +13,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  // DialogClose, // Not explicitly used as buttons handle close
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -31,7 +29,6 @@ import { useConfig } from './ConfigContext';
 import { SettingTitle } from './SettingsTitle';
 import { cn } from "@/src/background/util";
 
-// Styling constants
 const commonSubtleBorderClass = 'border-[var(--text)]/10';
 const commonControlBg = (isDark: boolean) => isDark ? 'bg-[rgba(255,255,255,0.1)]' : 'bg-[rgba(255,250,240,0.4)]';
 const commonItemShadow = 'shadow-md';
@@ -173,7 +170,7 @@ const PersonaModal = ({
       <DialogContent
         className={cn(
           "sm:max-w-[425px]",
-          "bg-[var(--bg)]", // Use main background for opacity
+          "bg-[var(--bg)]",
           "border", commonSubtleBorderClass,
           commonItemRounded,
           commonItemShadow,
@@ -295,7 +292,7 @@ const PersonaSelect = ({
       </SelectTrigger>
       <SelectContent
         className={cn(
-          "bg-[var(--bg)] text-[var(--text)] border", // Use main background for opacity
+          "bg-[var(--bg)] text-[var(--text)] border",
           commonSubtleBorderClass,
           "rounded-md shadow-lg"
         )}
@@ -355,7 +352,7 @@ export const Persona = () => {
     const newDefaultPrompt = personas?.[currentPersonaName] ?? personas?.Ein ?? "";
     setPersonaPrompt(newDefaultPrompt);
     setIsEditingPersona(false);
-  }, [currentPersonaName, JSON.stringify(personas)]); // Deep watch personas object
+  }, [currentPersonaName, JSON.stringify(personas)]);
 
   const handlePersonaModalOpenChange = (open: boolean) => {
     setIsPersonaModalOpen(open);
@@ -367,7 +364,7 @@ export const Persona = () => {
 
   const handleOpenPersonaModalForCreate = () => {
     setPersonaPrompt('');
-    setIsEditingPersona(true); // Allow immediate editing in the modal's context (though modal has its own input)
+    setIsEditingPersona(true);
     setIsPersonaModalOpen(true);
   };
   
@@ -428,12 +425,12 @@ export const Persona = () => {
             hasChange={hasChange}
             onSave={() => {
               updateConfig({ personas: { ...personas, [currentPersonaName]: personaPrompt } });
-              setIsEditingPersona(false); // Exit editing mode after save
+              setIsEditingPersona(false);
             }}
             onSaveAs={handleOpenPersonaModalForSaveAs}
             onCancel={() => {
               setPersonaPrompt(defaultPromptForCurrentPersona);
-              setIsEditingPersona(false); // Exit editing mode on cancel
+              setIsEditingPersona(false);
             }}
           />
         </div>
@@ -445,12 +442,12 @@ export const Persona = () => {
         personaPrompt={personaPrompt}
         personas={personas}
         updateConfig={updateConfig}
-        onModalClose={() => setIsPersonaModalOpen(false)} // This will trigger onOpenChange(false)
+        onModalClose={() => setIsPersonaModalOpen(false)}
         isDark={isDark}
       />
       <DeleteModal
         isOpen={isDeleteModalOpen}
-        onOpenChange={setIsDeleteModalOpen} // Directly set state
+        onOpenChange={setIsDeleteModalOpen}
         persona={currentPersonaName}
         personas={personas}
         updateConfig={updateConfig}
