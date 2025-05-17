@@ -34,7 +34,6 @@ import { Settings } from './Settings';
 import storage from '../background/storageUtil';
 
 function bridge() {
-    // --- Safety Measure 1: Basic DOM readiness check (optional, usually not an issue for content scripts) ---
 
     let title = '';
     let textContent = '';
@@ -47,8 +46,7 @@ function bridge() {
     try {
         title = document.title || '';
 
-        // --- Safety Measure 2: Limit the scope for innerText/innerHTML if body is enormous ---
-        const MAX_BODY_CHARS_FOR_DIRECT_EXTRACTION = 5_000_000; // Approx 5MB of text
+        const MAX_BODY_CHARS_FOR_DIRECT_EXTRACTION = 5_000_000;
         let bodyElement = document.body;
 
         if (document.body && document.body.innerHTML.length > MAX_BODY_CHARS_FOR_DIRECT_EXTRACTION) {
@@ -83,17 +81,21 @@ function bridge() {
 
     } catch (error) {
         console.error('[Cognito Bridge] Error during content extraction:', error);
+        let errorMessage = 'Unknown extraction error';
+        if (error instanceof Error) {
+            errorMessage = error.message;
+        } else if (typeof error === 'string') {
+            errorMessage = error;
+        }
         return JSON.stringify({
-            error: `Extraction failed: ${error.message}`,
-            title: document.title || 'Error extracting title', // Try to get title anyway
+            error: `Extraction failed: ${errorMessage}`,
+            title: document.title || 'Error extracting title',
             text: '', html: '', altTexts: '', tableData: '',
             meta: { description: '', keywords: '' }
         });
     }
 
-    // --- Safety Measure 3: Truncate extremely long outputs before stringifying ---
-    // This protects the extension storage and IPC messages if something goes unexpectedly huge.
-    const MAX_OUTPUT_STRING_LENGTH = 10_000_000; // 10MB for the whole JSON string
+    const MAX_OUTPUT_STRING_LENGTH = 10_000_000;
     
     let responseCandidate = {
         title,
@@ -166,7 +168,13 @@ async function injectBridge() {
     try {
         res = JSON.parse(rawResult);
     } catch (parseError) {
-        console.error('[Cognito:] Failed to parse JSON result from bridge:', parseError, 'Raw result string:', rawResult);
+        let message = 'Unknown parse error';
+        if (parseError instanceof Error) {
+            message = parseError.message;
+        } else if (typeof parseError === 'string') {
+            message = parseError;
+        }
+        console.error('[Cognito:] Failed to parse JSON result from bridge:', message, 'Raw result string:', rawResult, 'Original error object:', parseError);
         return;
     }
 
@@ -190,7 +198,13 @@ async function injectBridge() {
       storage.setItem('tabledata', res?.tableData ?? '');
       console.debug('[Cognito:] Stored extracted content.');
     } catch (storageError) {
-        console.error('[Cognito:] Storage error after successful extraction:', storageError);
+        let message = 'Unknown storage error';
+        if (storageError instanceof Error) {
+            message = storageError.message;
+        } else if (typeof storageError === 'string') {
+            message = storageError;
+        }
+        console.error('[Cognito:] Storage error after successful extraction:', message, 'Original error object:', storageError);
         storage.deleteItem('pagestring');
         storage.deleteItem('pagehtml');
         storage.deleteItem('alttexts');
@@ -410,7 +424,13 @@ const Cognito = () => {
         toast.success("Deleted all chats");
         reset();
     } catch (error) {
-        console.error("[Cognito] Error deleting all chats:", error);
+        let message = 'Unknown error deleting chats';
+        if (error instanceof Error) {
+            message = error.message;
+        } else if (typeof error === 'string') {
+            message = error;
+        }
+        console.error("[Cognito] Error deleting all chats:", message, 'Original error object:', error);
         toast.error("Failed to delete chats");
     }
   };
@@ -465,7 +485,13 @@ const Cognito = () => {
         }
       } catch (error) {
         if (!cancelled) {
-        console.error("[Cognito - Revised] Error during panel open tab check:", error);
+          let message = 'Unknown error during panel open tab check';
+          if (error instanceof Error) {
+              message = error.message;
+          } else if (typeof error === 'string') {
+              message = error;
+          }
+          console.error("[Cognito - Revised] Error during panel open tab check:", message, 'Original error object:', error);
           lastInjectedRef.current = { id: null, url: '' };
           setCurrentTabInfo({ id: null, url: '' });
           storage.deleteItem('pagestring');
