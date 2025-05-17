@@ -301,18 +301,38 @@ export const webSearch = async (
                 title: string;
                 snippet: string;
                 url: string | null;
+                content?: string;
             }
             const searchResults: SearchResult[] = [];
 
             if (webMode === 'Duckduckgo') {
-                htmlDoc.querySelectorAll('.web-result').forEach(result => {
-                    const titleEl = result.querySelector('.result__a');
-                    const snippetEl = result.querySelector('.result__snippet');
-                    const title = titleEl?.textContent?.trim() || '';
-                    const url = titleEl?.getAttribute('href');
-                    const snippet = snippetEl?.textContent?.trim() || '';
-                    if (title && url) searchResults.push({ title, snippet, url: url.startsWith('http') ? url : `https:${url}` });
-                });
+                const results = htmlDoc.querySelectorAll('.web-result');
+                for (const result of results) {
+                     const titleEl = result.querySelector('.result__a');
+                     const snippetEl = result.querySelector('.result__snippet');
+                     const title = titleEl?.textContent?.trim() || '';
+                     const rawUrl = titleEl?.getAttribute('href') || '';
+                     const snippet = snippetEl?.textContent?.trim() || '';
+                     const extractRealUrl = (duckduckgoRedirectUrl: string): string => {
+                        try {
+                            const urlObj = new URL(duckduckgoRedirectUrl, 'https://duckduckgo.com');
+                            const encodedUrl = urlObj.searchParams.get("uddg");
+                            return encodedUrl ? decodeURIComponent(encodedUrl) : duckduckgoRedirectUrl;
+                        } catch (e) {
+                            console.error("Invalid redirect URL:", duckduckgoRedirectUrl);
+                            return duckduckgoRedirectUrl;
+                        }
+                     };
+
+                     const realUrl = extractRealUrl(rawUrl);
+                     if (title && realUrl) {
+                     searchResults.push({
+                         title,
+                         snippet,
+                         url: realUrl,
+                        });
+                      }
+                    }
             } else if (webMode === 'Google') {
                 htmlDoc.querySelectorAll('div.g, div.MjjYud, div.hlcw0c').forEach(result => {
                     const linkEl = result.querySelector('a[href]');
@@ -546,7 +566,7 @@ export const webSearch = async (
 
             interface SearchResult {
                 title: string;
-                snippet: string; 
+                snippet: string;
                 url: string | null;
             }
             const searchResults: SearchResult[] = apiResponse.items.map(item => ({
