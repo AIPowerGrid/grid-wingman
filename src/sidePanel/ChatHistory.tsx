@@ -28,7 +28,7 @@ export type ChatMessage = {
 type ChatHistoryProps = {
   loadChat: (chat: ChatMessage) => void;
   onDeleteAll: () => void;
-  className?: string; // Expects "flex-1 w-full overflow-y-auto min-h-0" or similar
+  className?: string;
 };
 
 declare global {
@@ -121,7 +121,7 @@ export const ChatHistory = ({ loadChat, onDeleteAll, className }: ChatHistoryPro
           item => item && typeof item === 'object' && 'id' in item && 'last_updated' in item && 'turns' in item
       ) as ChatMessage[];
       
-      processAndSetMessages(validMessagesAfterDelete); // This updates allMessagesFromServer, then filteredMessages recomputes
+      processAndSetMessages(validMessagesAfterDelete);
 
       const newFilteredAfterDelete = validMessagesAfterDelete.filter(message => {
         if (!searchQuery) return true;
@@ -151,7 +151,7 @@ export const ChatHistory = ({ loadChat, onDeleteAll, className }: ChatHistoryPro
       const keys = await localforage.keys();
       const chatKeys = keys.filter(key => key.startsWith('chat_'));
       await Promise.all(chatKeys.map(k => localforage.removeItem(k)));
-      setAllMessagesFromServer([]); // This will also empty filteredMessages
+      setAllMessagesFromServer([]);
       if (onDeleteAll) onDeleteAll();
     } catch (e) { console.error("Error deleting all messages:", e); }
   }, [onDeleteAll]);

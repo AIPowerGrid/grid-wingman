@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { toast, Toaster } from 'react-hot-toast';
 import localforage from 'localforage';
-import { TbWorldSearch, TbBrowserPlus, TbApi } from "react-icons/tb"; // TbApi was already here
+import { TbWorldSearch, TbBrowserPlus, TbApi } from "react-icons/tb";
 import { BiBrain } from "react-icons/bi";
 import { FaWikipediaW, FaGoogle, FaBrave } from "react-icons/fa6";
 import { SiDuckduckgo } from "react-icons/si";
@@ -224,7 +224,6 @@ const MessageTemplate = ({ children, onClick }: { children: React.ReactNode, onC
   </div>)
 );
 
-// Define constants and WebSearchIconButton component (outside Cognito functional component)
 const WEB_SEARCH_MODES = [
   { id: 'Google', icon: FaGoogle, label: 'Google Search' },
   { id: 'Duckduckgo', icon: SiDuckduckgo, label: 'DuckDuckGo Search' },
@@ -506,7 +505,7 @@ const Cognito = () => {
   };
 
   return (
-    <TooltipProvider delayDuration={300}> {/* Adjusted delayDuration for quicker tooltips */}
+    <TooltipProvider delayDuration={300}>
       <div
         ref={containerRef}
         className={cn(
