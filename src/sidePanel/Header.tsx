@@ -77,12 +77,12 @@ const WelcomeModal: React.FC<WelcomeModalProps> = ({ isOpen, onClose, setSetting
       )}
       onInteractOutside={(e) => e.preventDefault()}
     >
-      <DialogHeader className="text-center font-['Bruno_Ace_SC'] font-bold p-2">
+      <DialogHeader className="text-center font-['Bruno_Ace_SC'] p-2">
         <DialogTitle className="text-base pt-2">Welcome</DialogTitle>
       </DialogHeader>
       <DialogDescription asChild>
         <div className="p-4 text-center">
-          <p className="text-[var(--text)] text-xl font-['Allura'] font-medium mb-2 -mt-7">
+          <p className="text-[var(--text)] text-xl font-['Bruno_Ace_SC'] mb-2 -mt-7">
             The game is afoot!<br />
           </p>
           <div className="flex justify-center">
@@ -650,7 +650,7 @@ export const Header: React.FC<HeaderProps> = ({
             )}
             {settingsMode && (
               <div className="flex items-center justify-center">
-                 <p className="relative top-0 text-lg font-['Bruno_Ace_SC'] font-semibold text-[var(--text)] whitespace-nowrap">
+                 <p className="relative top-0 text-lg font-['Bruno_Ace_SC'] text-[var(--text)] whitespace-nowrap">
                    The game is afoot{' '}
                    <WiMoonWaxingCrescent1 className="inline-block align-middle text-[#f5eee4] text-[20px] ml-2" />
                  </p>
@@ -658,7 +658,7 @@ export const Header: React.FC<HeaderProps> = ({
             )}
             {historyMode && (
               <div className="flex items-center justify-center">
-                <p className="font-['Bruno_Ace_SC'] text-lg font-semibold text-[var(--text)] whitespace-nowrap">
+                <p className="font-['Bruno_Ace_SC'] text-lg text-[var(--text)] whitespace-nowrap">
                   Chat History
                 </p>
               </div>
