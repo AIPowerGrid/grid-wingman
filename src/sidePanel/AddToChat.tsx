@@ -56,16 +56,16 @@ export const AddToChat = () => {
         </Tooltip>
 
         <DropdownMenuContent
-          align="end" // Aligns the end of the menu with the end of the trigger (replaces mr)
-          sideOffset={5} // Small offset from the trigger (replaces marginTop)
-          className="bg-secondary text-primary-foreground rounded-md min-w-[80px] z-50" // Mimic original: bg, color, border, rounded, padding. Added z-index just in case. Adjust min-w as needed.
+          align="end" 
+          sideOffset={5}
+          className="bg-secondary text-primary-foreground rounded-md min-w-[80px] z-50" 
         >
           <DropdownMenuItem
             onClick={() => updateConfig({ chatMode: undefined })}
             className={cn(
               "p-0",
-              "flex justify-center font-extrabold text-md cursor-pointer not-focus-visible", // Mimic original: flex, justify, font, size, padding
-              !currentMode ? "bg-background text-foreground" : "bg-transparent text-primary-foreground" // Conditional background for active state
+              "flex justify-center font-extrabold text-md cursor-pointer not-focus-visible", 
+              !currentMode ? "bg-background text-foreground" : "bg-transparent text-primary-foreground" 
             )}
           >
             CHAT
@@ -77,8 +77,8 @@ export const AddToChat = () => {
             onClick={() => updateConfig({ chatMode: 'page' })}
             className={cn(
               "p-0",
-              "flex justify-center font-extrabold text-md cursor-pointer not-focus-visible", // Mimic original styles
-              currentMode === 'page' ? "bg-background text-foreground" : "bg-transparent text-primary-foreground" // Conditional background
+              "flex justify-center font-extrabold text-md cursor-pointer not-focus-visible",
+              currentMode === 'page' ? "bg-background text-foreground" : "bg-transparent text-primary-foreground"
             )}
           >
             PAGE
@@ -90,8 +90,8 @@ export const AddToChat = () => {
             onClick={() => updateConfig({ chatMode: 'web' })}
             className={cn(
               "p-0",
-              "flex justify-center font-extrabold text-md cursor-pointer not-focus-visible", // Mimic original styles
-              currentMode === 'web' ? "bg-background text-foreground" : "bg-transparent text-primary-foreground" // Conditional background
+              "flex justify-center font-extrabold text-md cursor-pointer not-focus-visible",
+              currentMode === 'web' ? "bg-background text-foreground" : "bg-transparent text-primary-foreground"
             )}
           >
             WEB

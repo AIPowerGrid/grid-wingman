@@ -156,7 +156,6 @@ async function injectBridge() {
       func: bridge
     });
 
-    // Basic result checking
     if (!results || !Array.isArray(results) || results.length === 0 || !results[0] || typeof results[0].result !== 'string') {
         console.error('[Cognito:] Bridge function execution returned invalid or unexpected results structure:', results);
         return;
@@ -232,7 +231,6 @@ const WEB_SEARCH_MODES = [
   { id: 'GoogleCustomSearch', icon: TbApi, label: 'Google API Search' },
 ] as const;
 
-// Helper component for web search icon buttons
 const WebSearchIconButton = ({ children, onClick, isActive, title }: { children: React.ReactNode, onClick: () => void, isActive?: boolean, title: string }) => (
   <Tooltip>
     <TooltipTrigger>
@@ -259,7 +257,6 @@ const WebSearchIconButton = ({ children, onClick, isActive, title }: { children:
   </Tooltip>
 );
 
-
 const Cognito = () => {
   const [turns, setTurns] = useState<MessageTurn[]>([]);
   const [message, setMessage] = useState('');
@@ -275,7 +272,6 @@ const Cognito = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const lastInjectedRef = useRef<{ id: number | null, url: string }>({ id: null, url: '' });
 
-  // Hover states for button groups
   const [isPageActionsHovering, setIsPageActionsHovering] = useState(false);
   const [isWebSearchHovering, setIsWebSearchHovering] = useState(false);
 
@@ -612,7 +608,6 @@ const Cognito = () => {
                 </Tooltip>
               </div>)
                 )}
-            {/* Page Mode Action Buttons */}
             {!settingsMode && !historyMode && config?.chatMode === "page" && (
                    (<div
                       className={cn(
@@ -671,7 +666,6 @@ const Cognito = () => {
                      </div>
                    </div>)
             )}
-            {/* Web Search Mode Selection Buttons */}
             {!settingsMode && !historyMode && config?.chatMode === "web" && (
               <div
                 className={cn(

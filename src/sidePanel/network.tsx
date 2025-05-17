@@ -237,7 +237,6 @@ interface GoogleCustomSearchResponse {
 }
 
 
-// --- ENHANCED webSearch function ---
 export const webSearch = async (
     query: string,
     config: Config
@@ -246,9 +245,7 @@ export const webSearch = async (
     console.log('[webSearch] Web Mode from config:', config?.webMode);
 
     const webMode = config.webMode;
-    // Use serpMaxLinksToVisit for GoogleCustomSearch as well if we are scraping content
     const maxLinksToVisit = config.serpMaxLinksToVisit ?? 3;
-    // Use webLimit for GoogleCustomSearch content preview
     const charLimitPerPage = config.webLimit ? config.webLimit * 1000 : 15000; // Default to 15k if webLimit (in k) is not set
 
     const serpAbortController = new AbortController();
@@ -521,7 +518,6 @@ export const webSearch = async (
                         'Accept': 'application/json',
                     }
                 });
-                // Don't clear serpTimeoutId yet, it covers the whole GCS + scraping part
 
                 if (!response.ok) {
                     const errorBody = await response.json().catch(() => response.text());
@@ -548,10 +544,9 @@ export const webSearch = async (
                 return `No Google Custom Search results found for "${query}". (Total results from API: ${apiResponse.searchInformation?.totalResults || '0'})`;
             }
 
-            // Transform API results to the SearchResult structure for scraper
-            interface SearchResult { // Ensure this interface is defined
+            interface SearchResult {
                 title: string;
-                snippet: string; // This will be the API snippet
+                snippet: string; 
                 url: string | null;
             }
             const searchResults: SearchResult[] = apiResponse.items.map(item => ({
@@ -562,19 +557,18 @@ export const webSearch = async (
 
             console.log(`[webSearch - GoogleCustomSearch] Mapped ${searchResults.length} API results to scraper format. Attempting to fetch content from top ${Math.min(searchResults.length, maxLinksToVisit)} links.`);
 
-            // Now, use the existing scraper logic for these URLs
             const linksToFetch = searchResults.slice(0, maxLinksToVisit).filter(r => r.url); // Already sliced by API num, but good to be explicit
 
             const pageFetchPromises = linksToFetch.map(async (result) => {
                 if (!result.url) return { ...result, content: '[Invalid URL]', status: 'error' };
                 console.log(`[GoogleCustomSearch - Scraper] Fetching content from: ${result.url}`);
-                const pageController = new AbortController(); // New controller for each page fetch
+                const pageController = new AbortController();
                 const pageTimeoutId = setTimeout(() => pageController.abort(), 12000); // Individual page fetch timeout
                 try {
                     const pageResponse = await fetch(result.url, {
                         signal: pageController.signal,
                         method: 'GET',
-                        headers: { // Standard headers for scraping
+                        headers: {
                             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36',
                             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
                             'Accept-Language': 'en-US,en;q=0.9',
@@ -596,7 +590,7 @@ export const webSearch = async (
             });
 
             const fetchedPagesResults = await Promise.allSettled(pageFetchPromises);
-            clearTimeout(serpTimeoutId); // Clear the main timeout after all scraping attempts
+            clearTimeout(serpTimeoutId);
 
             let combinedResultsText = `Google Custom Search results for "${query}" (with scraped content):\n\n`;
             let pageIndex = 0;
@@ -605,7 +599,6 @@ export const webSearch = async (
                  combinedResultsText += `URL: ${result.url || '[No URL Found]'}\n`;
                  combinedResultsText += `API Snippet: ${result.snippet || '[No API Snippet]'}\n`;
 
-                 // Find the corresponding fetched page data
                  const correspondingFetch = fetchedPagesResults[pageIndex];
                  if (correspondingFetch?.status === 'fulfilled') {
                      const fetchedData = correspondingFetch.value as (typeof searchResults[0] & { scrapedContent: string }); // Cast for type safety
@@ -618,7 +611,6 @@ export const webSearch = async (
                  } else if (correspondingFetch?.status === 'rejected') {
                      combinedResultsText += `Scraped Content: [Error fetching page: ${correspondingFetch.reason}]\n\n`;
                  } else {
-                     // This case should ideally not happen if we iterate correctly over linksToFetch
                      combinedResultsText += `Scraped Content: [Not fetched or status unknown]\n\n`;
                  }
                  pageIndex++;

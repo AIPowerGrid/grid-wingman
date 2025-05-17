@@ -48,7 +48,7 @@ export const ConnectOpenRouter = () => {
             openRouterError: undefined,
             models: (config?.models || []).filter(m => !m.id.startsWith('openrouter_')).concat(
               data.data.map((model: any) => ({
-                id: `openrouter_${model.id}`, // OpenRouter model IDs are often like 'openai/gpt-3.5-turbo'
+                id: `openrouter_${model.id}`,
                 name: model.name || model.id,
                 host: 'openrouter',
                 active: true
@@ -93,7 +93,7 @@ export const ConnectOpenRouter = () => {
           onChange={e => setApiKey(e.target.value)}
           className={cn(
             "w-full", inputHeightClass, controlBg, subtleBorderClass,
-            "text-[var(--text)] rounded-md shadow-sm text-sm px-2.5 pr-8", // pr-8 for eye icon
+            "text-[var(--text)] rounded-md shadow-sm text-sm px-2.5 pr-8",
             "focus:border-[var(--active)] focus:ring-1 focus:ring-[var(--active)] focus:ring-offset-0",
             "hover:border-[var(--active)]"
           )}

@@ -28,8 +28,8 @@ const ConnectionSection: FC<ConnectionProps> = ({
   link,
 }) => (
   (<div className="px-4 py-3 border-b border-[var(--text)]/10 last:border-b-0">
-    <div className="flex items-center justify-between mb-2"> {/* For title and link alignment */}
-      <h4 className="text-base font-medium capitalize text-foreground"> {/* Consistent heading style */}
+    <div className="flex items-center justify-between mb-2">
+      <h4 className="text-base font-medium capitalize text-foreground">
         {title}
       </h4>
       {link && (
@@ -38,9 +38,9 @@ const ConnectionSection: FC<ConnectionProps> = ({
           target="_blank"
           rel="noopener noreferrer"
           className={cn(
-            "text-xs inline-flex items-center gap-1", // Smaller text, gap for icon
-            "text-[var(--link)] hover:text-[var(--active)] hover:underline", // Use theme link/active colors
-            "focus-visible:ring-1 focus-visible:ring-[var(--ring)] rounded-sm p-0.5" // Focus style
+            "text-xs inline-flex items-center gap-1",
+            "text-[var(--link)] hover:text-[var(--active)] hover:underline",
+            "focus-visible:ring-1 focus-visible:ring-[var(--ring)] rounded-sm p-0.5"
           )}
         >
           API Keys
@@ -56,7 +56,7 @@ export const Connect: FC = () => {
   const { config } = useConfig();
 
   const isDark = config?.theme === 'dark';
-  const subtleBorderClass = 'border-[var(--text)]/10'; // For the main accordion item
+  const subtleBorderClass = 'border-[var(--text)]/10';
   const controlBg = isDark ? 'bg-[rgba(255,255,255,0.1)]' : 'bg-[rgba(255,250,240,0.4)]';
   const itemShadow = 'shadow-md';
   const itemRounded = 'rounded-xl';
@@ -71,7 +71,7 @@ export const Connect: FC = () => {
         itemShadow,
         "transition-all duration-150 ease-in-out",
         "hover:border-[var(--active)] hover:brightness-105",
-        "overflow-hidden" // Keep overflow-hidden if it helps with internal layout
+        "overflow-hidden"
       )}
     >
       <AccordionTrigger
@@ -84,7 +84,7 @@ export const Connect: FC = () => {
       >
         <SettingTitle icon="♾️" text="Connect" />
       </AccordionTrigger>
-      <AccordionContent className="p-0 text-[var(--text)]"> {/* Removed padding, set base text color */}
+      <AccordionContent className="p-0 text-[var(--text)]">
         <ConnectionSection Component={ConnectOllama} title="Ollama" />
         <ConnectionSection Component={ConnectLmStudio} title="LM Studio" />
         <ConnectionSection

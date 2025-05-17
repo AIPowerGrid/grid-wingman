@@ -48,7 +48,6 @@ export const ConnectGroq = () => {
             models: (config?.models || []).filter(m => !m.id.startsWith('groq_')).concat(
               data.data.map((model: any) => ({ id: `groq_${model.id}`, name: model.id, host: 'groq', active: true }))
             ),
-            // selectedModel: `groq_${data.data[0].id}` // Optionally select the first model
           });
           toast.dismiss();
           toast.success('Connected to Groq');

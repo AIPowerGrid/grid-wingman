@@ -11,7 +11,7 @@ export const ConnectCustom = () => {
   const [apiKey, setApiKey] = useState(config?.customApiKey || '');
   const [endpoint, setEndpoint] = useState(config?.customEndpoint || '');
   const [visibleApiKey, setVisibleApiKey] = useState(false);
-  const [isLoading, setIsLoading] = useState(false); // For future async connection test
+  const [isLoading, setIsLoading] = useState(false);
 
   const isDark = config?.theme === 'dark';
   const controlBg = isDark ? 'bg-[rgba(255,255,255,0.1)]' : 'bg-[rgba(255,250,240,0.4)]';
@@ -54,7 +54,7 @@ export const ConnectCustom = () => {
     toast.success('Custom endpoint settings reset');
   };
 
-  const saveButtonDisabled = (!endpoint && !apiKey) || isLoading; // Disable if both are empty or loading
+  const saveButtonDisabled = (!endpoint && !apiKey) || isLoading;
   const isConnected = config?.customConnected; 
 
   return (
@@ -119,7 +119,6 @@ export const ConnectCustom = () => {
         )}
         {isConnected && (
           <>
-            {/* "Saved" checkmark could replace the eye icon if API key is not sensitive or always visible after save */}
             <Button
               variant="ghost" size="sm" aria-label="Custom Endpoint Settings Saved"
               className={cn(buttonHeightClass, "w-8 rounded-md text-[var(--success)]")}

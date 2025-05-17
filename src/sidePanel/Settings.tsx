@@ -27,7 +27,7 @@ export const Settings = () => {
       className="relative z-[1] top-0 w-full h-full flex-1 flex-col overflow-y-auto overflow-x-hidden bg-transparent text-foreground px-6 pb-10 pt-[56px] scrollbar-hidden"
       >
       <Accordion
-        type="single" // Or "multiple" if you want multiple items open
+        type="single"
         collapsible
         className="w-full flex flex-col gap-4"
       >
@@ -38,7 +38,7 @@ export const Settings = () => {
         <TtsSettings />
         <PageContext />
         <WebSearch />
-        <div className="pointer-events-none h-12" /> {/* prevent the missing bottom boarder */}
+        <div className="pointer-events-none h-12" />
       </Accordion>
     </div>
   );

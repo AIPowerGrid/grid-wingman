@@ -160,7 +160,7 @@ export const setTheme = (c: Theme, paperTextureEnabled: boolean = true) => {
   const codeFg = c.codeFg || bg;
   const preBg = c.preBg || text; 
   const preFg = c.preFg || bg;  
-  const mute = c.mute || (text === '#000000' ? '#757575' : '#A9A9A9'); // Fallback based on typical text color
+  const mute = c.mute || (text === '#000000' ? '#757575' : '#A9A9A9');
   const tableBorder = c.tableBorder || text;
   const errorColor = c.error || '#d32f2f';
   const successColor = c.success || '#388e3c';
@@ -236,7 +236,7 @@ const PaletteColorPicker = ({
       }}
       onChangeComplete={(finalColor) => {
         console.log(`PaletteColorPicker INTERNAL onChangeComplete for key "${themeKey}":`, finalColor.hex);
-        onColorChangeComplete(themeKey, finalColor); // This calls the function passed from Themes component
+        onColorChangeComplete(themeKey, finalColor);
       }}
       hideInput={["rgb", "hsv"]}
     />

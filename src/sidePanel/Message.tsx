@@ -70,7 +70,7 @@ const Pre = (props: CustomPreProps) => {
     }
     codeString = codeString.trim(); 
   }
-  const languageClass = codeElement?.props?.className || ''; // e.g., "language-js"
+  const languageClass = codeElement?.props?.className || '';
 
   const copyToClipboard = () => {
     if (codeString) {
@@ -81,8 +81,8 @@ const Pre = (props: CustomPreProps) => {
   };
   const preElementStyles: CSSProperties = {
     overflow: 'auto',
-    padding: '1rem', // Consistent padding for all code blocks
-    margin: 0,       // Margin is handled by the outer div
+    padding: '1rem',
+    margin: 0, 
     background: 'var(--markdown-pre-background)',
     color: 'var(--markdown-pre-foreground)', 
     borderRadius: '8px',
@@ -91,14 +91,14 @@ const Pre = (props: CustomPreProps) => {
 
   return (
     <div
-      className="relative my-4" // Margin for the entire code block
+      className="relative my-4"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
       <pre
         style={preElementStyles}
-        className={preClassName} // Pass through any className for the <pre> itself
-        {...restPreProps}       // Pass through other <pre> props
+        className={preClassName}
+        {...restPreProps}
         
       >
       {children}
@@ -110,8 +110,8 @@ const Pre = (props: CustomPreProps) => {
             aria-label={copied ? "Copied!" : "Copy code"}
             title={copied ? "Copied!" : "Copy code"}
             className={cn(
-              "absolute right-2 top-2 h-8 w-8 p-0", // Ensure padding doesn't make it too big
-              "bg-background text-foreground hover:bg-accent hover:text-accent-foreground", // Styles from original IconButton
+              "absolute right-2 top-2 h-8 w-8 p-0",
+              "bg-background text-foreground hover:bg-accent hover:text-accent-foreground",
               "transition-opacity duration-200",
               (hovered || copied) ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
             )}
@@ -135,12 +135,12 @@ const Code = (props: CustomCodeProps) => {
     return (
       <code
         style={{
-          color: 'var(--markdown-inline-code-foreground, var(--foreground))', // Use specific inline var
+          color: 'var(--markdown-inline-code-foreground, var(--foreground))',
           background: 'var(--markdown-code-background, var(--muted))',
           padding: '0.2rem 0.4rem',
           borderRadius: '4px'
         }}
-        className={className} // Pass through className for syntax highlighting themes
+        className={className}
         {...restCodeProps}
       >
         {children}
@@ -176,22 +176,22 @@ const A = ({ children, href, ...rest }: AnchorProps) => (
 type HeadingProps = { children?: ReactNode } & HTMLAttributes<HTMLHeadingElement>;
 const H1 = ({ children, ...rest }: HeadingProps) => (
   <h1 style={{
-    fontSize: '1.5rem', // text-2xl
-    fontWeight: 800,    // font-extrabold
-    margin: '1rem 0 1rem', // my-4
+    fontSize: '1.5rem',
+    fontWeight: 800,
+    margin: '1rem 0 1rem',
     borderBottom: '2px solid var(--markdown-h1, var(--foreground))',
-    paddingBottom: '0.5rem', // pb-2
+    paddingBottom: '0.5rem',
     color: 'var(--markdown-h1, var(--foreground))'
   }} {...rest}>{children}</h1>
 );
 
 const H2 = ({ children, ...rest }: HeadingProps) => (
   <h2 style={{
-    fontSize: '1.25rem', // text-xl
-    fontWeight: 700,     // font-bold
-    margin: '1rem 0 0.75rem', // mt-4 mb-3
+    fontSize: '1.25rem',
+    fontWeight: 700,
+    margin: '1rem 0 0.75rem',
     borderBottom: '1px solid var(--markdown-h2, var(--foreground))',
-    paddingBottom: '0.4rem', // ~pb-1.5
+    paddingBottom: '0.4rem',
     color: 'var(--markdown-h2, var(--foreground))'
   }} {...rest}>{children}</h2>
 );
@@ -202,7 +202,7 @@ const H3 = ({ children, ...rest }: HeadingProps) => (
     fontWeight: 600,
     margin: '0.75rem 0 0.5rem',
     borderBottom: '1px dashed var(--markdown-h3, var(--foreground))',
-    paddingBottom: '0.3rem', // ~pb-1
+    paddingBottom: '0.3rem',
     color: 'var(--markdown-h3, var(--foreground))'
   }} {...rest}>{children}</h3>
 );
@@ -210,8 +210,8 @@ const H3 = ({ children, ...rest }: HeadingProps) => (
 type StrongProps = { children?: ReactNode } & HTMLAttributes<HTMLElement>;
 const Strong = ({ children, ...rest }: StrongProps) => (
   <strong style={{
-    color: 'var(--markdown-strong, var(--foreground))', // Assuming --bold (if a color) maps to --foreground or a specific theme color
-    fontWeight: 700, // font-bold
+    color: 'var(--markdown-strong, var(--foreground))',
+    fontWeight: 700,
     fontFamily: 'Poppins, sans-serif'
   }} {...rest}>{children}</strong>
 );
@@ -219,7 +219,7 @@ const Strong = ({ children, ...rest }: StrongProps) => (
 type EmProps = { children?: ReactNode } & HTMLAttributes<HTMLElement>;
 const Em = ({ children, ...rest }: EmProps) => (
   <em style={{
-    color: 'var(--markdown-em, var(--foreground))', // Assuming --italic (if a color) maps to --foreground or a specific theme color
+    color: 'var(--markdown-em, var(--foreground))',
     fontStyle: 'italic'
   }} {...rest}>{children}</em>
 );
@@ -230,7 +230,7 @@ const Table = ({ children, ...rest }: TableProps) => (
     border: `2px solid var(--markdown-table-border, var(--foreground))`,
     borderCollapse: 'collapse',
     width: '100%',
-    margin: '1rem 0' // my-4
+    margin: '1rem 0'
   }} {...rest}>{children}</table>
 );
 
@@ -254,7 +254,7 @@ const Th = ({ children, ...rest }: ThProps) => (
   <th style={{
     padding: '0.5rem',
     border: `1px solid var(--markdown-table-border, var(--foreground))`,
-    fontWeight: 700 // font-bold
+    fontWeight: 700
   }} {...rest}>{children}</th>
 );
 
@@ -271,9 +271,9 @@ const Blockquote = ({ children, ...rest }: BlockquoteProps) => (
   <blockquote
     style={{
       borderLeft: '4px solid var(--markdown-h2, var(--foreground))',
-      margin: '1em 0', // my-4 (approx)
+      margin: '1em 0',
       padding: '0.5em 1em',
-      background: 'rgba(0,0,0,0.03)', // e.g. bg-black/5 dark:bg-white/5 or bg-muted/30
+      background: 'rgba(0,0,0,0.03)',
       color: 'var(--markdown-h2, var(--foreground))'
     }}
     {...rest}
@@ -327,7 +327,6 @@ const ThinkingBlock = ({ content }: { content: string }) => {
   );
 };
 
-// Markdown components mapping
 const markdownComponents = {
   ul: Ul,
   ol: Ol,
@@ -371,11 +370,11 @@ export const EditableMessage: FC<MessageProps> = ({
   return (
     <div
       className={cn(
-        "border rounded-2xl text-base font-semibold", // Chakra: border, borderRadius={16}, fontSize="md", fontWeight={600}
-        "w-[calc(100%-2rem)] mx-1 my-2", // Adjusted width, ml/mr/my (Chakra uses different spacing scale)
+        "border rounded-2xl text-base font-semibold",
+        "w-[calc(100%-2rem)] mx-1 my-2",
         "pb-1 pl-4 pr-4 pt-1", 
         "shadow-lg text-left relative",
-        turn.role === 'assistant' ? 'bg-accent border-accent-foreground' : 'bg-background border-foreground', // Chakra: background, borderColor
+        turn.role === 'assistant' ? 'bg-accent border-accent-foreground' : 'bg-background border-foreground',
         config?.paperTexture ? 'chat-message-bubble' : '',
         'chatMessage', isEditing ? 'editing' : '' 
       )}
@@ -423,7 +422,7 @@ export const EditableMessage: FC<MessageProps> = ({
           </div>
         </div>
       ) : (
-        <div className="message-markdown markdown-body relative z-[1] text-foreground"> {/* ADDED markdown-body class */}
+        <div className="message-markdown markdown-body relative z-[1] text-foreground">
           {turn.role === 'assistant' && turn.webDisplayContent && (
             <div className="message-prefix">
               <Markdown remarkPlugins={[[remarkGfm, { singleTilde: false }], remarkMath, remarkSupersub]} components={markdownComponents}>

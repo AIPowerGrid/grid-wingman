@@ -9,13 +9,13 @@ import { cn } from "@/src/background/util";
 export const ConnectOllama = () => {
   const { config, updateConfig } = useConfig();
   const [url, setUrl] = useState(config?.ollamaUrl || 'http://localhost:11434');
-  const [isLoading, setIsLoading] = useState(false); // Added loading state
+  const [isLoading, setIsLoading] = useState(false);
 
-  const isDark = config?.theme === 'dark'; // For controlBg, if needed, though direct vars are used below
+  const isDark = config?.theme === 'dark';
   const controlBg = isDark ? 'bg-[rgba(255,255,255,0.1)]' : 'bg-[rgba(255,250,240,0.4)]';
   const subtleBorderClass = 'border-[var(--text)]/10';
-  const inputHeightClass = 'h-8'; // Target height: 2rem or 32px. Adjust as needed (e.g., h-9 for 36px)
-  const buttonHeightClass = 'h-8'; // Match input height
+  const inputHeightClass = 'h-8';
+  const buttonHeightClass = 'h-8';
 
   const onConnect = () => {
     setIsLoading(true);
@@ -42,11 +42,11 @@ export const ConnectOllama = () => {
           });
           toast.dismiss();
           toast.success('Connected to Ollama');
-        } else if (data?.error) { // Some Ollama versions might return error this way
+        } else if (data?.error) {
           updateConfig({ ollamaError: data.error, ollamaConnected: false });
           toast.dismiss();
           toast.error(typeof data.error === 'string' ? data.error : "Ollama connection error");
-        } else { // Unexpected response structure
+        } else {
           updateConfig({ ollamaError: "Unexpected response from Ollama", ollamaConnected: false });
           toast.dismiss();
           toast.error('Unexpected response from Ollama');
@@ -79,8 +79,8 @@ export const ConnectOllama = () => {
           inputHeightClass,
           controlBg,
           subtleBorderClass,
-          "text-[var(--text)] rounded-md shadow-sm text-sm", // Consistent text, rounding, shadow, font size
-          "focus:border-[var(--active)] focus:ring-1 focus:ring-[var(--active)] focus:ring-offset-0", // Consistent focus
+          "text-[var(--text)] rounded-md shadow-sm text-sm",
+          "focus:border-[var(--active)] focus:ring-1 focus:ring-[var(--active)] focus:ring-offset-0",
           "hover:border-[var(--active)]",
           "px-2.5" 
         )}

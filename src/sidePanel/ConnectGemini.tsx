@@ -83,7 +83,7 @@ export const ConnectGemini = () => {
           onChange={e => setApiKey(e.target.value)}
           className={cn(
             "w-full", inputHeightClass, controlBg, subtleBorderClass,
-            "text-[var(--text)] rounded-md shadow-sm text-sm px-2.5 pr-8", // pr-8 for eye icon
+            "text-[var(--text)] rounded-md shadow-sm text-sm px-2.5 pr-8",
             "focus:border-[var(--active)] focus:ring-1 focus:ring-[var(--active)] focus:ring-offset-0",
             "hover:border-[var(--active)]"
           )}

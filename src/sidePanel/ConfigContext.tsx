@@ -2,7 +2,7 @@ import React, { createContext, use, useEffect, useState } from 'react';
  
  import { Config, ConfigContextType } from '../types/config';
  
- import { setTheme, themes, type Theme as AppTheme } from './Themes'; // Import the Theme type as AppTheme
+ import { setTheme, themes, type Theme as AppTheme } from './Themes';
  
  import storage from '../background/storageUtil';
 
@@ -26,7 +26,6 @@ export const personas = {
   Spike: 'You are Spike, a capable and versatile executor. Your role is to turn user prompts into actionable results. Behavior: First, correct or clarify the user’s prompt for better accuracy. Add helpful criteria to guide execution. Then, act on the improved prompt as effectively as possible. Mannerisms: Be concise, critical, and sharp. Skip fluff. Use simple, direct language. Focus on feasibility and correctness. When in doubt, fix it and move forward.'
 };
 
-// Explicitly type defaultConfig with the Config interface
 const defaultConfig: Config = {
   theme: 'moss',
   customTheme: {
@@ -38,9 +37,9 @@ const defaultConfig: Config = {
     italic: '#09993e',
     codeFg: '#c2e7b5',
     codeBg: '#eadbdb',
-    preBg: '#eadbdb', // Corrected: Was missing a digit
+    preBg: '#eadbdb',
     preFg: '#c2e7b5',
-    tableBorder: '#eadbdb', // Corrected: Was missing a digit
+    tableBorder: '#eadbdb',
     error: '#af1b1b',
     warning: '#388e3c',
     success: '#7eaa6e',
@@ -50,27 +49,27 @@ const defaultConfig: Config = {
   generateTitle: true,
   backgroundImage: true,
   persona: 'Ein',
-  webMode: 'Google', // Now checked against Config['webMode']
+  webMode: 'Google',
   webLimit: 60,
   serpMaxLinksToVisit: 3,
-  wikiNumBlocks: 3, // Default number of results for Wikipedia
-  wikiRerank: true, // Default to enable LLM reranking for Wikipedia
-  wikiNumBlocksToRerank: 10, // Default number of blocks to retrieve for reranking
+  wikiNumBlocks: 3,
+  wikiRerank: true,
+  wikiNumBlocksToRerank: 10,
   contextLimit: 60,
   maxTokens: 32480,
   temperature: 0.7,
   topP: 0.95,
   presencepenalty: 0,
-  models: [], // Initialize as an empty array matching Config['models'] type
-  selectedModel: undefined, // Example: Add default
-  chatMode: undefined, // Example: Add default
+  models: [],
+  selectedModel: undefined,
+  chatMode: undefined,
   lmStudioUrl: 'http://localhost:1234',
   lmStudioConnected: false,
   ollamaUrl: 'http://localhost:11434',
   ollamaConnected: false,
-  fontSize: 14, // Add this line to set base font size
+  fontSize: 14,
   panelOpen: false,
-  computeLevel: 'low', // Set default compute level
+  computeLevel: 'low',
   paperTexture: true,
   tts: {
     selectedVoice: undefined,
@@ -102,10 +101,9 @@ export const ConfigProvider = ({ children }: { children: React.ReactNode }) => {
     const baseSize = config?.fontSize || defaultConfig.fontSize;
     document.documentElement.style.setProperty('font-size', `${baseSize}px`);
 
-    // Apply theme and texture
     const currentThemeName = config.theme || defaultConfig.theme!;
     const paperTextureEnabled = config.paperTexture ?? defaultConfig.paperTexture!;
-    let themeToApply: Config['customTheme'] | (typeof themes)[0]; // More specific type
+    let themeToApply: Config['customTheme'] | (typeof themes)[0];
 
     if (currentThemeName === 'custom') {
       const baseCustomOrDefault = themes.find(t => t.name === 'custom') || defaultConfig.customTheme!;
@@ -133,7 +131,7 @@ export const ConfigProvider = ({ children }: { children: React.ReactNode }) => {
     });
   };
 
-  if (loading) return <div>Loading...</div>; // Prevent premature rendering
+  if (loading) return <div>Loading...</div>;
 
   return (
     (<ConfigContext value={{ config, updateConfig }}>

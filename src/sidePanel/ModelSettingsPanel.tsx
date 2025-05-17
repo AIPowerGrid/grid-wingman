@@ -22,14 +22,10 @@ export const ModelSettingsPanel = () => {
   const itemRounded = 'rounded-xl';
   const inputHeight = 'h-9';
 
-  // Consistent Slider class string
   const sliderClass = cn(
     "w-full",
-    // Track background (unfilled part) - use a subtle color
     "[&>span:first-child]:bg-[var(--text)]/10",
-    // Range (filled part) - use active color
     "[&>span:first-child>span:first-child]:bg-[var(--active)]",
-    // Thumb styling
     "[&_button]:bg-[var(--active)]",
     "[&_button]:border-[var(--text)]/50",
     "[&_button]:ring-offset-[var(--bg)]",
@@ -107,7 +103,6 @@ export const ModelSettingsPanel = () => {
             />
           </div>
 
-          {/* Top P */}
           <div className="space-y-3">
             <Label htmlFor="topP" className="text-base font-medium text-foreground">
               Top P ({topP.toFixed(2)})
@@ -117,11 +112,10 @@ export const ModelSettingsPanel = () => {
               min={0} max={1} step={0.01}
               value={[topP]}
               onValueChange={handleChange('topP')}
-              className={sliderClass} // Apply consistent slider class
+              className={sliderClass}
             />
           </div>
 
-          {/* presence_penalty */}
           <div className="space-y-3">
             <Label htmlFor="presencepenalty" className="text-base font-medium text-foreground">
             Presence Penalty ({presence_penalty.toFixed(2)})
@@ -133,7 +127,7 @@ export const ModelSettingsPanel = () => {
               step={0.01}
               value={[presence_penalty]}
               onValueChange={handleChange('presencepenalty')}
-              className={sliderClass} // Apply consistent slider class
+              className={sliderClass}
             />
           </div>
         </div>
