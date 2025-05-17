@@ -70,6 +70,7 @@ const AutoResizeTextarea = React.forwardRef(
           commonItemRounded,
           commonItemShadow,
           "text-[var(--text)]",
+          "no-scrollbar",
           commonSubtleBorderClass,
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2",
           isEffectivelyReadOnly
