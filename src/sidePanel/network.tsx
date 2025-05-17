@@ -213,7 +213,6 @@ interface WikiQueryResult {
     results: WikiSearchResultBlock[];
 }
 
-// Define interfaces for Google Custom Search API response
 interface GoogleCustomSearchItem {
   title: string;
   link: string;
