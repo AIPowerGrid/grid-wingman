@@ -7,7 +7,7 @@ const sliderRootStyles = cn(
   "relative flex w-full touch-none select-none items-center data-[disabled]:opacity-50 data-[orientation=vertical]:h-full data-[orientation=vertical]:min-h-44 data-[orientation=vertical]:w-auto data-[orientation=vertical]:flex-col",
   "[&>span[data-slot=slider-track]]:bg-[var(--text)]/10",
   "[&>span[data-slot=slider-track]>span[data-slot=slider-range]]:bg-[var(--active)]",
-  "[&>button[data-slot=slider-thumb]]:bg-foreground",
+  "[&>button[data-slot=slider-thumb]]:bg-white",
   "[&>button[data-slot=slider-thumb]]:border-primary/50",
   "[&>button[data-slot=slider-thumb]]:ring-offset-[var(--bg)]",
   "[&>button[data-slot=slider-thumb]]:focus-visible:ring-[var(--active)]"
@@ -35,7 +35,7 @@ function Slider({
 
   return (
     <SliderPrimitive.Root
-      data-slot="slider" // Keep data-slots if you use them for other styling/testing
+      data-slot="slider"
       defaultValue={defaultValue}
       value={value}
       min={min}
@@ -46,27 +46,24 @@ function Slider({
       <SliderPrimitive.Track
         data-slot="slider-track"
         className={cn(
-          "relative h-1.5 w-full grow overflow-hidden rounded-full bg-secondary", // Default Shadcn track bg
-          // Specific overrides for your theme if needed, but sliderRootStyles should handle it
+          "relative h-1.5 w-full grow overflow-hidden rounded-full bg-secondary",
           "data-[orientation=vertical]:h-full data-[orientation=vertical]:w-1.5"
         )}
       >
         <SliderPrimitive.Range
           data-slot="slider-range"
-          // The range's bg is now controlled by sliderRootStyles
           className={cn(
-            "absolute h-full bg-primary", // Default Shadcn range bg
+            "absolute h-full bg-primary",
             "data-[orientation=vertical]:w-full"
           )}
         />
       </SliderPrimitive.Track>
-      {(_values.length > 0 ? _values : [min]).map((_, index) => ( // Fallback to one thumb if _values is empty
+      {(_values.length > 0 ? _values : [min]).map((_, index) => (
         <SliderPrimitive.Thumb
           data-slot="slider-thumb"
           key={index}
-          // The thumb's bg and border are now controlled by sliderRootStyles
           className={cn(
-            "block h-4 w-4 rounded-full border border-primary/50 bg-foreground shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",
+            "block h-4 w-4 rounded-full border border-primary/50 bg-white shadow-sm transition-colors focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",
           )}
         />
       ))}
