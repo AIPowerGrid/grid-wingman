@@ -81,7 +81,6 @@ export const NotePopover = () => {
               id="use-note-switch"
               checked={config.useNote || false}
               onCheckedChange={handleToggleUseNote}
-              className="data-[state=checked]:bg-[var(--active)] data-[state=unchecked]:bg-[var(--input-bg)] [&>span]:bg-[var(--bg)]"
             />
           </div>
           <div>
