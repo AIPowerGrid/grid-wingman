@@ -383,7 +383,6 @@ export const EditableMessage: FC<MessageProps> = ({
           onStartEdit(index, turn.rawContent);
         }
       }}
-      title={"Double-click to edit"}
     >
       {isEditing ? (
         <div className="flex flex-col space-y-2 items-stretch w-full p-1">
