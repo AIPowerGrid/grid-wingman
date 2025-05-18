@@ -68,6 +68,8 @@ export interface Config {
   fontSize?: number;
   models?: Model[];
   selectedModel?: string;
+  useNote?: boolean;
+  noteContent?: string;
   chatMode?: 'web' | 'page' | 'chat' | string;
   theme?: string;
   customTheme?: {

@@ -14,6 +14,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { cn } from "@/src/background/util";
+import { NotePopover } from './NotePopover';
 
 interface AutoResizeTextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
     minRows?: number;
@@ -171,7 +172,7 @@ export const Input: FC<InputProps> = ({ isLoading, message, setMessage, onSend }
     (window.SpeechRecognition || window.webkitSpeechRecognition);
 
   return (
-    <div className="relative w-full flex items-center"> 
+    <div className="relative w-full flex items-end"> 
       <AddToChat /> 
       <TooltipProvider delayDuration={500}>
         <Tooltip>
@@ -230,6 +231,7 @@ export const Input: FC<InputProps> = ({ isLoading, message, setMessage, onSend }
         }}
         className="z-[1]"
       />
+      <NotePopover />
     </div>
   );
 };

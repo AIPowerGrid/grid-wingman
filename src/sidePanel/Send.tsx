@@ -23,14 +23,15 @@ export const Send = ({ isLoading, onSend }: SendProps) => {
         size="sm" 
         className={cn(
           "rounded-md",
-          "ml-2",
           "mr-2",
           "z-10",
           !isLoading && "hover:bg-muted/50"
         )}
         onClick={onSend}
         disabled={isDisabled}
+        style={{ paddingLeft: '0.5rem', paddingRight: '0.5rem' }}
       >
+
         {isLoading ? (
           (<Loader2 className="h-4 w-4 animate-spin text-foreground" />)
         ) : (

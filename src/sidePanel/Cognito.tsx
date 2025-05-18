@@ -6,7 +6,6 @@ import { BiBrain } from "react-icons/bi";
 import { FaWikipediaW, FaGoogle, FaBrave } from "react-icons/fa6";
 import { SiDuckduckgo } from "react-icons/si";
 
-
 import { Button } from "@/components/ui/button";
 import {
   Tooltip,
@@ -46,7 +45,8 @@ function bridge() {
     try {
         title = document.title || '';
 
-        const MAX_BODY_CHARS_FOR_DIRECT_EXTRACTION = 5_000_000;
+        // --- Safety Measure 2: Limit the scope for innerText/innerHTML if body is enormous ---
+        const MAX_BODY_CHARS_FOR_DIRECT_EXTRACTION = 5_000_000; // Approx 5MB of text
         let bodyElement = document.body;
 
         if (document.body && document.body.innerHTML.length > MAX_BODY_CHARS_FOR_DIRECT_EXTRACTION) {
@@ -133,7 +133,6 @@ async function injectBridge() {
   const queryOptions = { active: true, lastFocusedWindow: true };
   const [tab] = await chrome.tabs.query(queryOptions);
 
-  // Add early return for restricted URLs
   if (!tab?.id || tab.url?.startsWith('chrome://') || tab.url?.startsWith('chrome-extension://') || tab.url?.startsWith('about:')) { // Added about:
     console.debug('[Cognito:] Skipping injection for restricted URL:', tab?.url);
     storage.deleteItem('pagestring');
@@ -168,13 +167,7 @@ async function injectBridge() {
     try {
         res = JSON.parse(rawResult);
     } catch (parseError) {
-        let message = 'Unknown parse error';
-        if (parseError instanceof Error) {
-            message = parseError.message;
-        } else if (typeof parseError === 'string') {
-            message = parseError;
-        }
-        console.error('[Cognito:] Failed to parse JSON result from bridge:', message, 'Raw result string:', rawResult, 'Original error object:', parseError);
+        console.error('[Cognito:] Failed to parse JSON result from bridge:', parseError, 'Raw result string:', rawResult);
         return;
     }
 
@@ -190,7 +183,6 @@ async function injectBridge() {
     });
     console.log(`[Cognito:] Extracted Content: Text=${res?.text?.length}, HTML=${res?.html?.length}`);
 
-
     try {
       storage.setItem('pagestring', res?.text ?? '');
       storage.setItem('pagehtml', res?.html ?? '');
@@ -198,13 +190,7 @@ async function injectBridge() {
       storage.setItem('tabledata', res?.tableData ?? '');
       console.debug('[Cognito:] Stored extracted content.');
     } catch (storageError) {
-        let message = 'Unknown storage error';
-        if (storageError instanceof Error) {
-            message = storageError.message;
-        } else if (typeof storageError === 'string') {
-            message = storageError;
-        }
-        console.error('[Cognito:] Storage error after successful extraction:', message, 'Original error object:', storageError);
+        console.error('[Cognito:] Storage error after successful extraction:', storageError);
         storage.deleteItem('pagestring');
         storage.deleteItem('pagehtml');
         storage.deleteItem('alttexts');
@@ -217,7 +203,6 @@ async function injectBridge() {
     }
   }
 }
-
 
 const generateChatId = () => `chat_${Math.random().toString(16).slice(2)}`;
 
@@ -407,13 +392,30 @@ const Cognito = () => {
     setChatId(chat.id);
     setHistoryMode(false);
     setSettingsMode(false);
-    updateConfig({ chatMode: undefined, webMode: chat.webMode || config?.webMode }); // Load webMode if saved with chat
-    storage.deleteItem('pagestring');
-    storage.deleteItem('pagehtml');
-    storage.deleteItem('alttexts');
-    storage.deleteItem('tabledata');
-    lastInjectedRef.current = { id: null, url: '' };
-  };
+
+    const loadedConfigUpdate: Partial<Config> = {
+      chatMode: chat.chatMode || undefined, // Restore the original chat mode ('page', 'web', or undefined)
+      webMode: chat.webMode || config?.webMode, // Restore webMode if it was used
+    };
+
+    if (chat.useNoteActive && chat.noteContentUsed !== undefined) {
+      loadedConfigUpdate.useNote = true;
+      loadedConfigUpdate.noteContent = chat.noteContentUsed; // Restore the note content that was used
+    } else {
+      loadedConfigUpdate.useNote = false;
+      loadedConfigUpdate.noteContent = ''; // Clear note content if the loaded chat didn't use one
+    }
+    updateConfig(loadedConfigUpdate);
+
+    // Clear page-specific storage if not loading into page mode
+    if (loadedConfigUpdate.chatMode !== 'page') {
+      storage.deleteItem('pagestring');
+      storage.deleteItem('pagehtml');
+      storage.deleteItem('alttexts');
+      storage.deleteItem('tabledata');
+      lastInjectedRef.current = { id: null, url: '' };
+    }
+  }
 
   const deleteAll = async () => {
     console.log("[Cognito ] Deleting all chat history from localforage.");
@@ -424,13 +426,7 @@ const Cognito = () => {
         toast.success("Deleted all chats");
         reset();
     } catch (error) {
-        let message = 'Unknown error deleting chats';
-        if (error instanceof Error) {
-            message = error.message;
-        } else if (typeof error === 'string') {
-            message = error;
-        }
-        console.error("[Cognito] Error deleting all chats:", message, 'Original error object:', error);
+        console.error("[Cognito] Error deleting all chats:", error);
         toast.error("Failed to delete chats");
     }
   };
@@ -443,14 +439,17 @@ const Cognito = () => {
         turns,
         last_updated: Date.now(),
         model: config?.selectedModel,
-        webMode: config?.webMode, // Save webMode with chat
+        chatMode: config?.chatMode, 
+        webMode: config?.chatMode === 'web' ? config.webMode : undefined, // Save webMode only if relevant
+        useNoteActive: config?.useNote,
+        noteContentUsed: config?.useNote ? config.noteContent : undefined,
       };
       console.log(`[Cognito ] Saving chat ${chatId} (Turns: ${turns.length})`);
       localforage.setItem(chatId, savedChat).catch(err => {
         console.error(`[Cognito ] Error saving chat ${chatId}:`, err);
       });
     }
-  }, [chatId, turns, isLoading, chatTitle, config?.selectedModel, config?.webMode, historyMode, settingsMode]);
+  }, [chatId, turns, isLoading, chatTitle, config?.selectedModel, config?.chatMode, config?.webMode, config?.useNote, config?.noteContent, historyMode, settingsMode]);
 
   useEffect(() => {
     let cancelled = false;
@@ -485,13 +484,7 @@ const Cognito = () => {
         }
       } catch (error) {
         if (!cancelled) {
-          let message = 'Unknown error during panel open tab check';
-          if (error instanceof Error) {
-              message = error.message;
-          } else if (typeof error === 'string') {
-              message = error;
-          }
-          console.error("[Cognito - Revised] Error during panel open tab check:", message, 'Original error object:', error);
+        console.error("[Cognito - Revised] Error during panel open tab check:", error);
           lastInjectedRef.current = { id: null, url: '' };
           setCurrentTabInfo({ id: null, url: '' });
           storage.deleteItem('pagestring');

@@ -22,6 +22,8 @@ export type ChatMessage = {
   model?: string;
   turns: MessageTurn[];
   chatMode?: string;
+  noteContentUsed?: string;
+  useNoteActive?: boolean;
   webMode?: string;
 };
 

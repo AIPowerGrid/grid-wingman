@@ -6,7 +6,7 @@ import { ModelSettingsPanel } from './ModelSettingsPanel';
 import { Persona } from './Persona';
 import { Themes } from './Themes';
 import { TtsSettings } from './TtsSettings';
-import { WebSearch } from './WebSearch'; 
+import { WebSearch } from './WebSearch';
 
 
 export const Settings = () => {
@@ -38,7 +38,7 @@ export const Settings = () => {
         <TtsSettings />
         <PageContext />
         <WebSearch />
-        <div className="pointer-events-none h-12" />
+        <div className="pointer-events-none h-12" /> {/* prevent the missing bottom boarder */}
       </Accordion>
     </div>
   );

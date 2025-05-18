@@ -1,10 +1,10 @@
 import React, { createContext, use, useEffect, useState } from 'react';
  
- import { Config, ConfigContextType } from '../types/config';
+import { Config, ConfigContextType } from '../types/config';
  
- import { setTheme, themes, type Theme as AppTheme } from './Themes';
+import { setTheme, themes, type Theme as AppTheme } from './Themes';
  
- import storage from '../background/storageUtil';
+import storage from '../background/storageUtil';
 
 export const ConfigContext = createContext<ConfigContextType>({} as ConfigContextType);
 
@@ -74,7 +74,9 @@ const defaultConfig: Config = {
   tts: {
     selectedVoice: undefined,
     rate: 1,
-  }
+  },
+  useNote: false,
+  noteContent: '',
 };
 
 export const ConfigProvider = ({ children }: { children: React.ReactNode }) => {
@@ -117,9 +119,9 @@ export const ConfigProvider = ({ children }: { children: React.ReactNode }) => {
                      themes.find(t => t.name === defaultConfig.theme!) ||
                      themes[0];
     }
-    setTheme(themeToApply, paperTextureEnabled); // Pass texture state to setTheme
+    setTheme(themeToApply, paperTextureEnabled);
 
-  }, [loading, config?.fontSize, config?.customTheme, config?.theme, config?.paperTexture]); // Cleaned up dependencies
+  }, [loading, config?.fontSize, config?.customTheme, config?.theme, config?.paperTexture]);
 
   const updateConfig = (newConfig: Partial<Config>) => {
     setConfig(prev => {
