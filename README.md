@@ -41,6 +41,7 @@ Built on [sidellama](https://github.com/gyopak/sidellama).
         *   ...and any other platform that exposes an OpenAI-compatible API!
 
 *   **Diverse Personas:** Seven pre-built personas designed to cater to specific needs (see below).
+*   **Note** You can save context in the note and inject it to LLM as you want, it's convenient for you to compare or to embed context. This will be developed into a comprehensive memory system with RAG.  
 *   **Web Search Integration:** Enhanced access to information for context-aware AI interactions. Google Custom Search, Google Brave, DuckDuckGo, and Wikipedia Search are done in natural language.
 *   **Page context reading** Transcripts reading included for Bloomberg, YouTube, or other providers who put the transcripts in their HTML. PDF supports.
 *   **Enhanced Summarization** More granular control over summary length and detail over personas.
