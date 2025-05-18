@@ -20,7 +20,7 @@ function Switch({
         data-slot="switch-thumb"
        className={cn(
                     "pointer-events-none block size-4 rounded-full shadow-md ring-1 transition-transform duration-200 ease-in-out transform",
-                    "data-[state=checked]:translate-x-[12px] data-[state=checked]:bg-primary-foreground data-[state=checked]:ring-primary/50",
+                    "data-[state=checked]:translate-x-[12px] data-[state=checked]:bg-foreground data-[state=checked]:ring-primary/50",
                     "data-[state=unchecked]:translate-x-[0px] data-[state=unchecked]:bg-primary data-[state=unchecked]:ring-primary-foreground/50"
         )}
       />
