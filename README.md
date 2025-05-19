@@ -13,15 +13,11 @@ Built on [sidellama](https://github.com/gyopak/sidellama).
 *   Better local TTS/STT by API. [not important]
 ---
 
-*   ~Migrate to Shadcn/ui from Chakra-UI V2,~ and ~React 19~. [20250509]
-*   ~Wiki Search ~with API~[20250514] and kiwix(zim-reader)~ [20250515] [^1]
-*   ~Search with API for Google~ [20250516]
-*   ~Simple tool use to enhance the current web search to reduce the cost of running LLM and get a better result.~ [20250512]
 *   Replace 'deep research' with local/basic API services (even free tier)
 *   "Memory" for the chat history with RAG and ~search~[20250512].
 *   "Short Memory"(state) for web search and page parsing in the same task. Comparison mode.
-*   ~File support from direct API from Chrome~ [20250512]
 *   Edit text content directly from sidepanel. Basically, I want to extend this to the "AI agent".
+*   Add to note function (webpage, chat)
 
 [^1]: Consider it's done. Kiwix search plan abandoned, because it's less useful when it comes to LLM search. Just use the Zim browser locally. LLM won't be helpful if there is no embedding process. For local search, the best/easiest solution I think is to set up a local search index based on https://github.com/stanford-oval/WikiChat option 2, then change the links inside the network.tsx to HTTP://localhost:[your_port_number]. 
 ## Screenshot
