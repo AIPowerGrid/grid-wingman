@@ -11,7 +11,7 @@ function Switch({
       data-slot="switch"
       className={cn(
         // Track: thin and elegant
-        "peer relative inline-flex h-[10px] w-[26px] shrink-0 cursor-pointer items-center rounded-full bg-input transition-colors duration-200 data-[state=checked]:bg-primary data-[state=unchecked]:bg-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50",
+        "peer relative inline-flex h-[10px] w-[26px] shrink-0 cursor-pointer items-center rounded-full bg-input transition-colors duration-200 data-[state=checked]:bg-primary data-[state=unchecked]:bg-foreground/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50",
         className
       )}
       {...props}
