@@ -59,16 +59,16 @@ function getStatusText(mode: ChatMode, status: ChatStatus): string {
 
   if (mode === 'web') {
     if (status === 'searching') return 'Searching web…';
-    if (status === 'thinking') return 'Reading snippets…'; // Or "Processing web results..."
+    if (status === 'thinking') return 'Processing SERP…';
   }
 
   if (mode === 'page') {
     if (status === 'reading') return 'Reading page…';
     if (status === 'thinking') return 'Analyzing…';
   }
-  if (status === 'done') return 'Online'; // Assuming 'done' reverts to an online-like state
+  if (status === 'done') return 'Online';
 
-  return 'Online'; // Default fallback
+  return 'Online';
 }
 
 interface Config {
@@ -536,8 +536,8 @@ interface HeaderProps {
   downloadImage: () => void;
   downloadJson: () => void;
   downloadText: () => void;
-  chatMode: ChatMode; // Added for dynamic status
-  chatStatus: ChatStatus; // Added for dynamic status
+  chatMode: ChatMode;
+  chatStatus: ChatStatus;
 
 }
 export const Header: React.FC<HeaderProps> = ({
@@ -639,7 +639,7 @@ export const Header: React.FC<HeaderProps> = ({
     );
   };
 
-  const sideContainerWidthClass = "w-24"; // 96px
+  const sideContainerWidthClass = "w-24";
 
   return (
     <TooltipProvider delayDuration={500}>
@@ -694,7 +694,6 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
 
           {/* Middle Content Area */}
-          {/* Added px-2 to prevent text from sticking to side containers if they are visually empty */}
           <div className="flex-grow flex justify-center items-center overflow-hidden px-2">
             {visibleTitle && (
               <p className="text-lg font-semibold text-[var(--text)] italic whitespace-nowrap overflow-hidden text-ellipsis text-center">
@@ -723,7 +722,6 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
 
           {/* Right Button Area */}
-          {/* items-center to vertically align button if container is taller (though heights should be similar) */}
           <div className={cn("flex justify-end items-center min-h-10", sideContainerWidthClass)}>
             {!settingsMode && !historyMode && (
               <Tooltip>
@@ -761,7 +759,6 @@ export const Header: React.FC<HeaderProps> = ({
                 </TooltipContent>
               </Tooltip>
             )}
-            {/* If settingsMode, this div is empty but provides the fixed width for layout balance */}
           </div>
         </div>
 

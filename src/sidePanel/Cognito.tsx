@@ -407,8 +407,8 @@ const Cognito = () => {
     setSettingsMode(false);
 
     const loadedConfigUpdate: Partial<Config> = {
-      chatMode: chat.chatMode || undefined,
-      webMode: chat.webMode || config?.webMode,
+      // chatMode: chat.chatMode || undefined, // Do not restore chatMode from history
+      // webMode: chat.webMode || config?.webMode, // Do not restore webMode from history
     };
 
     if (chat.useNoteActive && chat.noteContentUsed !== undefined) {
@@ -434,7 +434,7 @@ const Cognito = () => {
     try {
         const keys = await localforage.keys();
         const chatKeys = keys.filter(key => key.startsWith('chat_'));
-        if (chatKeys.length === 0 && turns.length === 0) return;
+        if (chatKeys.length === 0 && turns.length === 0) return; // Avoid toast if nothing to delete
         await Promise.all(chatKeys.map(key => localforage.removeItem(key)));
         toast.success("Deleted all chats");
         reset();
@@ -445,7 +445,7 @@ const Cognito = () => {
   };
 
   useEffect(() => {
-    if (turns.length > 0 && !historyMode && !settingsMode) {
+    if (turns.length > 0 && !historyMode && !settingsMode) { // Save even if loading to capture user input immediately
       const savedChat: ChatMessage = {
         id: chatId,
         title: chatTitle || `Chat ${new Date(Date.now()).toLocaleString()}`,
@@ -464,11 +464,12 @@ const Cognito = () => {
     }
   }, [chatId, turns, chatTitle, config?.selectedModel, config?.chatMode, config?.webMode, config?.useNote, config?.noteContent, historyMode, settingsMode]);
 
+  // Effect to transition from 'done' to 'idle' for chatStatus
   useEffect(() => {
     if (chatStatus === 'done') {
       const timer = setTimeout(() => {
         setChatStatus('idle');
-      }, 1500);
+      }, 1500); // Show "Online" (from 'done' status) for 1.5 seconds then truly idle
       return () => clearTimeout(timer);
     }
   }, [chatStatus]);
@@ -546,9 +547,9 @@ const Cognito = () => {
     <TooltipProvider delayDuration={300}>
       <div
         ref={containerRef}
-        className={cn(
-          "w-full h-dvh p-0 relative overflow-hidden",
-          "flex flex-col bg-[var(--bg)]"
+        className={cn( // Ensure this container is exactly viewport height and handles its own overflow.
+          "w-full h-dvh p-0 relative overflow-hidden", // Changed min-h-dvh to h-dvh
+          "flex flex-col bg-[var(--bg)]" // Main flex container
         )}
       >
           <Header
@@ -562,8 +563,8 @@ const Cognito = () => {
             setHistoryMode={setHistoryMode}
             setSettingsMode={setSettingsMode}
             settingsMode={settingsMode}
-            chatMode={(config?.chatMode as ChatMode) || 'chat'}
-            chatStatus={chatStatus}
+            chatMode={(config?.chatMode as ChatMode) || 'chat'} // Pass current chat mode
+            chatStatus={chatStatus} // Pass current chat status
           />
         <div className="flex flex-col flex-1 min-h-0 overflow-y-auto">
           {settingsMode && (
@@ -571,15 +572,20 @@ const Cognito = () => {
           )}
 
           {!settingsMode && historyMode && (
+            // ChatHistory component handles its own internal scrolling
             <ChatHistory
-              className="flex-1 w-full min-h-0"
+              className="flex-1 w-full min-h-0" // Ensures it fills the parent if possible
               loadChat={loadChat}
               onDeleteAll={deleteAll}
             />
           )}
 
+          {/* Container for Messages and conditional action buttons when not in settings/history mode */}
           {!settingsMode && !historyMode && (
-            <div className="flex flex-col flex-1 min-h-0 relative">
+            // This div allows Messages to take up space and scroll internally.
+            // The absolute/fixed positioned buttons float on top.
+            // flex-1 and min-h-0 ensure this container and Messages within it behave correctly in flex layout.
+            <div className="flex flex-col flex-1 min-h-0 relative"> {/* Added relative for positioning context of fixed/absolute children if needed */}
             {!settingsMode && !historyMode && turns.length > 0 && (
                   <Messages
                     isLoading={isLoading}
@@ -590,8 +596,8 @@ const Cognito = () => {
                   />
                 )}
             {turns.length === 0 && !config?.chatMode && (
-              (<div className="fixed bottom-20 left-8 flex flex-col gap-2 z-[5]">
-                <Tooltip>
+              (<div className="fixed bottom-20 left-8 flex flex-col gap-2 z-[5]"> { /* bottom-20 (80px) should be above input bar */ }
+                <Tooltip> {/* Compute Level Button */}
                   <TooltipTrigger asChild>
                     <Button
                       aria-label="Cycle compute level"
@@ -747,7 +753,7 @@ const Cognito = () => {
           )}
         </div>
         {!settingsMode && !historyMode && (
-          <div className="p-2 relative z-[10]">
+          <div className="p-2 relative z-[10]"> {/* Wrapper for padding */}
             <Input
               isLoading={isLoading}
               message={message}
