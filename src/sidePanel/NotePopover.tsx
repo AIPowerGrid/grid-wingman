@@ -93,10 +93,27 @@ export const NotePopover = () => {
             />
           </div>
           <div className="flex justify-end space-x-2 pt-1">
-            <Button variant="outline" onClick={handleClearNote} disabled={!editableNote && !config.noteContent} className="border-[var(--border)] hover:bg-[var(--bg-hover)] text-xs px-2 py-1 h-auto">
+            <Button
+              variant="outline"
+              onClick={handleClearNote}
+              disabled={!editableNote && !config.noteContent}
+              className={cn(
+                "border-[var(--border)] text-[var(--text)]", // Base style for consistency
+                "text-xs px-2 py-1 h-auto w-16"
+              )}
+            >
               Clear
             </Button>
-            <Button onClick={handleSaveNote} className="bg-[var(--active)] text-[var(--bg)] hover:bg-[var(--active)]/90 text-xs px-2 py-1 h-auto" disabled={editableNote === (config.noteContent || '')}>
+            <Button
+              variant="outline"
+              onClick={handleSaveNote}
+              className={cn(
+                "border-[var(--border)] text-[var(--text)]", // Removed custom hover, ensure base text
+                "text-xs px-2 py-1 h-auto",
+                "w-16"
+              )}
+              disabled={editableNote === (config.noteContent || '')}
+            >
               Save
             </Button>
           </div>
