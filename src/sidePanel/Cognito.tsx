@@ -21,14 +21,11 @@ import { useUpdateModels } from './hooks/useUpdateModels';
 import { Background } from './Background';
 import { ChatHistory, ChatMessage, MessageTurn } from './ChatHistory';
 import { useConfig } from './ConfigContext';
-import type { Config } from '../types/config'; 
+import type { Config, ChatMode, ChatStatus } from '../types/config'; // Added ChatMode, ChatStatus
 import { Header } from './Header';
 import { Input } from './Input';
 import { Messages } from './Messages';
-import {
- downloadImage, downloadJson, downloadText
-} from '../background/messageUtils';
-import { Send } from './Send';
+import { downloadImage, downloadJson, downloadText } from '../background/messageUtils';
 import { Settings } from './Settings';
 import storage from '../background/storageUtil';
 
@@ -114,12 +111,12 @@ function bridge() {
         const availableLength = MAX_OUTPUT_STRING_LENGTH - JSON.stringify({ ...responseCandidate, text: "", html: "" }).length;
         let remainingLength = availableLength;
 
-        if (responseCandidate.text.length > remainingLength * 0.6) { // Prioritize text
+        if (responseCandidate.text.length > remainingLength * 0.6) { 
             responseCandidate.text = responseCandidate.text.substring(0, Math.floor(remainingLength * 0.6)) + "... (truncated)";
         }
         remainingLength = availableLength - responseCandidate.text.length;
 
-        if (responseCandidate.html.length > remainingLength * 0.8) { // Then HTML
+        if (responseCandidate.html.length > remainingLength * 0.8) {
              responseCandidate.html = responseCandidate.html.substring(0, Math.floor(remainingLength * 0.8)) + "... (truncated)";
         }
         console.warn('[Cognito Bridge] Content truncated. Final approx length:', JSON.stringify(responseCandidate).length);
@@ -273,6 +270,7 @@ const Cognito = () => {
 
   const [isPageActionsHovering, setIsPageActionsHovering] = useState(false);
   const [isWebSearchHovering, setIsWebSearchHovering] = useState(false);
+  const [chatStatus, setChatStatus] = useState<ChatStatus>('idle');
 
   useEffect(() => {
     const resizeObserver = new ResizeObserver(() => {
@@ -352,7 +350,19 @@ const Cognito = () => {
   }, [config?.chatMode]);
 
   const { chatTitle, setChatTitle } = useChatTitle(isLoading, turns, message);
-  const onSend = useSendMessage(isLoading, message, turns, webContent, config, setTurns, setMessage, setWebContent, setPageContent, setLoading);
+  const onSend = useSendMessage(
+    isLoading,
+    message,
+    turns,
+    webContent,
+    config,
+    setTurns,
+    setMessage,
+    setWebContent,
+    setPageContent,
+    setLoading,
+    setChatStatus // Pass the setter for dynamic status
+  );
   useUpdateModels();
 
   const reset = () => {
@@ -362,6 +372,7 @@ const Cognito = () => {
     setWebContent('');
     setLoading(false);
     updateConfig({ chatMode: undefined, computeLevel: 'low' });
+    setChatStatus('idle');    
     setMessage('');
     setChatTitle('');
     setChatId(generateChatId());
@@ -383,6 +394,7 @@ const Cognito = () => {
       return prevTurns;
     });
     setLoading(false);
+    setChatStatus('idle');
   };
 
   const loadChat = (chat: ChatMessage) => {
@@ -391,23 +403,23 @@ const Cognito = () => {
     setTurns(chat.turns);
     setChatId(chat.id);
     setHistoryMode(false);
+    setChatStatus('idle');
     setSettingsMode(false);
 
     const loadedConfigUpdate: Partial<Config> = {
-      chatMode: chat.chatMode || undefined, // Restore the original chat mode ('page', 'web', or undefined)
-      webMode: chat.webMode || config?.webMode, // Restore webMode if it was used
+      chatMode: chat.chatMode || undefined,
+      webMode: chat.webMode || config?.webMode,
     };
 
     if (chat.useNoteActive && chat.noteContentUsed !== undefined) {
       loadedConfigUpdate.useNote = true;
-      loadedConfigUpdate.noteContent = chat.noteContentUsed; // Restore the note content that was used
+      loadedConfigUpdate.noteContent = chat.noteContentUsed; 
     } else {
       loadedConfigUpdate.useNote = false;
-      loadedConfigUpdate.noteContent = ''; // Clear note content if the loaded chat didn't use one
+      loadedConfigUpdate.noteContent = ''; 
     }
     updateConfig(loadedConfigUpdate);
 
-    // Clear page-specific storage if not loading into page mode
     if (loadedConfigUpdate.chatMode !== 'page') {
       storage.deleteItem('pagestring');
       storage.deleteItem('pagehtml');
@@ -422,6 +434,7 @@ const Cognito = () => {
     try {
         const keys = await localforage.keys();
         const chatKeys = keys.filter(key => key.startsWith('chat_'));
+        if (chatKeys.length === 0 && turns.length === 0) return;
         await Promise.all(chatKeys.map(key => localforage.removeItem(key)));
         toast.success("Deleted all chats");
         reset();
@@ -432,7 +445,7 @@ const Cognito = () => {
   };
 
   useEffect(() => {
-    if (turns.length > 0 && !isLoading && !historyMode && !settingsMode) {
+    if (turns.length > 0 && !historyMode && !settingsMode) {
       const savedChat: ChatMessage = {
         id: chatId,
         title: chatTitle || `Chat ${new Date(Date.now()).toLocaleString()}`,
@@ -440,7 +453,7 @@ const Cognito = () => {
         last_updated: Date.now(),
         model: config?.selectedModel,
         chatMode: config?.chatMode, 
-        webMode: config?.chatMode === 'web' ? config.webMode : undefined, // Save webMode only if relevant
+        webMode: config?.chatMode === 'web' ? config.webMode : undefined,
         useNoteActive: config?.useNote,
         noteContentUsed: config?.useNote ? config.noteContent : undefined,
       };
@@ -449,12 +462,22 @@ const Cognito = () => {
         console.error(`[Cognito ] Error saving chat ${chatId}:`, err);
       });
     }
-  }, [chatId, turns, isLoading, chatTitle, config?.selectedModel, config?.chatMode, config?.webMode, config?.useNote, config?.noteContent, historyMode, settingsMode]);
+  }, [chatId, turns, chatTitle, config?.selectedModel, config?.chatMode, config?.webMode, config?.useNote, config?.noteContent, historyMode, settingsMode]);
+
+  useEffect(() => {
+    if (chatStatus === 'done') {
+      const timer = setTimeout(() => {
+        setChatStatus('idle');
+      }, 1500);
+      return () => clearTimeout(timer);
+    }
+  }, [chatStatus]);
 
   useEffect(() => {
     let cancelled = false;
 
     const handlePanelOpen = async () => {
+      if (cancelled) return;
       console.log("[Cognito - Revised] Panel opened. Resetting state.");
       reset();
 
@@ -524,15 +547,10 @@ const Cognito = () => {
       <div
         ref={containerRef}
         className={cn(
-          "w-full min-h-dvh p-0 relative overflow-hidden",
+          "w-full h-dvh p-0 relative overflow-hidden",
           "flex flex-col bg-[var(--bg)]"
         )}
       >
-        <div
-          className={cn(
-            "flex flex-col justify-between min-h-dvh",
-          )}
-        >
           <Header
             chatTitle={chatTitle}
             deleteAll={deleteAll}
@@ -544,14 +562,24 @@ const Cognito = () => {
             setHistoryMode={setHistoryMode}
             setSettingsMode={setSettingsMode}
             settingsMode={settingsMode}
+            chatMode={(config?.chatMode as ChatMode) || 'chat'}
+            chatStatus={chatStatus}
           />
+        <div className="flex flex-col flex-1 min-h-0 overflow-y-auto">
           {settingsMode && (
-            <div id="settings" className="relative flex-grow overflow-auto">
-              <Settings />
-            </div>
+            <Settings />
           )}
 
-          <div className="flex flex-col min-h-0">
+          {!settingsMode && historyMode && (
+            <ChatHistory
+              className="flex-1 w-full min-h-0"
+              loadChat={loadChat}
+              onDeleteAll={deleteAll}
+            />
+          )}
+
+          {!settingsMode && !historyMode && (
+            <div className="flex flex-col flex-1 min-h-0 relative">
             {!settingsMode && !historyMode && turns.length > 0 && (
                   <Messages
                     isLoading={isLoading}
@@ -561,8 +589,8 @@ const Cognito = () => {
                     onEditTurn={handleEditTurn}
                   />
                 )}
-            {!settingsMode && !historyMode && turns.length === 0 && !config?.chatMode && (
-              (<div className="absolute bottom-16 left-8 flex flex-col gap-2">
+            {turns.length === 0 && !config?.chatMode && (
+              (<div className="fixed bottom-20 left-8 flex flex-col gap-2 z-[5]">
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button
@@ -627,7 +655,7 @@ const Cognito = () => {
                 </Tooltip>
               </div>)
                 )}
-            {!settingsMode && !historyMode && config?.chatMode === "page" && (
+            {config?.chatMode === "page" && (
                    (<div
                       className={cn(
                         "fixed bottom-14 left-0 right-0",
@@ -648,7 +676,7 @@ const Cognito = () => {
                               TLDR
                             </MessageTemplate>
                           </TooltipTrigger>
-                          <TooltipContent side="top" className="bg-[var(--active)]/80 text-[var(--text)] border-[var(--text)]/50">
+                          <TooltipContent side="top" className=" text-[var(--text)] border-[var(--text)]/50">
                             <p>Quick Summary</p>
                           </TooltipContent>
                         </Tooltip>
@@ -658,7 +686,7 @@ const Cognito = () => {
                               Facts
                             </MessageTemplate>
                           </TooltipTrigger>
-                          <TooltipContent side="top" className="bg-[var(--active)]/80 text-[var(--text)] border-[var(--text)]/50">
+                          <TooltipContent side="top" className=" text-[var(--text)] border-[var(--text)]/50">
                             <p>Numbers, events, names</p>
                           </TooltipContent>
                         </Tooltip>
@@ -668,7 +696,7 @@ const Cognito = () => {
                               Yay!
                             </MessageTemplate>
                           </TooltipTrigger>
-                          <TooltipContent side="top" className="bg-[var(--active)]/80 text-[var(--text)] border-[var(--text)]/50">
+                          <TooltipContent side="top" className=" text-[var(--text)] border-[var(--text)]/50">
                             <p>Good news</p>
                           </TooltipContent>
                         </Tooltip>
@@ -678,14 +706,14 @@ const Cognito = () => {
                               Oops
                             </MessageTemplate>
                           </TooltipTrigger>
-                          <TooltipContent side="top" className="bg-[var(--active)]/80 text-[var(--text)] border-[var(--text)]/50">
+                          <TooltipContent side="top" className=" text-[var(--text)] border-[var(--text)]/50">
                             <p>Bad news</p>
                           </TooltipContent>
                         </Tooltip>
                      </div>
                    </div>)
             )}
-            {!settingsMode && !historyMode && config?.chatMode === "web" && (
+            {config?.chatMode === "web" && (
               <div
                 className={cn(
                   "fixed bottom-14 left-0 right-0",
@@ -715,34 +743,21 @@ const Cognito = () => {
                 </div>
               </div>
             )}
-          </div>
-
-          {!settingsMode && !historyMode && (
-            (<div
-              className={cn(
-                "bg-[var(--active)]/50 border-t border-[var(--text)]/50",
-                "flex justify-between items-center",
-                "pb-1 pt-1 relative z-[2]",
-                "not-focus-visible"
-              )}
-              style={{ opacity: settingsMode ? 0 : 1 }}
-            >
-              <Input isLoading={isLoading} message={message} setMessage={setMessage} onSend={onSend} />
-              <Send isLoading={isLoading} onSend={() => onSend(message)} />
-            </div>)
+            </div>
           )}
-
-          {historyMode && (
-            <ChatHistory
-            className="flex-1 w-full overflow-y-auto min-h-0"
-            loadChat={loadChat}
-              onDeleteAll={deleteAll}
-            />
-          )}
-
-          {config?.backgroundImage ? <Background /> : null}
         </div>
+        {!settingsMode && !historyMode && (
+          <div className="p-2 relative z-[10]">
+            <Input
+              isLoading={isLoading}
+              message={message}
+              setMessage={setMessage}
+              onSend={() => onSend(message)}
+            />
+          </div>
+        )}
 
+        {config?.backgroundImage ? <Background /> : null}
         <Toaster
           containerStyle={{
             borderRadius: 16,

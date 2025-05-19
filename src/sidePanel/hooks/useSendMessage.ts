@@ -1,16 +1,16 @@
 import { Dispatch, SetStateAction, useRef } from 'react';
-import { MessageTurn } from '../ChatHistory'; // Adjust path if needed
+import { MessageTurn } from '../ChatHistory';
 import { fetchDataAsStream, webSearch, processQueryWithAI } from '../network';
 import storage from 'src/background/storageUtil';
 import type { Config, Model } from 'src/types/config';
 import { normalizeApiEndpoint } from 'src/background/util';
 import { handleHighCompute, handleMediumCompute } from './computeHandlers';
+import { ChatMode, ChatStatus } from '../../types/config';
 
 import * as pdfjsLib from 'pdfjs-dist';
 
 try {
   const workerUrl = chrome.runtime.getURL('pdf.worker.mjs');
-  // Check if the URL is valid before assigning, to prevent errors if the file is missing
   if (workerUrl) {
     pdfjsLib.GlobalWorkerOptions.workerSrc = workerUrl;
   } else {
@@ -19,7 +19,6 @@ try {
 } catch (e) {
     console.error("Error setting pdf.js worker source:", e);
 }
-
 
 interface ApiMessage {
   role: 'user' | 'assistant' | 'system';
@@ -77,7 +76,6 @@ async function extractTextFromPdf(pdfUrl: string, callId?: number): Promise<stri
   }
 }
 
-
 const useSendMessage = (
   isLoading: boolean,
   originalMessage: string,
@@ -88,7 +86,8 @@ const useSendMessage = (
   setMessage: Dispatch<SetStateAction<string>>,
   setWebContent: Dispatch<SetStateAction<string>>,
   setPageContent: Dispatch<SetStateAction<string>>,
-  setLoading: Dispatch<SetStateAction<boolean>>
+  setLoading: Dispatch<SetStateAction<boolean>>,
+  setChatStatus: Dispatch<SetStateAction<ChatStatus>> // Added setter for chat status
 ) => {
   const completionGuard = useRef<number | null>(null);
 
@@ -116,6 +115,17 @@ const useSendMessage = (
     setLoading(true);
     setWebContent('');
     setPageContent('');
+
+    // Set initial chat status based on mode
+    const currentChatMode = config.chatMode as ChatMode || 'chat';
+    if (currentChatMode === 'web') {
+      setChatStatus('searching');
+    } else if (currentChatMode === 'page') {
+      setChatStatus('reading');
+    } else { // 'chat' or default
+      setChatStatus('thinking');
+    }
+
     completionGuard.current = callId;
     
     const updateAssistantTurn = (update: string, isFinished: boolean, isError?: boolean) => {
@@ -156,6 +166,7 @@ const useSendMessage = (
       if (isFinished || (isError === true)) {
         console.log(`[${callId}] updateAssistantTurn: Final state (Finished: ${isFinished}, Error: ${isError}). Clearing guard and loading.`);
         setLoading(false);
+        setChatStatus(isError ? 'idle' : 'done'); // Update status on finish/error
         completionGuard.current = null;
       }
     };
@@ -187,6 +198,7 @@ const useSendMessage = (
     // ... (Step 1: Optimize Query remains the same)
     if (performSearch) {
       console.log(`[${callId}] useSendMessage: Optimizing query...`);
+      setChatStatus('thinking'); // Status while optimizing query      
       const historyForQueryOptimization: ApiMessage[] = currentTurns.map(turn => ({
         role: turn.role,
         content: turn.rawContent
@@ -218,13 +230,16 @@ const useSendMessage = (
     // ... (Step 2: Perform Web Search remains the same)
     if (performSearch) {
       console.log(`[${callId}] useSendMessage: Performing web search...`);
+      setChatStatus('searching');
 
       try {
         searchRes = await webSearch(queryForProcessing, config);
+        setChatStatus('thinking'); // Status after search, before main LLM call      
       } catch (searchError) {
         console.error(`[${callId}] Web search failed:`, searchError);
         searchRes = ''; 
         processedQueryDisplay += `[Web Search Failed: ${searchError instanceof Error ? searchError.message : String(searchError)}]`;
+        setChatStatus('idle'); // Or some error status if you define one      
       }
       console.log(`[${callId}] useSendMessage: Web search done. Length: ${searchRes.length}`);
     }
@@ -249,6 +264,7 @@ const useSendMessage = (
     if (config?.chatMode === 'page') {
       let currentPageContent = '';
       console.log(`[${callId}] useSendMessage: Preparing page content...`);
+      setChatStatus('reading');      
       try {
         const [tab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
         
@@ -288,18 +304,30 @@ const useSendMessage = (
         : safeCurrentPageContent;
       pageContentForLlm = config?.contextLimit === 128 ? safeCurrentPageContent : limitedContent;
       setPageContent(pageContentForLlm || '');
+      setChatStatus('thinking'); // After reading page, before main LLM call      
       console.log(`[${callId}] Page content prepared for LLM. Length: ${pageContentForLlm?.length}`);
     } else {
       setPageContent('');
     }
 
     const persona = config?.personas?.[config?.persona] || '';
+    const pageContextString = (config?.chatMode === 'page' && pageContentForLlm)
+      ? `Use the following page content for context: ${pageContentForLlm}`
+      : '';
+    const webContextString = (config?.chatMode === 'web' && webContentForLlm)
+      ? `Refer to this web search summary: ${webContentForLlm}`
+      : '';
+    const noteContextString = (config?.useNote && config.noteContent)
+      ? `Refer to this note for context: ${config.noteContent}`
+      : '';
+
     const systemContent = `
       ${persona}
-      ${pageContentForLlm ? `. Use the following page content for context: ${pageContentForLlm}` : ''}
-      ${webContentForLlm ? `. Refer to this web search summary: ${webContentForLlm}` : ''}
+      ${noteContextString}
+      ${pageContextString}
+      ${webContextString}
     `.trim().replace(/\s+/g, ' ');
-    console.log(`[${callId}] useSendMessage: System prompt constructed.`);
+    console.log(`[${callId}] useSendMessage: System prompt constructed. Persona: ${!!persona}, PageCtx: ${!!pageContextString}, WebCtx: ${!!webContextString}, NoteCtx: ${!!noteContextString}`);
 
     const assistantTurnPlaceholder: MessageTurn = {
       role: 'assistant',
@@ -313,6 +341,7 @@ const useSendMessage = (
 
     // --- Step 4: Execute based on Compute Level ---
     try {
+      setChatStatus('thinking'); // General status before LLM call
       if (config?.computeLevel === 'high' && currentModel) {
         console.log(`[${callId}] useSendMessage: Starting HIGH compute level.`);
         await handleHighCompute(

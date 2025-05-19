@@ -1,9 +1,11 @@
 import type { TextareaHTMLAttributes, RefObject, FC } from 'react';
 import { AddToChat } from './AddToChat';
 import type { SpeechRecognition as SpeechRecognitionInstance, SpeechRecognitionEvent as SpeechRecognitionEventInstance, SpeechRecognitionErrorEvent as SpeechRecognitionErrorEventInstance } from '../types/speech';
-import { ForwardedRef, useEffect, useRef, useState, useCallback, Dispatch, SetStateAction } from 'react';
+import { useEffect, useRef, useState, useCallback, Dispatch, SetStateAction } from 'react';
 import { FaRegStopCircle } from 'react-icons/fa';
 import { SlMicrophone } from "react-icons/sl";
+import { BsSend } from "react-icons/bs";
+import { Loader2 } from 'lucide-react';
 import { useConfig } from './ConfigContext';
 import { Button } from "@/components/ui/button";
 import { toast } from "react-hot-toast";
@@ -39,9 +41,10 @@ export const AutoResizeTextarea = (
       ref={ref}
       minRows={minRows}
       maxRows={maxRows}
+      {...props}
       className={cn(
-        "flex w-full rounded-xl bg-background px-3 py-1 text-sm ring-offset-background",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1",
+        "flex w-full bg-transparent text-sm ring-offset-background",
+        "focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0",
         "disabled:cursor-not-allowed disabled:opacity-50",
         "min-h-[unset]",
         "overflow-y-auto",
@@ -49,11 +52,9 @@ export const AutoResizeTextarea = (
         "text-foreground",
         "text-sm placeholder:text-muted-foreground/75", 
         "font-semibold",
-        "hover:border-foreground hover:shadow-none",
-        className,
-        "shadow-sm shadow-muted/20"
+        "border-none shadow-none outline-none",
+        className
       )}
-      {...props}
     />
   );
 };
@@ -64,7 +65,7 @@ interface InputProps {
     isLoading: boolean;
     message: string;
     setMessage: Dispatch<SetStateAction<string>>; 
-    onSend: () => void;
+    onSend: () => void; // This is () => cognitoOnSend(cognitoMessageFromCognitoState)
 }
 
 export const Input: FC<InputProps> = ({ isLoading, message, setMessage, onSend }) => {
@@ -81,7 +82,12 @@ export const Input: FC<InputProps> = ({ isLoading, message, setMessage, onSend }
     ref.current?.focus();
   }, [message, config?.chatMode]);
 
-  const placeholder = config?.chatMode === 'web' ? 'what to search?' : config?.chatMode === 'page' ? 'about the page..' : '';
+  let placeholderText = 'Type a message...';
+  if (config?.chatMode === 'web') {
+    placeholderText = 'Enter your query...';
+  } else if (config?.chatMode === 'page') {
+    placeholderText = 'Ask about this page...';
+  }
 
   const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
 
@@ -170,11 +176,40 @@ export const Input: FC<InputProps> = ({ isLoading, message, setMessage, onSend }
 
   const isSpeechRecognitionSupported = typeof window !== 'undefined' &&
     (window.SpeechRecognition || window.webkitSpeechRecognition);
+  
+    const handleSendClick = () => {
+    if (message.trim()) {
+      onSend();
+    }
+  };
+
+  const handleTextareaKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (isLoading) return;
+    if (event.key === 'Enter' && message.trim() && !event.altKey && !event.metaKey && !event.shiftKey) {
+      event.preventDefault();
+      event.stopPropagation();
+      onSend();
+    }
+  };
 
   return (
-    <div className="relative w-full flex items-end"> 
+    <div className="flex w-full items-center gap-0 p-0 bg-[var(--card,var(--bg-secondary))] border border-[var(--text)]/20 rounded-lg shadow-md">
       <AddToChat /> 
-      <TooltipProvider delayDuration={500}>
+      <AutoResizeTextarea
+        ref={ref}
+        minRows={1}
+        maxRows={8}
+        autoComplete="off"
+        id="user-input"
+        placeholder={placeholderText}
+        value={message}
+        autoFocus
+        onChange={event => setMessage(event.target.value)}
+        onKeyDown={handleTextareaKeyDown}
+        className="flex-grow !bg-transparent px-0 py-1.5"
+      />
+      {isSpeechRecognitionSupported && (
+        <TooltipProvider delayDuration={500}>
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
@@ -190,15 +225,14 @@ export const Input: FC<InputProps> = ({ isLoading, message, setMessage, onSend }
               aria-label={isListening ? "Stop" : "Recording"}
               variant="ghost"
               size="sm"
-              className={cn(
-                "rounded-md mr-2",
-                "not-focus",
-                isListening ? "text-red-500 hover:bg-destructive/10" : "text-foreground hover:bg-muted/50",
-              )}
-              style={{ paddingLeft: '0.5rem', paddingRight: '0.5rem' }}
-              disabled={isLoading || !isSpeechRecognitionSupported}
+                className={cn(
+                  "p-2 rounded-md",
+                  "not-focus",
+                  isListening ? "text-red-500 hover:bg-destructive/10" : "text-foreground hover:bg-muted/50",
+                )}
+              disabled={isLoading}
             >
-              {isListening ? <FaRegStopCircle /> : <SlMicrophone />}
+                {isListening ? <FaRegStopCircle size={18} /> : <SlMicrophone size={18} />}
             </Button>
           </TooltipTrigger>
           <TooltipContent
@@ -208,30 +242,33 @@ export const Input: FC<InputProps> = ({ isLoading, message, setMessage, onSend }
             <p>{isListening ? "Stop" : "Recording"}</p>
           </TooltipContent>
         </Tooltip>
-      </TooltipProvider>
-
-      <AutoResizeTextarea
-        ref={ref}
-        minRows={1}
-        maxRows={8}
-        autoComplete="off"
-        id="user-input"
-        placeholder={placeholder}
-        value={message}
-        autoFocus
-        onChange={event => setMessage(event.target.value)}
-        onKeyDown={event => {
-          if (isLoading) return;
-          if (event.key === 'Enter' && message && !event.altKey && !event.metaKey && !event.shiftKey) {
-            event.preventDefault();
-            event.stopPropagation();
-            onSend();
-            setMessage('');
-          }
-        }}
-        className="z-[1]"
-      />
+        </TooltipProvider>
+      )}
       <NotePopover />
+      <TooltipProvider delayDuration={300}>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              aria-label="Send"
+              variant="ghost"
+              size="sm"
+              className={cn(
+                "p-2 rounded-md",
+                !isLoading && "hover:bg-muted/50"
+              )}
+              onClick={handleSendClick}
+              disabled={isLoading || !message.trim()}
+            >
+              {isLoading ? (
+                <Loader2 className="h-5 w-5 animate-spin text-foreground" />
+              ) : (
+                <BsSend className="h-5 w-5 text-foreground" />
+              )}
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="top" className="bg-secondary/50 text-foreground"><p>Send</p></TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
     </div>
   );
 };

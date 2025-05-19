@@ -143,7 +143,7 @@ export const TtsSettings = () => {
                 </SelectTrigger>
                 <SelectContent
                   className={cn(
-                    "bg-[var(--bg)] text-[var(--text)] border-[var(--text)]",
+                    "bg-[var(--bg)] text-[var(--text)] border border-[var(--text)]/10 ",
                     "rounded-md shadow-lg"
                   )}
                 >

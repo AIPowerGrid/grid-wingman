@@ -23,6 +23,21 @@ export interface TtsSettings {
   volume?:number;
 }
 
+export const CHAT_MODE_OPTIONS = [
+  { value: "chat", label: "Chat" },
+  { value: "page", label: "Page" },
+  { value: "web", label: "Web" },
+] as const;
+
+export type ChatMode = typeof CHAT_MODE_OPTIONS[number]['value']; // 'chat' | 'page' | 'web'
+
+export type ChatStatus =
+  | 'idle'
+  | 'typing'
+  | 'searching'
+  | 'reading'
+  | 'thinking'
+  | 'done';
 export interface Config {
   personas: Record<string, string>;
   persona: string;
@@ -70,7 +85,9 @@ export interface Config {
   selectedModel?: string;
   useNote?: boolean;
   noteContent?: string;
-  chatMode?: 'web' | 'page' | 'chat' | string;
+  // chatMode stores the *context* for the chat.
+  // 'page' or 'web' implies those respective contexts.
+  chatMode?: Exclude<ChatMode, 'chat'>; // Effectively 'page' | 'web' | undefined
   theme?: string;
   customTheme?: {
     active?: string;

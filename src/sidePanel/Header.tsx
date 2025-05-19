@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import * as React from 'react';
 import { FiSettings, FiX, FiTrash2 } from 'react-icons/fi';
 import { IoMoonOutline, IoSunnyOutline } from 'react-icons/io5';
-import { WiMoonWaxingCrescent1 } from 'react-icons/wi';
 import { useConfig } from './ConfigContext';
 import { useUpdateModels } from './hooks/useUpdateModels';
 import { themes as appThemes, type Theme as AppTheme } from './Themes';
@@ -48,7 +47,29 @@ import {
   AvatarImage,
 } from "@/components/ui/avatar";
 
-import { Model } from "@/src/types/config";
+import { Model, ChatMode, ChatStatus } from "@/src/types/config"; // Updated import
+
+function getStatusText(mode: ChatMode, status: ChatStatus): string {
+  if (status === 'idle') return 'Online';
+
+  if (mode === 'chat') {
+    if (status === 'typing') return 'Typing…';
+    if (status === 'thinking') return 'Thinking…';
+  }
+
+  if (mode === 'web') {
+    if (status === 'searching') return 'Searching web…';
+    if (status === 'thinking') return 'Reading snippets…'; // Or "Processing web results..."
+  }
+
+  if (mode === 'page') {
+    if (status === 'reading') return 'Reading page…';
+    if (status === 'thinking') return 'Analyzing…';
+  }
+  if (status === 'done') return 'Online'; // Assuming 'done' reverts to an online-like state
+
+  return 'Online'; // Default fallback
+}
 
 interface Config {
   theme?: string;
@@ -300,7 +321,7 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
              </div>
              <SheetTitle className="text-center font-['Orbitron',_sans-serif] tracking-tight -mt-10">
                <a href="https://github.com/3-ark/Cognito" target="_blank" rel="noopener noreferrer" className="text-xl font-semibold text-[var(--text)] bg-[var(--active)] inline-block px-3 py-1 rounded-md no-underline">
-                 COGNITO <sub className="italic contrast-200 text-[0.5em]">v3.3</sub>
+                 COGNITO <sub className="italic contrast-200 text-[0.5em]">v3.4</sub>
                </a>
              </SheetTitle>
              <SheetDescription className="text-center text-xl font-bold text-[var(--text)] leading-tight mt-0">
@@ -316,7 +337,7 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
                       <label htmlFor="persona-select" className="text-[var(--text)] opacity-80 text-lg font-medium uppercase shrink-0">
                         Persona
                       </label>
-                      <Avatar className="h-7 w-7 border border-[var(--text)]">
+                      <Avatar className="h-8 w-8 border border-[var(--text)]/10">
                         <AvatarImage src={personaImageSrc} alt={currentPersona} />
                         <AvatarFallback>{currentPersona.substring(0, 1).toUpperCase()}</AvatarFallback>
                       </Avatar>
@@ -327,7 +348,6 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
                           key={theme.name}
                           theme={theme}
                           updateConfig={updateConfig}
-                          size="h-7 w-7"
                         />
                       ))}
                     </div>
@@ -353,7 +373,10 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
                         <SelectValue placeholder="Select Persona..." />
                       </SelectTrigger>
                       <SelectContent
-                          className="bg-[var(--bg)] text-[var(--text)] border-[var(--text)]"
+                          className={cn(
+                            "bg-[var(--bg)] text-[var(--text)] border border-[var(--text)]/10",
+                            "rounded-md shadow-lg" // Added for consistency
+                          )}
                       >
                         {Object.keys(config?.personas || {}).map((p) => (
                           <SelectItem key={p} value={p} className="hover:brightness-95 focus:bg-[var(--active)]">
@@ -513,6 +536,9 @@ interface HeaderProps {
   downloadImage: () => void;
   downloadJson: () => void;
   downloadText: () => void;
+  chatMode: ChatMode;
+  chatStatus: ChatStatus;
+
 }
 export const Header: React.FC<HeaderProps> = ({
   chatTitle,
@@ -525,9 +551,13 @@ export const Header: React.FC<HeaderProps> = ({
   downloadImage,
   downloadJson,
   downloadText,
+  chatMode,
+  chatStatus,
 }) => {
   const { config, updateConfig } = useConfig();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const currentPersona = config?.persona || 'default';
+  const personaImageSrc = personaImages[currentPersona] || personaImages.default;
 
   const visibleTitle = chatTitle && !settingsMode && !historyMode;
 
@@ -536,8 +566,6 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   const showBackButton = settingsMode || historyMode;
-  const leftButtonLabel = showBackButton ? 'Back to Chat' : 'Open Settings';
-  const leftButtonIcon = showBackButton ? <FiX size="22px" /> : <FiSettings size="22px" />;
   
   const handleLeftButtonClick = () => {
     if (showBackButton) {
@@ -547,6 +575,8 @@ export const Header: React.FC<HeaderProps> = ({
       setIsSheetOpen(true);
     }
   };
+
+  const leftButtonLabel = showBackButton ? 'Back to Chat' : 'Open Settings';
 
   const handleDeleteAllWithConfirmation = () => {
     toast.custom(
@@ -609,35 +639,62 @@ export const Header: React.FC<HeaderProps> = ({
     );
   };
 
+  const sideContainerWidthClass = "w-24"; // 96px
+
   return (
     <TooltipProvider delayDuration={500}>
       <div
-        className={cn(  
-          "bg-[var(--active)]/50 border-b border-[var(--text)]/50",
+        className={cn(
+          "border-b border-[var(--text)]/20", // Changed: Removed background, subtler border
           "sticky top-0 z-10 p-0"
         )}
       >
-        <div className="flex items-center justify-between h-auto py-0.5 px-5">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                aria-label={leftButtonLabel}
-                variant="ghost"
-                size="sm"
-                className="text-[var(--text)] hover:bg-black/10 dark:hover:bg-white/10 rounded-md"
-                onClick={handleLeftButtonClick}
-              >
-                {leftButtonIcon}
-              </Button>
-            </TooltipTrigger>
-            {!showBackButton && (
-                <TooltipContent side="bottom" className="bg-[var(--active)]/50 text-[var(--text)] border-[var(--text)]">
-                  {leftButtonLabel}
-                </TooltipContent>
-            )}
-          </Tooltip>
+        <div className="flex items-center h-auto py-0.5 px-3"> {/* Overall padding for header content */}
+          {/* Left Button Area */}
+          <div className={cn("flex justify-start items-center min-h-10", sideContainerWidthClass)}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  aria-label={leftButtonLabel}
+                  variant="ghost"
+                  size={showBackButton ? "sm" : undefined}
+                  className={cn(
+                    "text-[var(--text)] hover:bg-black/10 dark:hover:bg-white/10 rounded-md",
+                    !showBackButton && "px-2 py-[3px] h-auto" // Custom padding for Avatar version
+                  )}
+                  onClick={handleLeftButtonClick}
+                >
+                  {showBackButton ? (
+                    <FiX size="22px" />
+                  ) : (
+                    <div className="flex items-center space-x-1.5">
+                      <Avatar className="h-8 w-8 border border-[var(--text)]/30">
+                        <AvatarImage src={personaImageSrc} alt={currentPersona} />
+                        <AvatarFallback>{(currentPersona === 'default' ? 'C' : currentPersona.substring(0, 1)).toUpperCase()}</AvatarFallback>
+                      </Avatar>
+                      <div className="flex flex-col items-start -space-y-0.5">
+                        <span className="text-[13px] font-medium text-[var(--text)] leading-tight">
+                          {currentPersona === 'default' ? 'Cognito' : currentPersona}
+                        </span>
+                        <span className="text-[10px] text-green-500/90 leading-tight flex items-center pt-0.5">
+                          {chatStatus === 'idle' && (
+                            <span className="h-1.5 w-1.5 bg-green-500 rounded-full mr-1"></span>
+                          )}
+                          {getStatusText(chatMode, chatStatus)}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" className="bg-[var(--active)]/50 text-[var(--text)] border-[var(--text)]">
+                {leftButtonLabel}
+              </TooltipContent>
+            </Tooltip>
+          </div>
 
-          <div className="flex-grow flex justify-center items-center overflow-hidden">
+          {/* Middle Content Area */}
+          <div className="flex-grow flex justify-center items-center overflow-hidden px-2">
             {visibleTitle && (
               <p className="text-lg font-semibold text-[var(--text)] italic whitespace-nowrap overflow-hidden text-ellipsis text-center">
                 {chatTitle}
@@ -645,14 +702,13 @@ export const Header: React.FC<HeaderProps> = ({
             )}
             {!visibleTitle && !historyMode && !settingsMode && (
               <Badge>
-                {config?.persona || 'Default'} @ {config?.selectedModel || 'None'}
+                {config?.selectedModel || 'No Model Selected'} {/* Changed: Show only model name */}
               </Badge>
             )}
             {settingsMode && (
               <div className="flex items-center justify-center">
-                 <p className="relative top-0 text-lg font-['Bruno_Ace_SC'] text-[var(--text)] whitespace-nowrap">
-                   The game is afoot{' '}
-                   <WiMoonWaxingCrescent1 className="inline-block align-middle text-[#f5eee4] text-[20px] ml-2" />
+                 <p className="relative top-0 text-lg font-['Bruno_Ace_SC'] text-[var(--text)] text-center">
+                   Configuration
                  </p>
               </div>
             )}
@@ -665,43 +721,44 @@ export const Header: React.FC<HeaderProps> = ({
             )}
           </div>
 
-          <div className="min-w-[40px] flex justify-end">
-             {!settingsMode && !historyMode && (
-               <Tooltip>
-                 <TooltipTrigger asChild>
-                   <Button
-                     aria-label="Reset Chat"
-                     variant="ghost"
-                     size="sm"
-                     className="text-[var(--text)] hover:bg-black/10 dark:hover:bg-white/10 rounded-md"
-                     onClick={reset}
-                   >
-                     <FiTrash2 size="18px" />
-                   </Button>
-                 </TooltipTrigger>
-                 <TooltipContent side="bottom" className="bg-[var(--active)]/50 text-[var(--text)] border-[var(--text)]">
-                   Reset Chat
-                 </TooltipContent>
-               </Tooltip>
-             )}
-             {historyMode && (
-                <Tooltip>
-                  <TooltipTrigger asChild> 
-                    <Button
-                      aria-label="Delete All History"
-                      variant="ghost"
-                      size="sm"
-                      className="text-[var(--text)] hover:bg-black/10 dark:hover:bg-white/10 rounded-md"
-                      onClick={handleDeleteAllWithConfirmation} 
-                    >
-                      <FiTrash2 size="18px" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent side="bottom" className="bg-[var(--active)]/50 text-[var(--text)] border-[var(--text)]">
-                    Delete All
-                  </TooltipContent>
-                </Tooltip>
-             )}
+          {/* Right Button Area */}
+          <div className={cn("flex justify-end items-center min-h-10", sideContainerWidthClass)}>
+            {!settingsMode && !historyMode && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    aria-label="Reset Chat"
+                    variant="ghost"
+                    size="sm"
+                    className="text-[var(--text)] hover:bg-black/10 dark:hover:bg-white/10 rounded-md"
+                    onClick={reset}
+                  >
+                    <FiTrash2 size="18px" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" className="bg-[var(--active)]/50 text-[var(--text)] border-[var(--text)]">
+                  Reset Chat
+                </TooltipContent>
+              </Tooltip>
+            )}
+            {historyMode && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    aria-label="Delete All History"
+                    variant="ghost"
+                    size="sm"
+                    className="text-[var(--text)] hover:bg-black/10 dark:hover:bg-white/10 rounded-md"
+                    onClick={handleDeleteAllWithConfirmation}
+                  >
+                    <FiTrash2 size="18px" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" className="bg-[var(--active)]/50 text-[var(--text)] border-[var(--text)]">
+                  Delete All
+                </TooltipContent>
+              </Tooltip>
+            )}
           </div>
         </div>
 

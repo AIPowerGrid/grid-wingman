@@ -1,12 +1,9 @@
-import { GoArrowSwitch } from "react-icons/go";
-import { Button } from "@/components/ui/button";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuSeparator
-} from "@/components/ui/dropdown-menu";
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+} from "@/components/ui/select";
 import {
   Tooltip,
   TooltipContent,
@@ -14,38 +11,46 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { cn } from "@/src/background/util";
-
+import { CHAT_MODE_OPTIONS, ChatMode } from '@/src/types/config';
 import { useConfig } from './ConfigContext';
 
 export const AddToChat = () => {
   const { config, updateConfig } = useConfig();
 
-  const currentMode = config?.chatMode;
+  const currentModeInConfig = config?.chatMode;
+
+  const handleModeChange = (selectedValue: string) => {
+    const mode = selectedValue as ChatMode;
+    updateConfig({
+      chatMode: mode === "chat" ? undefined : mode,
+    });
+  };
+
+  const selectValue = currentModeInConfig || "chat";
 
   return (
-    (<TooltipProvider delayDuration={500}>
-      <DropdownMenu>
+    <TooltipProvider delayDuration={500}>
+      <Select value={selectValue} onValueChange={handleModeChange}>
         <Tooltip>
           <TooltipTrigger asChild>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm" 
-                aria-label="Switch Chat Mode"
-                className={cn(
-                  "rounded-md ml-2 text-foreground hover:bg-muted/50 font-extrabold", 
-                  "px-2 not-focus-visible",
-                )}
-              >
-                <div className="flex items-center justify-center h-full">
-                  {!currentMode ? (
-                    (<GoArrowSwitch className="h-5 w-5 text-foreground" />)
-                  ) : (
-                    (<span className="text-sm">{currentMode.toUpperCase()}</span>)
-                  )}
-                </div>
-              </Button>
-            </DropdownMenuTrigger>
+            <SelectTrigger
+              aria-label="Switch Chat Mode"
+              className={cn(
+                "border-none shadow-none bg-transparent",
+                "hover:bg-[var(--text)]/10",
+                "text-foreground font-extrabold",
+                "px-2 h-9 w-fit",
+                "not-focus-visible",
+                "focus-visible:ring-1 focus-visible:ring-[var(--active)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--bg)]",
+                "[&>svg]:text-[var(--text)]"
+              )}
+            >
+              {!currentModeInConfig ? (
+                <span className="text-sm">Mode</span>
+              ) : (
+                <span className="text-sm">{currentModeInConfig.toUpperCase()}</span>
+              )}
+            </SelectTrigger>
           </TooltipTrigger>
           <TooltipContent
             side="top"
@@ -55,49 +60,28 @@ export const AddToChat = () => {
           </TooltipContent>
         </Tooltip>
 
-        <DropdownMenuContent
-          align="end" 
+        <SelectContent
+          align="end"
           sideOffset={5}
-          className="bg-secondary text-primary-foreground rounded-md min-w-[80px] z-50" 
+          className={cn(
+            "bg-[var(--bg)] text-[var(--text)] border border-[var(--text)]/10 rounded-md shadow-lg",
+            "min-w-[80px] z-50"
+          )}
         >
-          <DropdownMenuItem
-            onClick={() => updateConfig({ chatMode: undefined })}
-            className={cn(
-              "p-0",
-              "flex justify-center font-extrabold text-md cursor-pointer not-focus-visible", 
-              !currentMode ? "bg-background text-foreground" : "bg-transparent text-primary-foreground" 
-            )}
-          >
-            CHAT
-          </DropdownMenuItem>
-
-          <DropdownMenuSeparator className="bg-border h-[1px] my-1" />
-
-          <DropdownMenuItem
-            onClick={() => updateConfig({ chatMode: 'page' })}
-            className={cn(
-              "p-0",
-              "flex justify-center font-extrabold text-md cursor-pointer not-focus-visible",
-              currentMode === 'page' ? "bg-background text-foreground" : "bg-transparent text-primary-foreground"
-            )}
-          >
-            PAGE
-          </DropdownMenuItem>
-
-          <DropdownMenuSeparator className="bg-border h-[1px] my-1" />
-
-          <DropdownMenuItem
-            onClick={() => updateConfig({ chatMode: 'web' })}
-            className={cn(
-              "p-0",
-              "flex justify-center font-extrabold text-md cursor-pointer not-focus-visible",
-              currentMode === 'web' ? "bg-background text-foreground" : "bg-transparent text-primary-foreground"
-            )}
-          >
-            WEB
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </TooltipProvider>)
+          {CHAT_MODE_OPTIONS.map((option) => (
+            <SelectItem
+              key={option.value}
+              value={option.value}
+              className={cn(
+                "text-[var(--text)]",
+                "hover:brightness-95 focus:bg-[var(--active)] focus:text-[var(--active-foreground)]"
+              )}
+            >
+              {option.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </TooltipProvider>
   );
-};
+}

@@ -57,11 +57,10 @@ export const NotePopover = () => {
                 variant="ghost"
                 size="sm"
                 className={cn(
-                  "rounded-md ml-2 not-focus-visible",
+                  "rounded-md not-focus-visible",
                   config.useNote ? "text-[var(--active)] hover:bg-muted/80" : "text-foreground hover:bg-muted/50"
                 )}
-                aria-label="Toggle/Edit Note" // More accessible than title attribute alone
-                style={{ paddingLeft: '0.5rem', paddingRight: '0.5rem' }}
+                aria-label="Toggle/Edit Note"
               >
                 <LuNotebookPen className="h-5 w-5" />
               </Button>

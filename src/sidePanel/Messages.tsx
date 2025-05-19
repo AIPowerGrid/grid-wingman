@@ -15,7 +15,6 @@ import { useConfig } from './ConfigContext';
 import { Button } from "@/components/ui/button";
 import { cn } from "@/src/background/util";
 
-// --- Helper Function to Clean Text for TTS ---
 const cleanTextForTTS = (text: string): string => {
   let cleanedText = text;
   cleanedText = cleanedText.replace(/(\*\*|__|\*|_)(.*?)\1/g, '$2');
@@ -26,7 +25,6 @@ const cleanTextForTTS = (text: string): string => {
   cleanedText = cleanedText.replace(/\s{2,}/g, ' ');
   return cleanedText.trim();
 };
-// --- End Helper Function ---
 
 interface MessagesProps {
   turns?: MessageTurn[];
@@ -112,11 +110,10 @@ export const Messages: React.FC<MessagesProps> = ({
       id="messages"
       className={cn(
         "flex flex-col flex-grow w-full overflow-y-auto pb-2 pt-2",
-        "h-[calc(100dvh-5rem)]",
         "no-scrollbar"
       )}
       style={{
-        background: config?.paperTexture ? 'transparent' : 'var(--bg)', // Or map --bg to a Tailwind color like 'bg-background' if defined
+        background: config?.paperTexture ? 'transparent' : 'var(--bg)',
         opacity: settingsMode ? 0 : 1,
       }}
     >
@@ -135,12 +132,12 @@ export const Messages: React.FC<MessagesProps> = ({
               (<div
                 className={cn(
                   "flex flex-col items-center self-end space-y-0 mr-1 pb-3 transition-opacity duration-200",
-                  (hoveredIndex === i || speakingIndex === i) ? 'opacity-100' : 'opacity-0' // Conditional opacity
+                  (hoveredIndex === i || speakingIndex === i) ? 'opacity-100' : 'opacity-0'
                 )}
               >
                 {editingIndex !== i && (
                   <Button aria-label="Copy" variant="ghost" size="sm" onClick={() => copyMessage(turn.rawContent)} title="Copy message">
-                    <FiCopy className="h-4 w-4 text-[var(--text)]" /> {/* Adjust size/color if needed */}
+                    <FiCopy className="h-4 w-4 text-[var(--text)]" />
                   </Button>
                 )}
                 {speakingIndex === i ? (
