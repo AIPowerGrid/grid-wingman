@@ -70,7 +70,7 @@ export const themes: Theme[] = [
     codeFg: '#91989F',
     preBg: '#FCFAF2',
     preFg: '#91989F',
-    mute: '#f2f1ec', 
+    mute: '#fcfaf27f', 
     tableBorder: '#FCFAF2',
     error: '#d32f2f',
     success: '#388e3c',
@@ -160,7 +160,7 @@ export const setTheme = (c: Theme, paperTextureEnabled: boolean = true) => {
   const codeFg = c.codeFg || bg;
   const preBg = c.preBg || text; 
   const preFg = c.preFg || bg;  
-  const mute = c.mute || (text === '#000000' ? '#757575' : '#A9A9A9');
+  const mute = c.mute || (text === '#000000' ? '#757575' : '#A9A9A9'); // Fallback based on typical text color
   const tableBorder = c.tableBorder || text;
   const errorColor = c.error || '#d32f2f';
   const successColor = c.success || '#388e3c';
@@ -263,7 +263,7 @@ export const Themes = () => {
   const itemRounded = 'rounded-xl';
   
   const [pickerVisibleForKey, setPickerVisibleForKey] = useState<keyof Omit<Theme, 'name'> | null>(null);
-  const [customThemeColors, setCustomThemeColors] = useState<Omit<Theme, 'name'>>(() => {
+  const [customThemeColors, setCustomThemeColors] = useState<Omit<Theme, 'name'>>(() => { /* ...initialization logic... */
     const baseDefault = themes.find((t) => t.name === 'custom') || DEFAULT_CUSTOM_THEME_FALLBACK;
     const { name, ...restOfBaseDefault } = baseDefault;
 
@@ -319,7 +319,7 @@ export const Themes = () => {
         setCustomThemeColors(newCustomColorsCandidate);
       }
     }
-  }, [config?.customTheme, config?.theme, customThemeColors]); // Added customThemeColors back to ensure re-check if it's modified externally, though unlikely here.
+  }, [config?.customTheme, config?.theme, customThemeColors]);
 
   const handleColorChange = useCallback((key: keyof Omit<Theme, 'name'>, colorResult: IColor) => {
     console.log(`Themes: handleColorChange called for key "${key}" with color`, colorResult.hex);

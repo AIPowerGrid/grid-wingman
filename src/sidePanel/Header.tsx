@@ -536,8 +536,8 @@ interface HeaderProps {
   downloadImage: () => void;
   downloadJson: () => void;
   downloadText: () => void;
-  chatMode: ChatMode;
-  chatStatus: ChatStatus;
+  chatMode: ChatMode; // Added for dynamic status
+  chatStatus: ChatStatus; // Added for dynamic status
 
 }
 export const Header: React.FC<HeaderProps> = ({
@@ -676,7 +676,7 @@ export const Header: React.FC<HeaderProps> = ({
                         <span className="text-[13px] font-medium text-[var(--text)] leading-tight">
                           {currentPersona === 'default' ? 'Cognito' : currentPersona}
                         </span>
-                        <span className="text-[10px] text-green-600/90 leading-tight flex items-center pt-0.5">
+                        <span className="text-[10px] text-muted-foreground leading-tight flex items-center pt-0.5">
                           {chatStatus === 'idle' && (
                             <span className="h-1.5 w-1.5 bg-green-600 rounded-full mr-1"></span>
                           )}
@@ -694,6 +694,7 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
 
           {/* Middle Content Area */}
+          {/* Added px-2 to prevent text from sticking to side containers if they are visually empty */}
           <div className="flex-grow flex justify-center items-center overflow-hidden px-2">
             {visibleTitle && (
               <p className="text-lg font-semibold text-[var(--text)] italic whitespace-nowrap overflow-hidden text-ellipsis text-center">
@@ -722,6 +723,7 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
 
           {/* Right Button Area */}
+          {/* items-center to vertically align button if container is taller (though heights should be similar) */}
           <div className={cn("flex justify-end items-center min-h-10", sideContainerWidthClass)}>
             {!settingsMode && !historyMode && (
               <Tooltip>
@@ -729,7 +731,7 @@ export const Header: React.FC<HeaderProps> = ({
                   <Button
                     aria-label="Reset Chat"
                     variant="ghost"
-                    size="sm"
+                    size="sm" // Consistent size for icon button
                     className="text-[var(--text)] hover:bg-black/10 dark:hover:bg-white/10 rounded-md"
                     onClick={reset}
                   >
@@ -747,7 +749,7 @@ export const Header: React.FC<HeaderProps> = ({
                   <Button
                     aria-label="Delete All History"
                     variant="ghost"
-                    size="sm"
+                    size="sm" // Consistent size for icon button
                     className="text-[var(--text)] hover:bg-black/10 dark:hover:bg-white/10 rounded-md"
                     onClick={handleDeleteAllWithConfirmation}
                   >
@@ -759,6 +761,7 @@ export const Header: React.FC<HeaderProps> = ({
                 </TooltipContent>
               </Tooltip>
             )}
+            {/* If settingsMode, this div is empty but provides the fixed width for layout balance */}
           </div>
         </div>
 
