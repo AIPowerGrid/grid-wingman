@@ -374,7 +374,7 @@ export const EditableMessage: FC<MessageProps> = ({
         "w-[calc(100%-2rem)] mx-1 my-2",
         "pb-1 pl-4 pr-4 pt-1", 
         "shadow-lg text-left relative",
-        turn.role === 'assistant' ? 'bg-accent border-foreground' : 'bg-background border-foreground',
+        turn.role === 'assistant' ? 'bg-accent border-[var(--text)]/20' : 'bg-background border-[var(--text)]/20',
         config?.paperTexture ? 'chat-message-bubble' : '',
         'chatMessage', isEditing ? 'editing' : '' 
       )}
