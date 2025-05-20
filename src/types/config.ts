@@ -29,7 +29,7 @@ export const CHAT_MODE_OPTIONS = [
   { value: "web", label: "Web" },
 ] as const;
 
-export type ChatMode = typeof CHAT_MODE_OPTIONS[number]['value']; // 'chat' | 'page' | 'web'
+export type ChatMode = typeof CHAT_MODE_OPTIONS[number]['value'];
 
 export type ChatStatus =
   | 'idle'
@@ -77,17 +77,15 @@ export interface Config {
   customApiKey?: string;
   customConnected?: boolean;
   customError?: string | unknown;
-  googleApiKey?: string; // Added for Google Custom Search
-  googleCx?: string; // Added for Google Custom Search CX
+  googleApiKey?: string;
+  googleCx?: string;
   visibleApiKeys?: boolean;
   fontSize?: number;
   models?: Model[];
   selectedModel?: string;
   useNote?: boolean;
   noteContent?: string;
-  // chatMode stores the *context* for the chat.
-  // 'page' or 'web' implies those respective contexts.
-  chatMode?: Exclude<ChatMode, 'chat'>; // Effectively 'page' | 'web' | undefined
+  chatMode?: Exclude<ChatMode, 'chat'>;
   theme?: string;
   customTheme?: {
     active?: string;
@@ -111,6 +109,8 @@ export interface Config {
   paperTexture?: boolean;
   panelOpen: boolean;
   tts?: TtsSettings;
+  userName?: string;
+  userProfile?: string;
 }
 
 export interface ConfigContextType {

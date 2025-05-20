@@ -47,7 +47,7 @@ const defaultConfig: Config = {
   },
   personas,
   generateTitle: true,
-  backgroundImage: true,
+  backgroundImage: false,
   persona: 'Ein',
   webMode: 'Google',
   webLimit: 60,
@@ -70,13 +70,15 @@ const defaultConfig: Config = {
   fontSize: 14,
   panelOpen: false,
   computeLevel: 'low',
-  paperTexture: true,
+  paperTexture: false,
   tts: {
     selectedVoice: undefined,
     rate: 1,
   },
   useNote: false,
   noteContent: '',
+  userName: 'user', 
+  userProfile: ''
 };
 
 export const ConfigProvider = ({ children }: { children: React.ReactNode }) => {

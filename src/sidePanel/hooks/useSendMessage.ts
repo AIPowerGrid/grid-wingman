@@ -26,7 +26,6 @@ interface ApiMessage {
 }
 
 export const getAuthHeader = (config: Config, currentModel: Model) => {
-  // ... (getAuthHeader remains the same)
   if (currentModel?.host === 'groq' && config.groqApiKey) {
     return { Authorization: `Bearer ${config.groqApiKey}` };
   }
@@ -63,8 +62,8 @@ async function extractTextFromPdf(pdfUrl: string, callId?: number): Promise<stri
       const page = await pdf.getPage(i);
       const textContent = await page.getTextContent();
       const pageText = textContent.items.map(item => ('str' in item ? item.str : '')).join(' ');
-      fullText += pageText + '\n\n'; // Add double newline between pages for readability
-      if (i % 10 === 0 || i === pdf.numPages) { // Log progress for large PDFs
+      fullText += pageText + '\n\n';
+      if (i % 10 === 0 || i === pdf.numPages) {
         console.log(`[${callId || 'PDF'}] Extracted text from page ${i}/${pdf.numPages}`);
       }
     }
@@ -72,7 +71,7 @@ async function extractTextFromPdf(pdfUrl: string, callId?: number): Promise<stri
     return fullText.trim();
   } catch (error) {
     console.error(`[${callId || 'PDF'}] Error extracting text from PDF (${pdfUrl}):`, error);
-    throw error; // Rethrow to be caught by the caller
+    throw error;
   }
 }
 
@@ -87,7 +86,7 @@ const useSendMessage = (
   setWebContent: Dispatch<SetStateAction<string>>,
   setPageContent: Dispatch<SetStateAction<string>>,
   setLoading: Dispatch<SetStateAction<boolean>>,
-  setChatStatus: Dispatch<SetStateAction<ChatStatus>> // Added setter for chat status
+  setChatStatus: Dispatch<SetStateAction<ChatStatus>>
 ) => {
   const completionGuard = useRef<number | null>(null);
 
@@ -97,8 +96,9 @@ const useSendMessage = (
     
     const message = overridedMessage || originalMessage;
 
-    if (isLoading) {
-      console.log(`[${callId}] useSendMessage: Bailing out: isLoading is true.`);
+    if (!config) {
+      console.log(`[${callId}] useSendMessage: Bailing out: Missing config.`);
+      setLoading(false);
       return;
     }
     if (!message || !config) {
@@ -116,7 +116,6 @@ const useSendMessage = (
     setWebContent('');
     setPageContent('');
 
-    // Set initial chat status based on mode
     const currentChatMode = config.chatMode as ChatMode || 'chat';
     if (currentChatMode === 'web') {
       setChatStatus('searching');
@@ -166,7 +165,7 @@ const useSendMessage = (
       if (isFinished || (isError === true)) {
         console.log(`[${callId}] updateAssistantTurn: Final state (Finished: ${isFinished}, Error: ${isError}). Clearing guard and loading.`);
         setLoading(false);
-        setChatStatus(isError ? 'idle' : 'done'); // Update status on finish/error
+        setChatStatus(isError ? 'idle' : 'done');
         completionGuard.current = null;
       }
     };
@@ -187,7 +186,6 @@ const useSendMessage = (
 
     const performSearch = config?.chatMode === 'web';
     const currentModel = config?.models?.find(m => m.id === config.selectedModel);
-
     if (!currentModel) {
       console.error(`[${callId}] useSendMessage: No current model found.`);
       updateAssistantTurn("Configuration error: No model selected.", true, true);
@@ -227,7 +225,6 @@ const useSendMessage = (
       queryForProcessing = message;
     }
 
-    // ... (Step 2: Perform Web Search remains the same)
     if (performSearch) {
       console.log(`[${callId}] useSendMessage: Performing web search...`);
       setChatStatus('searching');
@@ -320,14 +317,33 @@ const useSendMessage = (
     const noteContextString = (config?.useNote && config.noteContent)
       ? `Refer to this note for context: ${config.noteContent}`
       : '';
+    
+    let userContextStatement = '';
+    const userName = config.userName?.trim();
+    const userProfile = config.userProfile?.trim();
 
-    const systemContent = `
-      ${persona}
-      ${noteContextString}
-      ${pageContextString}
-      ${webContextString}
-    `.trim().replace(/\s+/g, ' ');
-    console.log(`[${callId}] useSendMessage: System prompt constructed. Persona: ${!!persona}, PageCtx: ${!!pageContextString}, WebCtx: ${!!webContextString}, NoteCtx: ${!!noteContextString}`);
+    if (userName && userName.toLowerCase() !== 'user' && userName !== '') {
+      // Only include the name if it's set and not the default "user"
+      userContextStatement = `You are interacting with a user named "${userName}".`;
+      if (userProfile) {
+        userContextStatement += ` Their provided profile information is: "${userProfile}".`;
+      }
+    } else if (userProfile) {
+      // If username is default/empty but profile exists
+      userContextStatement = `You are interacting with a user. Their provided profile information is: "${userProfile}".`;
+    }
+    // If both are default/empty, userContextStatement will remain empty, which is fine.
+
+    const systemPromptParts = [];
+    if (persona) systemPromptParts.push(persona);
+    if (userContextStatement) systemPromptParts.push(userContextStatement); // Add user context here
+    if (noteContextString) systemPromptParts.push(noteContextString);
+    if (pageContextString) systemPromptParts.push(pageContextString);
+    if (webContextString) systemPromptParts.push(webContextString);
+    
+    const systemContent = systemPromptParts.join('\n\n').trim(); // Join parts with double newlines for clarity
+
+    console.log(`[${callId}] useSendMessage: System prompt constructed. Persona: ${!!persona}, UserCtx: ${!!userContextStatement}, NoteCtx: ${!!noteContextString}, PageCtx: ${!!pageContextString}, WebCtx: ${!!webContextString}`);
 
     const assistantTurnPlaceholder: MessageTurn = {
       role: 'assistant',
@@ -341,7 +357,7 @@ const useSendMessage = (
 
     // --- Step 4: Execute based on Compute Level ---
     try {
-      setChatStatus('thinking'); // General status before LLM call
+      setChatStatus('thinking'); 
       if (config?.computeLevel === 'high' && currentModel) {
         console.log(`[${callId}] useSendMessage: Starting HIGH compute level.`);
         await handleHighCompute(
@@ -384,7 +400,7 @@ const useSendMessage = (
           throw new Error(`Could not determine API URL for host: ${currentModel.host}`);
         }
 
-        console.log(`[${callId}] useSendMessage: Sending chat request to ${url}`);
+        console.log(`[${callId}] useSendMessage: Sending chat request to ${url} with system prompt: "${systemContent}"`); // Log the system prompt
         await fetchDataAsStream(
           url,
           {

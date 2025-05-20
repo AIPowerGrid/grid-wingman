@@ -1,22 +1,42 @@
 import { toPng } from 'html-to-image';
-import { MessageTurn } from '../sidePanel/ChatHistory'; // Adjust path if needed
+import { MessageTurn } from '../sidePanel/ChatHistory';
+import storage from './storageUtil';
+import { Config } from '../types/config';
 
 const getTimestamp = () => {
   return new Date().toJSON().slice(0, 19).replace('T', '_').replace(/:/g, '-');
 };
 
-export const downloadText = (turns: MessageTurn[]) => {
+export const downloadText = async (turns: MessageTurn[]) => {
   if (!turns || turns.length === 0) return;
 
+  let assistantPersonaName = 'assistant';
+  let userNameToDisplay = 'user';
+
+  try {
+    const storedConfigString = await storage.getItem('config');
+    if (storedConfigString) {
+      const config: Config = JSON.parse(storedConfigString);
+      if (config.persona && typeof config.persona === 'string' && config.persona.trim() !== '') {
+        assistantPersonaName = config.persona;
+      }
+      if (config.userName && typeof config.userName === 'string' && config.userName.trim() !== '') {
+        userNameToDisplay = config.userName;
+      }
+    }
+  } catch (error) {
+    console.error('Failed to load config to get persona name for download:', error);
+  }
+
   const text = turns.map(turn => {
-    let turnText = `${turn.role}\n`;
+    const roleName = turn.role === 'assistant' ? assistantPersonaName : (turn.role === 'user' ? userNameToDisplay : turn.role);
+    let turnText = `${roleName}:\n`;
     if (turn.role === 'assistant' && turn.webDisplayContent) {
         turnText += `**From the Internet**\n${turn.webDisplayContent}\n\n---\n\n`;
     }
     turnText += turn.rawContent;
     return turnText;
 }).join('\n\n');
-
   const element = document.createElement('a');
 
   element.setAttribute('href', `data:text/plain;charset=utf-8,${encodeURIComponent(text)}`);
@@ -65,11 +85,11 @@ export const downloadImage = (turns: MessageTurn[]) => {
 
   const wrapper = document.createElement('div');
   wrapper.style.display = 'flex';
-  wrapper.style.flexDirection = 'column'; // To maintain chat order in the image
+  wrapper.style.flexDirection = 'column';
   wrapper.style.paddingBottom = '1rem';
   wrapper.style.background = document.documentElement.style.getPropertyValue('--bg');
   if (nodes[0]) {
-      wrapper.style.width = `${nodes[0].offsetWidth}px`; // Set width based on message width
+      wrapper.style.width = `${nodes[0].offsetWidth}px`;
   }
 
 
@@ -77,7 +97,7 @@ export const downloadImage = (turns: MessageTurn[]) => {
     const cloned = n.cloneNode(true);
     if (cloned instanceof HTMLElement) {
       cloned.style.marginTop = '1rem';
-      cloned.style.boxSizing = 'border-box'; // Include padding/border in width calculation
+      cloned.style.boxSizing = 'border-box';
       wrapper.appendChild(cloned);
     } else {
       console.warn('Cloned node is not an HTMLElement:', cloned);
@@ -95,23 +115,23 @@ export const downloadImage = (turns: MessageTurn[]) => {
           "Cancel edit"
         ];
         if (labelsToExclude.includes(ariaLabel)) {
-          return false; // Exclude this button
+          return false;
         }
       }
     }
-    return true; // Include the node by default
+    return true;
   }
 
   document.body.appendChild(wrapper);
 
   toPng(wrapper, {
-    filter, // Use the updated filter
-    pixelRatio: 2, // Adjusted pixelRatio, 4 might be excessive and cause performance issues/large files
+    filter,
+    pixelRatio: 2,
     style: {
-        margin: '0', // Reset margin for the snapshot if needed
-        padding: wrapper.style.paddingBottom, // Keep necessary padding
+        margin: '0',
+        padding: wrapper.style.paddingBottom,
     },
-    backgroundColor: document.documentElement.style.getPropertyValue('--bg') || '#ffffff' // Provide fallback bg
+    backgroundColor: document.documentElement.style.getPropertyValue('--bg') || '#ffffff'
   })
     .then(dataUrl => {
       const element = document.createElement('a');

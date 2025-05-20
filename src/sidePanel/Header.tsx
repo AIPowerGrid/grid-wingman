@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import * as React from 'react';
 import { FiSettings, FiX, FiTrash2 } from 'react-icons/fi';
 import { IoMoonOutline, IoSunnyOutline } from 'react-icons/io5';
+import { PiShareFatThin } from "react-icons/pi";
 import { useConfig } from './ConfigContext';
 import { useUpdateModels } from './hooks/useUpdateModels';
 import { themes as appThemes, type Theme as AppTheme } from './Themes';
@@ -25,6 +26,7 @@ import {
   DialogTitle,
   DialogDescription,
   DialogOverlay,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import {
   Select,
@@ -34,6 +36,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Tooltip,
   TooltipContent,
@@ -47,27 +50,29 @@ import {
   AvatarImage,
 } from "@/components/ui/avatar";
 
-import { Model, ChatMode, ChatStatus } from "@/src/types/config"; // Updated import
+import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
+import { IoChevronBack } from "react-icons/io5";
+import { RxAvatar } from "react-icons/rx";
+import { CiText, CiImageOn } from "react-icons/ci";
+import { TbJson } from "react-icons/tb";
+
+import { Model, ChatMode, ChatStatus } from "@/src/types/config";
 
 function getStatusText(mode: ChatMode, status: ChatStatus): string {
   if (status === 'idle') return 'Online';
-
   if (mode === 'chat') {
     if (status === 'typing') return 'Typing…';
     if (status === 'thinking') return 'Thinking…';
   }
-
   if (mode === 'web') {
     if (status === 'searching') return 'Searching web…';
     if (status === 'thinking') return 'Processing SERP…';
   }
-
   if (mode === 'page') {
     if (status === 'reading') return 'Reading page…';
     if (status === 'thinking') return 'Analyzing…';
   }
   if (status === 'done') return 'Online';
-
   return 'Online';
 }
 
@@ -81,7 +86,10 @@ interface Config {
   fontSize?: number;
   generateTitle?: boolean;
   backgroundImage?: boolean;
+  userName?: string;
+  userProfile?: string;
 }
+
 interface WelcomeModalProps {
   isOpen: boolean;
   onClose: (open: boolean) => void;
@@ -198,9 +206,6 @@ interface SettingsSheetProps {
   config: Config;
   updateConfig: (newConfig: Partial<Config>) => void;
   setSettingsMode: (mode: boolean) => void;
-  downloadText: () => void;
-  downloadJson: () => void;
-  downloadImage: () => void;
   setHistoryMode: (mode: boolean) => void;
 }
 
@@ -211,9 +216,6 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
   updateConfig,
   setSettingsMode,
   setHistoryMode,
-  downloadText,
-  downloadJson,
-  downloadImage,
 }) => {
   const [searchQuery, setSearchQuery] = React.useState('');
   const [inputFocused, setInputFocused] = React.useState(false);
@@ -258,13 +260,7 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
     onOpenChange(false);
   };
 
-  const handleExportClick = (action: () => void) => {
-    action();
-    onOpenChange(false);
-  };
-
   const presetThemesForSheet = appThemes.filter(t => t.name !== 'custom' && t.name !== config?.customTheme?.name);
-
 
   return (
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
@@ -277,7 +273,7 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
              "p-0 border-r-0 shadow-xl flex flex-col h-full max-h-screen",
              "[&>button]:hidden",
              "settings-drawer-content",
-             "overflow-y-auto"
+             "overflow-y-auto",
             )}
             style={{ height: '100dvh' }}
             ref={sheetContentRef}
@@ -330,7 +326,6 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
           </SheetHeader>
            <div className={cn("flex flex-col h-full overflow-y-auto settings-drawer-body", "no-scrollbar")}>
               <div className={cn("flex flex-col space-y-5 flex-1", sectionPaddingX, "py-4",)}>
-
                 <div>
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center space-x-2">
@@ -375,7 +370,7 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
                       <SelectContent
                           className={cn(
                             "bg-[var(--bg)] text-[var(--text)] border border-[var(--text)]/10",
-                            "rounded-md shadow-lg" // Added for consistency
+                            "rounded-md shadow-lg"
                           )}
                       >
                         {Object.keys(config?.personas || {}).map((p) => (
@@ -387,7 +382,7 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
                     </Select>
                   </div>
                 </div>
-                
+
                 <div>
                   <label htmlFor="model-input" className="block text-[var(--text)] opacity-80 text-lg font-medium uppercase">
                     Model
@@ -420,7 +415,7 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
                     {inputFocused && (
                        <ScrollArea
                          className={cn(
-                            "absolute w-full mt-1 max-h-[200px] overflow-y-auto",
+                            "w-full mt-1 max-h-[200px] overflow-y-auto",
                             "bg-[var(--bg)] border-[var(--text)] rounded-md shadow-md z-10",
                             "no-scrollbar"
                          )}
@@ -489,31 +484,6 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
                       Chat History
                     </Button>
                  </div>
-
-                 <div className="space-y-3">
-                   <p className="text-[var(--text)] opacity-80 text-lg font-medium mb-2 uppercase">
-                     Export Now
-                   </p>
-                   {[
-                     { label: "Text", action: downloadText },
-                     { label: "JSON", action: downloadJson },
-                     { label: "Image", action: downloadImage },
-                   ].map(item => (
-                     <Button
-                       key={item.label} variant="outline" size={controlSize}
-                       onClick={() => handleExportClick(item.action)}
-                       className={cn(
-                         controlBg, subtleBorderClass, buttonHeight,
-                         "text-[var(--text)] rounded-xl shadow-md w-full justify-start font-medium",
-                         "hover:border-[var(--active)] hover:brightness-98 active:bg-[var(--active)] active:brightness-95",
-                         "focus:ring-1 focus:ring-[var(--active)]"
-                       )}
-                       style={{ filter: controlFilter }}
-                     >
-                       {item.label}
-                     </Button>
-                   ))}
-                 </div>
               </div>
               <div className={cn("mt-auto text-center text-[var(--text)] opacity-70 text-xs font-normal pb-4", sectionPaddingX)}>
                   Made with ❤️ by @3-Arc
@@ -524,6 +494,114 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
   );
 };
 
+interface EditProfileDialogProps {
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
+  config: Config;
+  updateConfig: (newConfig: Partial<Config>) => void;
+}
+
+const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
+  isOpen,
+  onOpenChange,
+  config,
+  updateConfig,
+}) => {
+  const [currentUserName, setCurrentUserName] = useState(config?.userName || '');
+  const [currentUserProfile, setCurrentUserProfile] = useState(config?.userProfile || '');
+
+  useEffect(() => {
+    if (isOpen) {
+      setCurrentUserName(config?.userName || '');
+      setCurrentUserProfile(config?.userProfile || '');
+    }
+  }, [isOpen, config?.userName, config?.userProfile]);
+
+  const handleSave = () => {
+    updateConfig({ userName: currentUserName, userProfile: currentUserProfile });
+    onOpenChange(false);
+    toast.success("Profile updated!");
+  };
+
+  const isDark = config?.theme === 'dark';
+  const controlBg = isDark ? 'bg-[rgba(255,255,255,0.1)]' : 'bg-[rgba(255,250,240,0.4)]';
+  const subtleBorderClass = 'border-[var(--text)]/10';
+  const inputHeight = 'h-10';
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+      <DialogOverlay className="bg-black/60" />
+      <DialogContent
+        className={cn(
+          "bg-[var(--bg)] text-[var(--text)] border-[var(--text)]",
+          "rounded-lg shadow-xl p-0",
+          "max-w-xs"
+        )}
+      >
+        <DialogHeader className="px-6 py-4 border-b border-[var(--text)]/10">
+          <DialogTitle className="text-lg font-semibold text-[var(--text)]">Edit Profile</DialogTitle>
+          <DialogDescription className="text-sm text-[var(--text)] opacity-80">
+            Set your display name and profile information. (For chat and export purposes)
+          </DialogDescription>
+        </DialogHeader>
+        <div className="px-6 py-5 space-y-4">
+          <div className="space-y-1.5">
+            <Label htmlFor="username" className="text-sm font-medium text-[var(--text)] opacity-90">
+              Username
+            </Label>
+            <Input
+              id="username"
+              value={currentUserName}
+              onChange={(e) => setCurrentUserName(e.target.value)}
+              placeholder="Your display name"
+              className={cn(
+                controlBg, subtleBorderClass, inputHeight,
+                "text-[var(--text)] rounded-md shadow-sm w-full",
+                "focus:border-[var(--active)] focus:ring-1 focus:ring-[var(--active)]",
+                "hover:border-[var(--active)] hover:brightness-98",
+                "placeholder:text-muted-foreground"
+              )}
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="userprofile" className="text-sm font-medium text-[var(--text)] opacity-90">
+              User Profile
+            </Label>
+            <Input
+              id="userprofile"
+              value={currentUserProfile}
+              onChange={(e) => setCurrentUserProfile(e.target.value)}
+              placeholder="Your profile information (e.g., bio, link)"
+              className={cn(
+                controlBg, subtleBorderClass, inputHeight,
+                "text-[var(--text)] rounded-md shadow-sm w-full",
+                "focus:border-[var(--active)] focus:ring-1 focus:ring-[var(--active)]",
+                "hover:border-[var(--active)] hover:brightness-98",
+                "placeholder:text-muted-foreground"
+              )}
+            />
+          </div>
+        </div>
+        <DialogFooter className="px-6 py-4 border-t border-[var(--text)]/10">
+          <Button
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            className="text-[var(--text)] border-[var(--text)]/50 hover:bg-[var(--text)]/10"
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleSave}
+            className="bg-[var(--active)] text-[var(--bg)] hover:brightness-110"
+          >
+            Save Changes
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
 
 interface HeaderProps {
   chatTitle?: string | null;
@@ -531,15 +609,15 @@ interface HeaderProps {
   setSettingsMode: (mode: boolean) => void;
   historyMode: boolean;
   setHistoryMode: (mode: boolean) => void;
-  deleteAll: () => void | Promise<void>; 
+  deleteAll: () => void | Promise<void>;
   reset: () => void;
   downloadImage: () => void;
   downloadJson: () => void;
   downloadText: () => void;
   chatMode: ChatMode;
   chatStatus: ChatStatus;
-
 }
+
 export const Header: React.FC<HeaderProps> = ({
   chatTitle,
   settingsMode,
@@ -556,6 +634,7 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   const { config, updateConfig } = useConfig();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [isEditProfileDialogOpen, setIsEditProfileDialogOpen] = useState(false);
   const currentPersona = config?.persona || 'default';
   const personaImageSrc = personaImages[currentPersona] || personaImages.default;
 
@@ -566,7 +645,7 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   const showBackButton = settingsMode || historyMode;
-  
+
   const handleLeftButtonClick = () => {
     if (showBackButton) {
       setSettingsMode(false);
@@ -605,16 +684,16 @@ export const Header: React.FC<HeaderProps> = ({
               Cancel
             </Button>
             <Button
-              variant="default" 
+              variant="default"
               size="sm"
               className={cn(
-                "bg-red-600 text-white hover:bg-red-700", 
+                "bg-red-600 text-white hover:bg-red-700",
                 "focus:ring-1 focus:ring-red-400 focus:ring-offset-1 focus:ring-offset-[var(--bg)]"
               )}
               onClick={async () => {
                 try {
                   if (typeof deleteAll === 'function') {
-                    await deleteAll(); 
+                    await deleteAll();
                   } else {
                     console.error("Header: deleteAll prop is not a function or undefined.", deleteAll);
                     toast.error("Failed to delete history: Operation not available.");
@@ -640,16 +719,24 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   const sideContainerWidthClass = "w-24";
+  // Make right container width same as left for symmetry
+  const rightSideContainerWidthClass = sideContainerWidthClass;
+
+  const dropdownContentClasses = "z-50 min-w-[6rem] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md animate-in data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2";
+  const dropdownItemClasses = "flex cursor-default select-none items-center rounded-sm px-2 py-1 text-sm outline-none transition-colors focus:bg-accent focus:text-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50";
+  const dropdownSubTriggerClasses = "flex cursor-default select-none items-center rounded-sm px-2 py-1 text-sm outline-none focus:bg-accent data-[state=open]:bg-accent";
+  const dropdownSeparatorClasses = "-mx-1 my-1 h-px bg-muted";
+
 
   return (
     <TooltipProvider delayDuration={500}>
       <div
         className={cn(
-          "border-b border-[var(--text)]/20", // Changed: Removed background, subtler border
+          "border-b border-[var(--text)]/20",
           "sticky top-0 z-10 p-0"
         )}
       >
-        <div className="flex items-center h-auto py-0.5 px-3"> {/* Overall padding for header content */}
+        <div className="flex items-center h-auto py-0.5 px-2">
           {/* Left Button Area */}
           <div className={cn("flex justify-start items-center min-h-10", sideContainerWidthClass)}>
             <Tooltip>
@@ -660,7 +747,7 @@ export const Header: React.FC<HeaderProps> = ({
                   size={showBackButton ? "sm" : undefined}
                   className={cn(
                     "text-[var(--text)] hover:bg-black/10 dark:hover:bg-white/10 rounded-md",
-                    !showBackButton && "px-2 py-[3px] h-auto" // Custom padding for Avatar version
+                    !showBackButton && "px-2 py-[3px] h-auto"
                   )}
                   onClick={handleLeftButtonClick}
                 >
@@ -694,15 +781,15 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
 
           {/* Middle Content Area */}
-          <div className="flex-grow flex justify-center items-center overflow-hidden px-2">
+          <div className="flex-grow flex justify-center items-center overflow-hidden px-1">
             {visibleTitle && (
-              <p className="text-lg font-semibold text-[var(--text)] italic whitespace-nowrap overflow-hidden text-ellipsis text-center">
+              <p className="text-sm font-semibold text-[var(--text)] whitespace-nowrap overflow-hidden text-ellipsis text-center">
                 {chatTitle}
               </p>
             )}
             {!visibleTitle && !historyMode && !settingsMode && (
               <Badge>
-                {config?.selectedModel || 'No Model Selected'} {/* Changed: Show only model name */}
+                {config?.selectedModel || 'No Model Selected'}
               </Badge>
             )}
             {settingsMode && (
@@ -714,7 +801,7 @@ export const Header: React.FC<HeaderProps> = ({
             )}
             {historyMode && (
               <div className="flex items-center justify-center">
-                <p className="font-['Bruno_Ace_SC'] text-lg text-[var(--text)] whitespace-nowrap">
+                <p className="font-['Bruno_Ace_SC'] text-lg text-[var(--text)] whitespace-nowrap text-center">
                   Chat History
                 </p>
               </div>
@@ -722,24 +809,118 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
 
           {/* Right Button Area */}
-          <div className={cn("flex justify-end items-center min-h-10", sideContainerWidthClass)}>
+          {/* Removed -ml-2 from this container for symmetrical spacing */}
+          <div className={cn("flex justify-end items-center min-h-10", rightSideContainerWidthClass)}>
             {!settingsMode && !historyMode && (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    aria-label="Reset Chat"
-                    variant="ghost"
-                    size="sm" // Consistent size for icon button
-                    className="text-[var(--text)] hover:bg-black/10 dark:hover:bg-white/10 rounded-md"
-                    onClick={reset}
-                  >
-                    <FiTrash2 size="18px" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent side="bottom" className="bg-[var(--active)]/50 text-[var(--text)] border-[var(--text)]">
-                  Reset Chat
-                </TooltipContent>
-              </Tooltip>
+              <>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      aria-label="Reset Chat"
+                      variant="ghost"
+                      size="sm"
+                      className="text-[var(--text)] hover:bg-black/10 dark:hover:bg-white/10 rounded-md"
+                      onClick={reset}
+                    >
+                      <FiTrash2 size="18px" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom" className="bg-[var(--active)]/50 text-[var(--text)] border-[var(--text)]">
+                    Reset Chat
+                  </TooltipContent>
+                </Tooltip>
+
+                {/* Share Button with Radix Dropdown Menu */}
+                <DropdownMenuPrimitive.Root>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <DropdownMenuPrimitive.Trigger asChild>
+                        <Button
+                          aria-label="Share Options"
+                          variant="ghost"
+                          size="sm"
+                          className="-ml-2 text-[var(--text)] hover:bg-black/10 dark:hover:bg-white/10 rounded-md" // -ml-2 here is on the button, which is fine for inter-button spacing
+                        >
+                          <PiShareFatThin size="18px" />
+                        </Button>
+                      </DropdownMenuPrimitive.Trigger>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom" className="bg-[var(--active)]/50 text-[var(--text)] border-[var(--text)]">
+                      Share Options
+                    </TooltipContent>
+                  </Tooltip>
+                  <DropdownMenuPrimitive.Portal>
+                    <DropdownMenuPrimitive.Content
+                      className={cn(
+                        dropdownContentClasses,
+                        "bg-[var(--bg)] text-[var(--text)] border-[var(--text)]/20 shadow-xl"
+                      )}
+                      sideOffset={5}
+                      align="end"
+                    >
+                      <DropdownMenuPrimitive.Item
+                        className={cn(
+                          dropdownItemClasses,
+                          "hover:bg-[var(--active)]/30 focus:bg-[var(--active)]/30 cursor-pointer"
+                        )}
+                        onSelect={() => setIsEditProfileDialogOpen(true)}
+                      >
+                        <RxAvatar className="mr-auto h-4 w-4" />
+                        Edit Profile
+                      </DropdownMenuPrimitive.Item>
+                      <DropdownMenuPrimitive.Separator
+                        className={cn(
+                          dropdownSeparatorClasses,
+                          "bg-[var(--text)]/10"
+                        )}
+                      />
+                      <DropdownMenuPrimitive.Sub>
+                        <DropdownMenuPrimitive.SubTrigger
+                          className={cn(
+                            dropdownSubTriggerClasses,
+                            "hover:bg-[var(--active)]/30 focus:bg-[var(--active)]/30 cursor-pointer"
+                          )}
+                        >
+                        <IoChevronBack className="mr-auto h-4 w-4" />
+                          Export Chat
+                        </DropdownMenuPrimitive.SubTrigger>
+                        <DropdownMenuPrimitive.Portal>
+                          <DropdownMenuPrimitive.SubContent
+                            className={cn(
+                              dropdownContentClasses,
+                              "bg-[var(--bg)] text-[var(--text)] border-[var(--text)]/20 shadow-lg"
+                            )}
+                            sideOffset={2}
+                            alignOffset={-5}
+                          >
+                            <DropdownMenuPrimitive.Item
+                              className={cn(dropdownItemClasses, "hover:bg-[var(--active)]/30 focus:bg-[var(--active)]/30 cursor-pointer")}
+                              onSelect={downloadText}
+                            >
+                            <CiText className="mr-auto h-4 w-4" />
+                              .txt
+                            </DropdownMenuPrimitive.Item>
+                            <DropdownMenuPrimitive.Item
+                              className={cn(dropdownItemClasses, "hover:bg-[var(--active)]/30 focus:bg-[var(--active)]/30 cursor-pointer")}
+                              onSelect={downloadJson}
+                            >
+                            <TbJson className="mr-auto h-4 w-4" />
+                              .json
+                            </DropdownMenuPrimitive.Item>
+                            <DropdownMenuPrimitive.Item
+                              className={cn(dropdownItemClasses, "hover:bg-[var(--active)]/30 focus:bg-[var(--active)]/30 cursor-pointer")}
+                              onSelect={downloadImage}
+                            >
+                            <CiImageOn className="mr-auto h-4 w-4" />
+                              .png
+                            </DropdownMenuPrimitive.Item>
+                          </DropdownMenuPrimitive.SubContent>
+                        </DropdownMenuPrimitive.Portal>
+                      </DropdownMenuPrimitive.Sub>
+                    </DropdownMenuPrimitive.Content>
+                  </DropdownMenuPrimitive.Portal>
+                </DropdownMenuPrimitive.Root>
+              </>
             )}
             {historyMode && (
               <Tooltip>
@@ -747,7 +928,7 @@ export const Header: React.FC<HeaderProps> = ({
                   <Button
                     aria-label="Delete All History"
                     variant="ghost"
-                    size="sm" // Consistent size for icon button
+                    size="sm"
                     className="text-[var(--text)] hover:bg-black/10 dark:hover:bg-white/10 rounded-md"
                     onClick={handleDeleteAllWithConfirmation}
                   >
@@ -773,9 +954,13 @@ export const Header: React.FC<HeaderProps> = ({
           updateConfig={updateConfig}
           setSettingsMode={setSettingsMode}
           setHistoryMode={setHistoryMode}
-          downloadText={downloadText}
-          downloadJson={downloadJson}
-          downloadImage={downloadImage}
+        />
+
+        <EditProfileDialog
+          isOpen={isEditProfileDialogOpen}
+          onOpenChange={setIsEditProfileDialogOpen}
+          config={config}
+          updateConfig={updateConfig}
         />
       </div>
     </TooltipProvider>

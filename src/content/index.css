@@ -373,9 +373,9 @@ bottom: -0.2em;
 /* --- Global Paper Texture Styles --- */
 
 
-html[data-paper-texture="true"] #radix-\0000ab r2\0000bb ::before { /* Target DrawerBody, escaped for CSS validity */
+html[data-paper-texture="true"] .chatMessage::before {
   content: "";
-  position: fixed; 
+  position: absolute; 
   width: 100%; height: 100%;
   top: 0; left: 0; right: 0; bottom: 0;
   background-image: url('~assets/images/paper-texture.png');
@@ -385,18 +385,31 @@ html[data-paper-texture="true"] #radix-\0000ab r2\0000bb ::before { /* Target Dr
   pointer-events: none;
   mix-blend-mode: multiply;
   filter: contrast(1) brightness(1);
-  z-index: 0; 
+  z-index: 1; 
   border-radius: inherit; 
 }
 
+html[data-paper-texture="true"] .settings-drawer-content::before {
+  content: "";
+  position: absolute; 
+  width: 100%; height: 100%;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-image: url('~assets/images/paper-texture.png');
+  background-size: auto;
+  background-repeat: repeat;
+  opacity: 0.3;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+  filter: contrast(1) brightness(1);
+  z-index: 1; 
+  border-radius: inherit; 
+}
 
-
-/* Texture for individual chat message bubbles (conditional) */
 html[data-paper-texture="true"] #root::before {
   content: "";
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
-  width: 100%; height: 100%; /* Ensure this selector is correct for your #root element context */
+  width: 100%; height: 100%;
   background-image: url('~assets/images/paper-texture.png');
   background-size: 512px;
   background-repeat: repeat;
@@ -404,8 +417,8 @@ html[data-paper-texture="true"] #root::before {
   pointer-events: none;
   mix-blend-mode: multiply; 
   filter: contrast(1) brightness(1);
-  z-index: 1; /* Behind the message content */
-  border-radius: inherit; /* Inherit the bubble's border-radius */
+  z-index: 0;
+  border-radius: inherit;
 }
 
 /* Math rendering (KaTeX) */
@@ -418,7 +431,7 @@ html[data-paper-texture="true"] #root::before {
 }
 
 .not-focus-visible:focus-visible {
-  outline: none !important; /* Removes standard outline */
+  outline: none !important;
   box-shadow: none !important; /* Removes box-shadow based focus */
   --tw-ring-offset-shadow: 0 0 #0000 !important;
   --tw-ring-shadow: 0 0 #0000 !important;

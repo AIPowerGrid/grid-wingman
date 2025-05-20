@@ -206,7 +206,7 @@ export const Input: FC<InputProps> = ({ isLoading, message, setMessage, onSend }
         autoFocus
         onChange={event => setMessage(event.target.value)}
         onKeyDown={handleTextareaKeyDown}
-        className="flex-grow !bg-transparent px-0 py-1.5"
+        className="flex-grow !bg-transparent px-0 py-1"
       />
       {isSpeechRecognitionSupported && (
         <TooltipProvider delayDuration={500}>
