@@ -1,70 +1,93 @@
-import * as React from "react"
-import * as SheetPrimitive from "@radix-ui/react-dialog"
-import { XIcon } from "lucide-react"
+import * as React from "react";
+import * as SheetPrimitive from "@radix-ui/react-dialog"; // Sheet is built on Dialog
+import { XIcon } from "lucide-react";
+import { cn } from "@/src/background/util";
 
-import { cn } from "@/src/background/util"
+// --- SheetContent Variants ---
+const sheetContentVariants = {
+  default: (side: "top" | "right" | "bottom" | "left" = "right") => cn(
+    "bg-background data-[state=open]:animate-in data-[state=closed]:animate-out fixed z-50 flex flex-col gap-4 shadow-lg transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500",
+    side === "right" && "data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right inset-y-0 right-0 h-full w-3/4 border-l sm:max-w-sm",
+    side === "left" && "data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left inset-y-0 left-0 h-full w-3/4 border-r sm:max-w-sm",
+    side === "top" && "data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top inset-x-0 top-0 h-auto border-b",
+    side === "bottom" && "data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom inset-x-0 bottom-0 h-auto border-t"
+  ),
+  themedPanel: (side: "top" | "right" | "bottom" | "left" = "right") => cn(
+    // Base animation and positioning from default
+    "data-[state=open]:animate-in data-[state=closed]:animate-out fixed z-50 flex flex-col gap-4 transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500",
+    side === "right" && "data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right inset-y-0 right-0 h-full border-l", // Removed w-3/4, sm:max-w-sm to be set by consumer
+    side === "left" && "data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left inset-y-0 left-0 h-full border-r", // Removed w-3/4, sm:max-w-sm
+    side === "top" && "data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top inset-x-0 top-0 h-auto border-b",
+    side === "bottom" && "data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom inset-x-0 bottom-0 h-auto border-t",
+    // Theming from header.tsx
+    "bg-[var(--bg)] text-[var(--text)] shadow-xl" // Added shadow-xl from header
+  ),
+};
+
 
 function Sheet({ ...props }: React.ComponentProps<typeof SheetPrimitive.Root>) {
-  return <SheetPrimitive.Root data-slot="sheet" {...props} />
+  return <SheetPrimitive.Root data-slot="sheet" {...props} />;
 }
 
 function SheetTrigger({
   ...props
 }: React.ComponentProps<typeof SheetPrimitive.Trigger>) {
-  return <SheetPrimitive.Trigger data-slot="sheet-trigger" {...props} />
+  return <SheetPrimitive.Trigger data-slot="sheet-trigger" {...props} />;
 }
 
 function SheetClose({
   ...props
 }: React.ComponentProps<typeof SheetPrimitive.Close>) {
-  return <SheetPrimitive.Close data-slot="sheet-close" {...props} />
+  return <SheetPrimitive.Close data-slot="sheet-close" {...props} />;
 }
 
 function SheetPortal({
   ...props
 }: React.ComponentProps<typeof SheetPrimitive.Portal>) {
-  return <SheetPrimitive.Portal data-slot="sheet-portal" {...props} />
+  return <SheetPrimitive.Portal data-slot="sheet-portal" {...props} />;
 }
 
+// Using DialogOverlay from the modified dialog.tsx for consistency if preferred,
+// or keep SheetPrimitive.Overlay if its behavior is distinct.
+// For this example, let's assume Sheet uses its own overlay definition but it's identical to Dialog's default.
 function SheetOverlay({
   className,
   ...props
 }: React.ComponentProps<typeof SheetPrimitive.Overlay>) {
   return (
-    <SheetPrimitive.Overlay
+    <SheetPrimitive.Overlay // Or use your DialogOverlay if it's meant to be shared
       data-slot="sheet-overlay"
       className={cn(
-        "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/50",
+        "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/50", // Default overlay
         className
       )}
       {...props}
     />
-  )
+  );
 }
 
-function SheetContent({
-  className,
-  children,
-  side = "right",
-  ...props
-}: React.ComponentProps<typeof SheetPrimitive.Content> & {
-  side?: "top" | "right" | "bottom" | "left"
-}) {
+interface SheetContentProps
+  extends React.ComponentProps<typeof SheetPrimitive.Content> {
+  side?: "top" | "right" | "bottom" | "left";
+  variant?: "default" | "themedPanel"; // Keyof typeof sheetContentVariants won't work directly with function
+}
+
+const SheetContent = React.forwardRef<
+  React.ElementRef<typeof SheetPrimitive.Content>,
+  SheetContentProps
+>(({ className, children, side = "right", variant = "default", ...props }, ref) => {
+  const variantStyles = variant === "themedPanel"
+    ? sheetContentVariants.themedPanel(side)
+    : sheetContentVariants.default(side);
+
   return (
     <SheetPortal>
-      <SheetOverlay />
+      <SheetOverlay /> {/* This will use the default bg-black/50 */}
       <SheetPrimitive.Content
+        ref={ref}
         data-slot="sheet-content"
         className={cn(
-          "bg-background data-[state=open]:animate-in data-[state=closed]:animate-out fixed z-50 flex flex-col gap-4 shadow-lg transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500",
-          side === "right" &&
-            "data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right inset-y-0 right-0 h-full w-3/4 border-l sm:max-w-sm",
-          side === "left" &&
-            "data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left inset-y-0 left-0 h-full w-3/4 border-r sm:max-w-sm",
-          side === "top" &&
-            "data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top inset-x-0 top-0 h-auto border-b",
-          side === "bottom" &&
-            "data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom inset-x-0 bottom-0 h-auto border-t",
+          variantStyles,
           className
         )}
         {...props}
@@ -76,8 +99,10 @@ function SheetContent({
         </SheetPrimitive.Close>
       </SheetPrimitive.Content>
     </SheetPortal>
-  )
-}
+  );
+});
+SheetContent.displayName = SheetPrimitive.Content.displayName;
+
 
 function SheetHeader({ className, ...props }: React.ComponentProps<"div">) {
   return (
@@ -134,6 +159,6 @@ export {
   SheetFooter,
   SheetTitle,
   SheetDescription,
-  SheetOverlay,
+  SheetOverlay, // Exporting the original SheetOverlay
   SheetPortal,
-}
+};

@@ -2,14 +2,12 @@ import { useState, useEffect, useRef } from 'react';
 import * as React from 'react';
 import { FiSettings, FiX, FiTrash2 } from 'react-icons/fi';
 import { IoMoonOutline, IoSunnyOutline } from 'react-icons/io5';
-import { PiShareFatThin } from "react-icons/pi";
+import { PiShareFatLight } from "react-icons/pi";
 import { useConfig } from './ConfigContext';
 import { useUpdateModels } from './hooks/useUpdateModels';
 import { themes as appThemes, type Theme as AppTheme } from './Themes';
 import { cn } from "@/src/background/util";
-
 import { toast } from 'react-hot-toast';
-
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -56,7 +54,10 @@ import { RxAvatar } from "react-icons/rx";
 import { CiText, CiImageOn } from "react-icons/ci";
 import { TbJson } from "react-icons/tb";
 
-import { Model, ChatMode, ChatStatus } from "@/src/types/config";
+import {type Config, Model, ChatMode, ChatStatus } from "@/src/types/config";
+import { personaImages } from './constants';
+
+const sharedTooltipContentStyle = "bg-[var(--active)]/50 text-[var(--text)] border-[var(--text)]";
 
 function getStatusText(mode: ChatMode, status: ChatStatus): string {
   if (status === 'idle') return 'Online';
@@ -76,20 +77,6 @@ function getStatusText(mode: ChatMode, status: ChatStatus): string {
   return 'Online';
 }
 
-interface Config {
-  theme?: string;
-  persona?: string;
-  personas?: Record<string, any>;
-  selectedModel?: string;
-  models?: Model[];
-  customTheme?: any;
-  fontSize?: number;
-  generateTitle?: boolean;
-  backgroundImage?: boolean;
-  userName?: string;
-  userProfile?: string;
-}
-
 interface WelcomeModalProps {
   isOpen: boolean;
   onClose: (open: boolean) => void;
@@ -97,11 +84,10 @@ interface WelcomeModalProps {
 }
 const WelcomeModal: React.FC<WelcomeModalProps> = ({ isOpen, onClose, setSettingsMode }) => (
   <Dialog open={isOpen} onOpenChange={onClose}>
-    <DialogOverlay className="bg-black/60" />
     <DialogContent
-      className={cn(
-          "bg-[var(--bg)] text-[var(--text)] border-[var(--text)]",
-          "rounded-lg shadow-lg p-0 max-w-[240px] max-h-[140px]",
+      variant="themedPanel" // Using new variant
+      className={cn( 
+          "max-w-[240px] max-h-[140px]",
           "[&>button]:hidden"
       )}
       onInteractOutside={(e) => e.preventDefault()}
@@ -119,13 +105,10 @@ const WelcomeModal: React.FC<WelcomeModalProps> = ({ isOpen, onClose, setSetting
               variant="outline"
               className={cn(
                   "bg-[var(--active)] text-[var(--text)] border-[var(--text)]",
-                  "rounded-xl shadow-sm px-1 py-1 h-auto",
-                  "text-sm",
+                  "rounded-xl shadow-sm px-1 py-1 h-auto text-sm",
                   "hover:brightness-95 hover:shadow-md active:brightness-90"
               )}
-              onClick={() => {
-                  setSettingsMode(true);
-              }}
+              onClick={() => setSettingsMode(true)}
             >
               <FiSettings className="size-3" /> Connect
             </Button>
@@ -148,28 +131,6 @@ const Badge = ({ children }: { children: React.ReactNode }) => (
     {children}
   </div>
 );
-
-const personaImages: {
-  Agatha: string;
-  Spike: string;
-  Warren: string;
-  Jet: string;
-  Jan: string;
-  Sherlock: string;
-  Ein: string;
-  Faye: string;
-  default: string;
-  [key: string]: string | undefined;
-} = {  Agatha: 'assets/images/agatha.png',
-  Spike: 'assets/images/spike.png',
-  Warren: 'assets/images/warren.png',
-  Jet: 'assets/images/jet.png',
-  Jan: 'assets/images/jan.png',
-  Sherlock: 'assets/images/Cognito.png',
-  Ein: 'assets/images/ein.png',
-  Faye:'assets/images/faye.png',
-  default: 'assets/images/custom.png'
-};
 
 const SheetThemeButton = ({ theme, updateConfig, size = "h-7 w-7" }: { theme: AppTheme; updateConfig: (newConfig: Partial<Config>) => void; size?: string }) => (
   <Tooltip>
@@ -242,13 +203,7 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
   };
 
   const isDark = config?.theme === 'dark';
-  const subtleBorderClass = 'border-[var(--text)]/10';
-  const controlBg = isDark ? 'bg-[rgba(255,255,255,0.1)]' : 'bg-[rgba(255,250,240,0.4)]';
-  const inputHeight = 'h-9';
   const sectionPaddingX = 'px-6';
-  const controlFilter = 'brightness-102 contrast-98';
-  const buttonHeight = 'h-9';
-  const controlSize = 'default';
 
   const handleConfigClick = () => {
     setSettingsMode(true);
@@ -264,16 +219,17 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
 
   return (
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
-        <SheetOverlay className="bg-black/50" />
+        <SheetOverlay /> {/* Uses default SheetOverlay, bg-black/50 */}
         <SheetContent
+           variant="themedPanel" // Using new variant
            side="left"
-           className={cn(
+           className={cn( // Specific layout overrides for SettingsSheet
              "w-[320px] sm:w-[380px]",
-             "bg-[var(--bg)] text-[var(--text)]",
-             "p-0 border-r-0 shadow-xl flex flex-col h-full max-h-screen",
+             "p-0 border-r-0", 
+             "flex flex-col h-full max-h-screen",
              "[&>button]:hidden",
              "settings-drawer-content",
-             "overflow-y-auto",
+             "overflow-y-auto"
             )}
             style={{ height: '100dvh' }}
             ref={sheetContentRef}
@@ -286,33 +242,21 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
              <div className="flex items-center justify-between mb-2 relative z-10">
                <Tooltip>
                  <TooltipTrigger asChild>
-                   <Button
-                     variant="ghost"
-                     size="sm"
-                     aria-label={isDark ? 'Light' : 'Dark'}
-                     onClick={toggleTheme}
-                     className="text-[var(--text)] hover:bg-black/10 dark:hover:bg-white/10 rounded-md "
-                   >
+                   <Button variant="ghost" size="sm" aria-label={isDark ? 'Light' : 'Dark'} onClick={toggleTheme} className="text-[var(--text)] hover:bg-black/10 dark:hover:bg-white/10 rounded-md ">
                      {isDark ? <IoSunnyOutline size="20px" /> : <IoMoonOutline size="20px" />}
                    </Button>
                  </TooltipTrigger>
-                 <TooltipContent side="bottom" className="bg-[var(--active)]/50 text-[var(--text)] border-[var(--text)]">
+                 <TooltipContent side="bottom" className={sharedTooltipContentStyle}>
                    {isDark ? 'Light' : 'Dark'}
                  </TooltipContent>
                </Tooltip>
                <Tooltip>
                  <TooltipTrigger asChild>
-                   <Button
-                     variant="ghost" size="sm" aria-label="Close Settings"
-                     className="text-[var(--text)] hover:bg-black/10 dark:hover:bg-white/10 rounded-md relative top-[1px]"
-                     onClick={() => onOpenChange(false)}
-                   >
+                   <Button variant="ghost" size="sm" aria-label="Close Settings" className="text-[var(--text)] hover:bg-black/10 dark:hover:bg-white/10 rounded-md relative top-[1px]" onClick={() => onOpenChange(false)}>
                      <FiX size="20px" />
                    </Button>
                  </TooltipTrigger>
-                 <TooltipContent side="bottom" className="bg-[var(--active)]/50 text-[var(--text)] border-[var(--text)]">
-                   Close Settings
-                 </TooltipContent>
+                 <TooltipContent side="bottom" className={sharedTooltipContentStyle}> Close Settings </TooltipContent>
                </Tooltip>
              </div>
              <SheetTitle className="text-center font-['Orbitron',_sans-serif] tracking-tight -mt-10">
@@ -354,24 +298,13 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
                     >
                       <SelectTrigger
                         id="persona-select"
-                        className={cn(
-                          controlBg,
-                          subtleBorderClass,
-                          inputHeight,
-                          "text-[var(--text)] rounded-xl shadow-md w-full",
-                          "focus:border-[var(--active)] focus:ring-1 focus:ring-[var(--active)]",
-                          "hover:border-[var(--active)] hover:brightness-98",
-                          "data-[placeholder]:text-muted-foreground"
-                        )}
-                        style={{ filter: controlFilter }}
+                        variant="settingsPanel" // Using new variant
+                        className="w-full data-[placeholder]:text-muted-foreground"
                       >
                         <SelectValue placeholder="Select Persona..." />
                       </SelectTrigger>
                       <SelectContent
-                          className={cn(
-                            "bg-[var(--bg)] text-[var(--text)] border border-[var(--text)]/10",
-                            "rounded-md shadow-lg"
-                          )}
+                        variant="settingsPanel" // Using new variant for the dropdown panel
                       >
                         {Object.keys(config?.personas || {}).map((p) => (
                           <SelectItem key={p} value={p} className="hover:brightness-95 focus:bg-[var(--active)]">
@@ -384,9 +317,7 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
                 </div>
 
                 <div>
-                  <label htmlFor="model-input" className="block text-[var(--text)] opacity-80 text-lg font-medium uppercase">
-                    Model
-                  </label>
+                  <label htmlFor="model-input" className="block text-[var(--text)] opacity-80 text-lg font-medium uppercase">Model</label>
                   <div className="relative">
                     <Input
                        id="model-input"
@@ -404,13 +335,13 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
                        }}
                        onBlur={() => setTimeout(() => setInputFocused(false), 200)}
                        className={cn(
-                         controlBg, subtleBorderClass, inputHeight,
-                         "text-[var(--text)] rounded-xl shadow-md",
+                         "text-[var(--text)] rounded-xl shadow-md h-9", // Manually applying if Input not refactored
+                         "bg-[rgba(255,250,240,0.4)] dark:bg-[rgba(255,255,255,0.1)]",
+                         "border-[var(--text)]/10",
                          "focus:border-[var(--active)] focus:ring-1 focus:ring-[var(--active)]",
                          "hover:border-[var(--active)] hover:brightness-98",
                          "placeholder:text-muted-foreground"
                        )}
-                       style={{ filter: controlFilter }}
                     />
                     {inputFocused && (
                        <ScrollArea
@@ -459,27 +390,27 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
                 </div>
 
                  <div className="space-y-3">
-                    <Button
-                      variant="outline" size={controlSize} onClick={handleConfigClick}
-                      className={cn(
-                        controlBg, subtleBorderClass, buttonHeight,
-                        "text-[var(--text)] rounded-xl shadow-md w-full justify-start font-medium",
+                    <Button // Assuming Button has a 'settingsPanelAction' variant
+                      size="default" onClick={handleConfigClick}
+                      className={cn( // Manually applying if Button not refactored
+                        "text-[var(--text)] rounded-xl shadow-md w-full justify-start font-medium h-9",
+                        "bg-[rgba(255,250,240,0.4)] dark:bg-[rgba(255,255,255,0.1)]",
+                        "border-[var(--text)]/10",
                         "hover:border-[var(--active)] hover:brightness-98 active:bg-[var(--active)] active:brightness-95",
                         "focus:ring-1 focus:ring-[var(--active)]"
                       )}
-                      style={{ filter: controlFilter }}
                     >
                       Configuration
                     </Button>
-                    <Button
-                       variant="outline" size={controlSize} onClick={handleHistoryClick}
-                       className={cn(
-                         controlBg, subtleBorderClass, buttonHeight,
-                         "text-[var(--text)] rounded-xl shadow-md w-full justify-start font-medium",
-                         "hover:border-[var(--active)] hover:brightness-98 active:bg-[var(--active)] active:brightness-95",
-                         "focus:ring-1 focus:ring-[var(--active)]"
+                    <Button // Assuming Button has a 'settingsPanelAction' variant
+                       size="default" onClick={handleHistoryClick}
+                       className={cn( // Manually applying if Button not refactored
+                        "text-[var(--text)] rounded-xl shadow-md w-full justify-start font-medium h-9",
+                        "bg-[rgba(255,250,240,0.4)] dark:bg-[rgba(255,255,255,0.1)]",
+                        "border-[var(--text)]/10",
+                        "hover:border-[var(--active)] hover:brightness-98 active:bg-[var(--active)] active:brightness-95",
+                        "focus:ring-1 focus:ring-[var(--active)]"
                        )}
-                       style={{ filter: controlFilter }}
                     >
                       Chat History
                     </Button>
@@ -530,13 +461,9 @@ const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogOverlay className="bg-black/60" />
       <DialogContent
-        className={cn(
-          "bg-[var(--bg)] text-[var(--text)] border-[var(--text)]",
-          "rounded-lg shadow-xl p-0",
-          "max-w-xs"
-        )}
+        variant="themedPanel" // Using new variant
+        className="max-w-xs" // Specific width override
       >
         <DialogHeader className="px-6 py-4 border-b border-[var(--text)]/10">
           <DialogTitle className="text-lg font-semibold text-[var(--text)]">Edit Profile</DialogTitle>
@@ -544,19 +471,17 @@ const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
             Set your display name and profile information. (For chat and export purposes)
           </DialogDescription>
         </DialogHeader>
-        <div className="px-6 py-5 space-y-4">
+        <div className="px-6 py-5 space-y-4"> {/* Padding re-added */}
           <div className="space-y-1.5">
             <Label htmlFor="username" className="text-sm font-medium text-[var(--text)] opacity-90">
               Username
             </Label>
             <Input
               id="username"
-              value={currentUserName}
-              onChange={(e) => setCurrentUserName(e.target.value)}
-              placeholder="Your display name"
-              className={cn(
-                controlBg, subtleBorderClass, inputHeight,
-                "text-[var(--text)] rounded-md shadow-sm w-full",
+              className={cn( // Manually applying if Input not refactored
+                "text-[var(--text)] rounded-md shadow-sm w-full h-10",
+                "bg-[rgba(255,250,240,0.4)] dark:bg-[rgba(255,255,255,0.1)]",
+                "border-[var(--text)]/10",
                 "focus:border-[var(--active)] focus:ring-1 focus:ring-[var(--active)]",
                 "hover:border-[var(--active)] hover:brightness-98",
                 "placeholder:text-muted-foreground"
@@ -569,12 +494,10 @@ const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
             </Label>
             <Input
               id="userprofile"
-              value={currentUserProfile}
-              onChange={(e) => setCurrentUserProfile(e.target.value)}
-              placeholder="Your profile information (e.g., bio, link)"
-              className={cn(
-                controlBg, subtleBorderClass, inputHeight,
-                "text-[var(--text)] rounded-md shadow-sm w-full",
+              className={cn( // Manually applying if Input not refactored
+                "text-[var(--text)] rounded-md shadow-sm w-full h-10",
+                "bg-[rgba(255,250,240,0.4)] dark:bg-[rgba(255,255,255,0.1)]",
+                "border-[var(--text)]/10",
                 "focus:border-[var(--active)] focus:ring-1 focus:ring-[var(--active)]",
                 "hover:border-[var(--active)] hover:brightness-98",
                 "placeholder:text-muted-foreground"
@@ -719,14 +642,11 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   const sideContainerWidthClass = "w-24";
-  // Make right container width same as left for symmetry
   const rightSideContainerWidthClass = sideContainerWidthClass;
-
   const dropdownContentClasses = "z-50 min-w-[6rem] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md animate-in data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2";
   const dropdownItemClasses = "flex cursor-default select-none items-center rounded-sm px-2 py-1 text-sm outline-none transition-colors focus:bg-accent focus:text-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50";
   const dropdownSubTriggerClasses = "flex cursor-default select-none items-center rounded-sm px-2 py-1 text-sm outline-none focus:bg-accent data-[state=open]:bg-accent";
   const dropdownSeparatorClasses = "-mx-1 my-1 h-px bg-muted";
-
 
   return (
     <TooltipProvider delayDuration={500}>
@@ -809,7 +729,6 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
 
           {/* Right Button Area */}
-          {/* Removed -ml-2 from this container for symmetrical spacing */}
           <div className={cn("flex justify-end items-center min-h-10", rightSideContainerWidthClass)}>
             {!settingsMode && !historyMode && (
               <>
@@ -841,7 +760,7 @@ export const Header: React.FC<HeaderProps> = ({
                           size="sm"
                           className="-ml-2 text-[var(--text)] hover:bg-black/10 dark:hover:bg-white/10 rounded-md" // -ml-2 here is on the button, which is fine for inter-button spacing
                         >
-                          <PiShareFatThin size="18px" />
+                          <PiShareFatLight size="18px" />
                         </Button>
                       </DropdownMenuPrimitive.Trigger>
                     </TooltipTrigger>

@@ -1,27 +1,6 @@
 import { cn } from "@/src/background/util";
 import { useConfig } from './ConfigContext';
-
-const personaImages: {
-  Agatha: string;
-  Spike: string;
-  Warren: string;
-  Jet: string;
-  Jan: string;
-  Sherlock: string;
-  Ein: string;
-  Faye: string;
-  default: string;
-  [key: string]: string | undefined;
-} = {  Agatha: 'assets/images/agatha.png',
-  Spike: 'assets/images/spike.png',
-  Warren: 'assets/images/warren.png',
-  Jet: 'assets/images/jet.png',
-  Jan: 'assets/images/jan.png',
-  Sherlock: 'assets/images/Cognito.png',
-  Ein: 'assets/images/ein.png',
-  Faye:'assets/images/faye.png',
-  default: 'assets/images/custom.png'
-};
+import { personaImages } from "./constants";
 
 export const Background = () => {
   const { config } = useConfig();
