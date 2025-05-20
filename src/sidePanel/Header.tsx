@@ -225,9 +225,9 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
            side="left"
            className={cn( // Specific layout overrides for SettingsSheet
              "w-[320px] sm:w-[380px]",
-             "p-0 border-r-0", 
+             "p-0 border-r-0", // p-0 from variant, border-r-0 specific here
              "flex flex-col h-full max-h-screen",
-             "[&>button]:hidden",
+             "[&>button]:hidden", // Hides default close button from SheetContent
              "settings-drawer-content",
              "overflow-y-auto"
             )}
@@ -238,8 +238,8 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
               sheetContentRef.current?.focus({ preventScroll: true });
             }}
         >
-          <SheetHeader className="px-4 pt-3 pb-3">
-             <div className="flex items-center justify-between mb-2 relative z-10">
+          <SheetHeader className="px-4 pt-3 pb-3"> {/* Specific padding for this header */}
+            <div className="flex items-center justify-between mb-2 relative z-10">
                <Tooltip>
                  <TooltipTrigger asChild>
                    <Button variant="ghost" size="sm" aria-label={isDark ? 'Light' : 'Dark'} onClick={toggleTheme} className="text-[var(--text)] hover:bg-black/10 dark:hover:bg-white/10 rounded-md ">
@@ -454,16 +454,11 @@ const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
     toast.success("Profile updated!");
   };
 
-  const isDark = config?.theme === 'dark';
-  const controlBg = isDark ? 'bg-[rgba(255,255,255,0.1)]' : 'bg-[rgba(255,250,240,0.4)]';
-  const subtleBorderClass = 'border-[var(--text)]/10';
-  const inputHeight = 'h-10';
-
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent
-        variant="themedPanel" // Using new variant
-        className="max-w-xs" // Specific width override
+        variant="themedPanel"
+        className="max-w-xs"
       >
         <DialogHeader className="px-6 py-4 border-b border-[var(--text)]/10">
           <DialogTitle className="text-lg font-semibold text-[var(--text)]">Edit Profile</DialogTitle>
@@ -471,14 +466,16 @@ const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
             Set your display name and profile information. (For chat and export purposes)
           </DialogDescription>
         </DialogHeader>
-        <div className="px-6 py-5 space-y-4"> {/* Padding re-added */}
+        <div className="px-6 py-5 space-y-4">
           <div className="space-y-1.5">
             <Label htmlFor="username" className="text-sm font-medium text-[var(--text)] opacity-90">
               Username
             </Label>
             <Input
               id="username"
-              className={cn( // Manually applying if Input not refactored
+              value={currentUserName}
+              onChange={(e) => setCurrentUserName(e.target.value)}
+              className={cn(
                 "text-[var(--text)] rounded-md shadow-sm w-full h-10",
                 "bg-[rgba(255,250,240,0.4)] dark:bg-[rgba(255,255,255,0.1)]",
                 "border-[var(--text)]/10",
@@ -494,7 +491,9 @@ const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
             </Label>
             <Input
               id="userprofile"
-              className={cn( // Manually applying if Input not refactored
+              value={currentUserProfile}
+              onChange={(e) => setCurrentUserProfile(e.target.value)}              
+              className={cn(
                 "text-[var(--text)] rounded-md shadow-sm w-full h-10",
                 "bg-[rgba(255,250,240,0.4)] dark:bg-[rgba(255,255,255,0.1)]",
                 "border-[var(--text)]/10",
