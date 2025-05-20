@@ -193,7 +193,10 @@ export const Input: FC<InputProps> = ({ isLoading, message, setMessage, onSend }
   };
 
   return (
-    <div className="flex w-full items-center gap-0 p-0 bg-[var(--card,var(--bg-secondary))] border border-[var(--text)]/20 rounded-lg shadow-md">
+    <div className={cn(
+      "flex w-full items-center gap-0 p-0 bg-[var(--card,var(--bg-secondary))] rounded-lg shadow-md",
+      config?.theme === 'dark' ? 'border border-[var(--active)]' : 'border border-[var(--text)]/20'
+    )}>
       <AddToChat /> 
       <AutoResizeTextarea
         ref={ref}

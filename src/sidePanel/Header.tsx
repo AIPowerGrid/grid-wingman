@@ -651,7 +651,7 @@ export const Header: React.FC<HeaderProps> = ({
     <TooltipProvider delayDuration={500}>
       <div
         className={cn(
-          "border-b border-[var(--text)]/20",
+          config?.theme === 'dark' ? 'border border-[var(--active)]' : 'border border-[var(--text)]/20',
           "sticky top-0 z-10 p-0"
         )}
       >
