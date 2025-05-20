@@ -332,7 +332,7 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
                       <label htmlFor="persona-select" className="text-[var(--text)] opacity-80 text-lg font-medium uppercase shrink-0">
                         Persona
                       </label>
-                      <Avatar className="h-8 w-8 border border-[var(--text)]/10">
+                      <Avatar className="h-8 w-8 border border-[var(--active)]">
                         <AvatarImage src={personaImageSrc} alt={currentPersona} />
                         <AvatarFallback>{currentPersona.substring(0, 1).toUpperCase()}</AvatarFallback>
                       </Avatar>
@@ -755,7 +755,7 @@ export const Header: React.FC<HeaderProps> = ({
                     <FiX size="22px" />
                   ) : (
                     <div className="flex items-center space-x-1.5">
-                      <Avatar className="h-8 w-8 border border-[var(--text)]/30">
+                      <Avatar className="h-8 w-8 border border-[var(--active)]">
                         <AvatarImage src={personaImageSrc} alt={currentPersona} />
                         <AvatarFallback>{(currentPersona === 'default' ? 'C' : currentPersona.substring(0, 1)).toUpperCase()}</AvatarFallback>
                       </Avatar>
