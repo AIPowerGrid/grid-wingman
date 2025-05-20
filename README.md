@@ -10,7 +10,6 @@ Built on [sidellama](https://github.com/gyopak/sidellama).
 
 *   Bug fixes and improvements.
 *   Evaluate and integrate pull requests.
-*   Better local TTS/STT by API. [not important]
 ---
 
 *   Replace 'deep research' with local/basic API services (even free tier)
@@ -18,6 +17,8 @@ Built on [sidellama](https://github.com/gyopak/sidellama).
 *   "Short Memory"(state) for web search and page parsing in the same task. Comparison mode.
 *   Edit text content directly from sidepanel. Basically, I want to extend this to the "AI agent".
 *   Add to note function (webpage, chat)
+*   Better local TTS/STT by API. [add https://github.com/rhulha/StreamingKokoroJS to my extension, thanks for your code in advance.] 
+
 
 [^1]: Consider it's done. Kiwix search plan abandoned, because it's less useful when it comes to LLM search. Just use the Zim browser locally. LLM won't be helpful if there is no embedding process. For local search, the best/easiest solution I think is to set up a local search index based on https://github.com/stanford-oval/WikiChat option 2, then change the links inside the network.tsx to HTTP://localhost:[your_port_number]. 
 ## Screenshot
@@ -117,6 +118,7 @@ It's outdated, so I deleted it. New Doc needs some time to complete.
 https://github.com/stanford-oval/WikiChat
 [sidellama](https://github.com/gyopak/sidellama).
 https://github.com/AlexBefest/highCompute.py
+https://github.com/rhulha/StreamingKokoroJS
 https://github.com/ken107/piper-browser-extension
 
 ## License
