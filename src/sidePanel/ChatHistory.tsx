@@ -177,13 +177,13 @@ export const ChatHistory = ({ loadChat, onDeleteAll, className }: ChatHistoryPro
   if (allMessagesFromServer.length === 0 && !searchQuery) {
     return (
       <div className={rootComputedClassName}>
-        <div className="p-0 border-b border-border">
+        <div className="p-0 border-b">
           <Input
             type="text"
             placeholder="Search chat history..."
             value={searchQuery}
             onChange={handleSearchChange}
-            className="w-full bg-background text-foreground border-border placeholder:text-muted-foreground"
+            className="w-full bg-background text-foreground placeholder:text-muted-foreground"
           />
         </div>
         <ScrollArea className="flex-1 w-full min-h-0">
@@ -198,13 +198,13 @@ export const ChatHistory = ({ loadChat, onDeleteAll, className }: ChatHistoryPro
   if (filteredMessages.length === 0 && searchQuery) {
     return (
       <div className={rootComputedClassName}>
-        <div className="p-0 border-b border-border">
+        <div className="p-0">
           <Input
             type="text"
             placeholder="Search chat history..."
             value={searchQuery}
             onChange={handleSearchChange}
-            className="w-full bg-background text-foreground border-border placeholder:text-muted-foreground"
+            className="w-full bg-background text-foreground placeholder:text-muted-foreground"
           />
         </div>
         <ScrollArea className="flex-1 w-full min-h-0">
@@ -218,13 +218,13 @@ export const ChatHistory = ({ loadChat, onDeleteAll, className }: ChatHistoryPro
 
   return (
     <div className={rootComputedClassName}>
-       <div className="p-0 border-b border-border">
+       <div className="p-0">
         <Input
           type="text"
           placeholder="Search chat history (titles & content)..."
           value={searchQuery}
           onChange={handleSearchChange}
-          className="w-full bg-background text-foreground border-border placeholder:text-muted-foreground"
+          className="w-full bg-background rounded-none text-foreground placeholder:text-muted-foreground"
         />
       </div>     
       <ScrollArea
