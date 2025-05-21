@@ -14,8 +14,7 @@ import { useState } from 'react';
 export const Settings = () => {
   const { config } = useConfig();
   const [showWarning, setShowWarning] = useState(!config?.models || config.models.length === 0);
-  const [accordionValue, setAccordionValue] = useState<string | undefined>(undefined);
-
+  const [accordionValue, setAccordionValue] = useState<string>("");
   return (
     <div
       id="settings"
