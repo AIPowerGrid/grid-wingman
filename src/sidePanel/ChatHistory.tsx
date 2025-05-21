@@ -177,13 +177,13 @@ export const ChatHistory = ({ loadChat, onDeleteAll, className }: ChatHistoryPro
   if (allMessagesFromServer.length === 0 && !searchQuery) {
     return (
       <div className={rootComputedClassName}>
-        <div className="p-0 border-b">
+        <div className="p-0">
           <Input
             type="text"
             placeholder="Search chat history..."
             value={searchQuery}
             onChange={handleSearchChange}
-            className="w-full bg-background text-foreground placeholder:text-muted-foreground"
+            className="w-full bg-background rounded-none text-foreground placeholder:text-muted-foreground"
           />
         </div>
         <ScrollArea className="flex-1 w-full min-h-0">
