@@ -27,7 +27,7 @@ export const personas = {
 };
 
 const defaultConfig: Config = {
-  theme: 'moss',
+  theme: 'dark',
   customTheme: {
     active: '#7eaa6e',
     bg: '#c2e7b5',
@@ -48,7 +48,7 @@ const defaultConfig: Config = {
   personas,
   generateTitle: true,
   backgroundImage: false,
-  persona: 'Ein',
+  persona: 'Sherlock',
   webMode: 'Google',
   webLimit: 60,
   serpMaxLinksToVisit: 3,

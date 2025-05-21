@@ -47,9 +47,6 @@ function SheetPortal({
   return <SheetPrimitive.Portal data-slot="sheet-portal" {...props} />;
 }
 
-// Using DialogOverlay from the modified dialog.tsx for consistency if preferred,
-// or keep SheetPrimitive.Overlay if its behavior is distinct.
-// For this example, let's assume Sheet uses its own overlay definition but it's identical to Dialog's default.
 function SheetOverlay({
   className,
   ...props
@@ -159,6 +156,6 @@ export {
   SheetFooter,
   SheetTitle,
   SheetDescription,
-  SheetOverlay, // Exporting the original SheetOverlay
+  SheetOverlay,
   SheetPortal,
 };

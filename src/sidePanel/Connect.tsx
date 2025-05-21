@@ -63,7 +63,7 @@ export const Connect: FC = () => {
 
   return (
     <AccordionItem
-      value="connections"
+      value="connect"
       className={cn(
         controlBg,
         subtleBorderClass,

@@ -430,16 +430,31 @@ html[data-paper-texture="true"] #root::before {
   padding: 0;
 }
 
-.not-focus-visible:focus-visible {
-  outline: none !important;
-  box-shadow: none !important; /* Removes box-shadow based focus */
-  --tw-ring-offset-shadow: 0 0 #0000 !important;
-  --tw-ring-shadow: 0 0 #0000 !important;
-  --tw-ring-opacity: 0 !important;
-  --tw-ring-offset-width: 0px !important;
-  --tw-ring-width: 0px !important; /* This is often the key for rings */
-}
-
 .focus-visible\:ring-1.focus-visible\:ring-offset-0.focus-visible.AutoResizeTextarea {
   box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1); /* Adjust color and intensity */
 }
+
+.fingerprint-pulse-btn {
+  position: relative;
+  padding: 0.75rem;
+  border-radius: 50%;
+  border: 0px solid var(--active);
+  background: var(--bg, #fff);
+  overflow: visible;
+  box-shadow: 0 0 0 0 var(--active);
+  animation: fingerprint-shadow-pulse 1.5s infinite cubic-bezier(.66,0,0,1);
+  transition: border-color 0.3s;
+}
+
+@keyframes fingerprint-shadow-pulse {
+  0% {
+    box-shadow: 0 0 0 0 var(--active);
+  }
+  70% {
+    box-shadow: 0 0 0 12px rgba(102,215,238,0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(102,215,238,0);
+  }
+}
+

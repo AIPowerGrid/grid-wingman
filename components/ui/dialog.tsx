@@ -6,7 +6,7 @@ import { cn } from "@/src/background/util";
 // --- DialogOverlay Variants ---
 const dialogOverlayVariants = {
   default: "bg-black/50",
-  darker: "bg-black/60", // For the WelcomeModal and EditProfileDialog
+  darker: "bg-black/60",
 };
 
 // --- DialogContent Variants ---
@@ -18,7 +18,7 @@ const dialogContentVariants = {
     "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 fixed top-[50%] left-[50%] z-50 grid w-full translate-x-[-50%] translate-y-[-50%] gap-4 duration-200",
     // Styles from header.tsx dialogs
     "bg-[var(--bg)] text-[var(--text)] border-[var(--text)]",
-    "rounded-lg shadow-xl p-0" // p-0 and shadow-xl common to EditProfileDialog
+    "rounded-lg shadow-xl p-0"
   ),
 };
 
@@ -81,7 +81,7 @@ const DialogContent = React.forwardRef<
 >(({ className, children, variant = "default", ...props }, ref) => {
   return (
     <DialogPortal data-slot="dialog-portal">
-      <DialogOverlay variant={variant === "themedPanel" ? "darker" : "default"} /> {/* Auto-select darker overlay for themedPanel */}
+      <DialogOverlay variant={variant === "themedPanel" ? "darker" : "default"} />
       <DialogPrimitive.Content
         ref={ref}
         data-slot="dialog-content"

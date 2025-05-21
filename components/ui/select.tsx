@@ -3,30 +3,24 @@ import * as SelectPrimitive from "@radix-ui/react-select";
 import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from "lucide-react";
 import { cn } from "@/src/background/util";
 
-// --- SelectTrigger Variants ---
 const selectTriggerVariants = {
   default:
     "border-input bg-transparent data-[placeholder]:text-muted-foreground [&_svg:not([class*='text-'])]:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 dark:hover:bg-input/50 shadow-xs data-[size=default]:h-9 data-[size=sm]:h-8",
   settingsPanel: cn(
-    // Styles from header.tsx for settings controls
     "text-[var(--text)] rounded-xl shadow-md",
     "focus:border-[var(--active)] focus:ring-1 focus:ring-[var(--active)]",
     "hover:border-[var(--active)] hover:brightness-98",
-    // Light/Dark mode for controlBg (assuming --text implies the theme)
     "bg-[rgba(255,250,240,0.4)] dark:bg-[rgba(255,255,255,0.1)]", // This needs to align with your `controlBg` logic
     "border-[var(--text)]/10", // subtleBorderClass
-    "h-9" // inputHeight
+    "h-9"
   ),
 };
 
-// --- SelectContent Variants ---
 const selectContentVariants = {
   default:
     "bg-popover text-popover-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 relative z-50 max-h-(--radix-select-content-available-height) min-w-[8rem] origin-(--radix-select-content-transform-origin) overflow-x-hidden overflow-y-auto rounded-md border shadow-md",
   settingsPanel: cn(
-    // Base styles for Radix SelectContent animation and positioning
     "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 relative z-50 max-h-(--radix-select-content-available-height) min-w-[8rem] origin-(--radix-select-content-transform-origin) overflow-x-hidden overflow-y-auto",
-    // Styles from header.tsx for the dropdown panel
     "bg-[var(--bg)] text-[var(--text)] border border-[var(--text)]/10",
     "rounded-md shadow-lg"
   ),
@@ -100,7 +94,6 @@ const SelectContent = React.forwardRef<
           selectContentVariants[variant], // Apply variant styles
           variant === "default" && position === "popper" && // Original popper positioning for default only
             "data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1",
-          // If 'settingsPanel' variant also needs popper specific translations, add them here or adjust variant
           className
         )}
         position={position}

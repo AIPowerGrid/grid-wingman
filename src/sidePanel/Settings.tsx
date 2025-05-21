@@ -7,32 +7,54 @@ import { Persona } from './Persona';
 import { Themes } from './Themes';
 import { TtsSettings } from './TtsSettings';
 import { WebSearch } from './WebSearch';
-
+import { Button } from '@/components/ui/button';
+import { cn } from 'src/background/util';
+import { useState } from 'react';
 
 export const Settings = () => {
   const { config } = useConfig();
-  const defaultIndex = (config?.models || [])?.length === 0 ? 1 : undefined;
-  const isDark = config?.theme === 'dark';
-
-  const subtleBorderClass = 'border-[var(--text)]/10';
-  const controlBg = isDark
-    ? 'bg-[rgba(255,255,255,0.1)]' 
-    : 'bg-[rgba(255,250,240,0.4)]';
-  const itemShadow = 'shadow-md'; 
-  const itemRounded = 'rounded-xl'; 
+  const [showWarning, setShowWarning] = useState(!config?.models || config.models.length === 0);
+  const [accordionValue, setAccordionValue] = useState<string | undefined>(undefined);
 
   return (
     <div
       id="settings"
       className="relative z-[1] top-0 w-full h-full flex-1 flex-col overflow-y-auto overflow-x-hidden bg-transparent text-foreground px-6 pb-10 pt-[56px] scrollbar-hidden"
       >
+      {/* Add warning box at the top */}
+      {showWarning && (
+        <div className={cn(
+          "mb-4 p-4 rounded-xl",
+          "bg-[var(--active)]/20 border border-[var(--active)]",
+          "text-[var(--text)]"
+        )}>
+          <div className="flex flex-col items-center gap-3">
+            <p className="text-center font-medium">
+              Please connect to your models to start chatting
+            </p>
+            <Button
+              variant="outline"
+              className="border-[var(--active)] hover:bg-[var(--active)]/30"
+              onClick={() => {
+                setAccordionValue("connect");
+                setShowWarning(false);
+              }}
+            >
+              Connect Models
+            </Button>
+          </div>
+        </div>
+      )}
+
       <Accordion
         type="single"
         collapsible
         className="w-full flex flex-col gap-4"
+        value={accordionValue}
+        onValueChange={setAccordionValue}
       >
-        <Themes /> 
         <Connect />
+        <Themes /> 
         <ModelSettingsPanel />
         <Persona />
         <TtsSettings />

@@ -5,21 +5,21 @@ module.exports = {
     "./src/sidePanel/index.html",
   ],
   theme: {
-    extend: {borderColor: {
-      'subtle-light': 'rgba(0, 0, 0, 0.3)',   // For light theme
-      'subtle-dark': 'rgba(255, 255, 255, 0.3)', // For dark theme
+    extend: {
+      borderColor: {
+        'subtle-light': 'rgba(0, 0, 0, 0.3)',
+        'subtle-dark': 'rgba(255, 255, 255, 0.3)',
+      },
       keyframes: {
         "border-pulse": {
-          "0%, 100%": { borderColor: "rgba(var(--ring), 0.5)" }, // Adjust color and opacity as needed
-          "50%": { borderColor: "rgba(var(--ring), 1)" },
+          "0%, 100%": { borderColor: "oklch(from var(--ring) L C H / 0.5)" },
+          "50%": { borderColor: "oklch(from var(--ring) L C H / 1)" },
         },
       },
       animation: {
-        "input-focus": "border-pulse 1.5s ease-in-out infinite", // Adjust duration and easing
+        "input-focus": "border-pulse 1.5s ease-in-out infinite",
       },
     },
   },
-  },
   plugins: [require('tailwindcss-animate'), require('tailwind-scrollbar-hide'), require('tailwind-scrollbar')],
 }
-

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import * as React from 'react';
-import { FiSettings, FiX, FiTrash2 } from 'react-icons/fi';
+import { FiX, FiTrash2 } from 'react-icons/fi';
 import { IoMoonOutline, IoSunnyOutline } from 'react-icons/io5';
 import { PiShareFatLight } from "react-icons/pi";
 import { useConfig } from './ConfigContext';
@@ -53,6 +53,7 @@ import { IoChevronBack } from "react-icons/io5";
 import { RxAvatar } from "react-icons/rx";
 import { CiText, CiImageOn } from "react-icons/ci";
 import { TbJson } from "react-icons/tb";
+import { IoFingerPrint } from "react-icons/io5";
 
 import {type Config, Model, ChatMode, ChatStatus } from "@/src/types/config";
 import { personaImages } from './constants';
@@ -82,10 +83,10 @@ interface WelcomeModalProps {
   onClose: (open: boolean) => void;
   setSettingsMode: (mode: boolean) => void;
 }
-const WelcomeModal: React.FC<WelcomeModalProps> = ({ isOpen, onClose, setSettingsMode }) => (
+const WelcomeModal: React.FC<WelcomeModalProps> = ({ isOpen, onClose, setSettingsMode}) => (
   <Dialog open={isOpen} onOpenChange={onClose}>
     <DialogContent
-      variant="themedPanel" // Using new variant
+      variant="themedPanel"
       className={cn( 
           "max-w-[240px] max-h-[140px]",
           "[&>button]:hidden"
@@ -101,17 +102,14 @@ const WelcomeModal: React.FC<WelcomeModalProps> = ({ isOpen, onClose, setSetting
             The game is afoot!<br />
           </p>
           <div className="flex justify-center">
-            <Button
-              variant="outline"
-              className={cn(
-                  "bg-[var(--active)] text-[var(--text)] border-[var(--text)]",
-                  "rounded-xl shadow-sm px-1 py-1 h-auto text-sm",
-                  "hover:brightness-95 hover:shadow-md active:brightness-90"
-              )}
-              onClick={() => setSettingsMode(true)}
-            >
-              <FiSettings className="size-3" /> Connect
-            </Button>
+                <Button
+                  variant="ghost"
+                  className="fingerprint-pulse-btn"
+                  onClick={() => setSettingsMode(true)}
+                  aria-label="Connect to your models"
+                >
+                  <IoFingerPrint size="48" color="var(--active)" />
+                </Button>
           </div>
         </div>
       </DialogDescription>
@@ -219,15 +217,15 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
 
   return (
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
-        <SheetOverlay /> {/* Uses default SheetOverlay, bg-black/50 */}
+        <SheetOverlay />
         <SheetContent
-           variant="themedPanel" // Using new variant
+           variant="themedPanel"
            side="left"
-           className={cn( // Specific layout overrides for SettingsSheet
+           className={cn(
              "w-[320px] sm:w-[380px]",
-             "p-0 border-r-0", // p-0 from variant, border-r-0 specific here
+             "p-0 border-r-0",
              "flex flex-col h-full max-h-screen",
-             "[&>button]:hidden", // Hides default close button from SheetContent
+             "[&>button]:hidden",
              "settings-drawer-content",
              "overflow-y-auto"
             )}
@@ -238,7 +236,7 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
               sheetContentRef.current?.focus({ preventScroll: true });
             }}
         >
-          <SheetHeader className="px-4 pt-3 pb-3"> {/* Specific padding for this header */}
+          <SheetHeader className="px-4 pt-3 pb-3">
             <div className="flex items-center justify-between mb-2 relative z-10">
                <Tooltip>
                  <TooltipTrigger asChild>
@@ -298,13 +296,13 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
                     >
                       <SelectTrigger
                         id="persona-select"
-                        variant="settingsPanel" // Using new variant
+                        variant="settingsPanel"
                         className="w-full data-[placeholder]:text-muted-foreground"
                       >
                         <SelectValue placeholder="Select Persona..." />
                       </SelectTrigger>
                       <SelectContent
-                        variant="settingsPanel" // Using new variant for the dropdown panel
+                        variant="settingsPanel"
                       >
                         {Object.keys(config?.personas || {}).map((p) => (
                           <SelectItem key={p} value={p} className="hover:brightness-95 focus:bg-[var(--active)]">
@@ -335,7 +333,7 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
                        }}
                        onBlur={() => setTimeout(() => setInputFocused(false), 200)}
                        className={cn(
-                         "text-[var(--text)] rounded-xl shadow-md h-9", // Manually applying if Input not refactored
+                         "text-[var(--text)] rounded-xl shadow-md h-9",
                          "bg-[rgba(255,250,240,0.4)] dark:bg-[rgba(255,255,255,0.1)]",
                          "border-[var(--text)]/10",
                          "focus:border-[var(--active)] focus:ring-1 focus:ring-[var(--active)]",
@@ -390,9 +388,9 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
                 </div>
 
                  <div className="space-y-3">
-                    <Button // Assuming Button has a 'settingsPanelAction' variant
+                    <Button
                       size="default" onClick={handleConfigClick}
-                      className={cn( // Manually applying if Button not refactored
+                      className={cn(
                         "text-[var(--text)] rounded-xl shadow-md w-full justify-start font-medium h-9",
                         "bg-[rgba(255,250,240,0.4)] dark:bg-[rgba(255,255,255,0.1)]",
                         "border-[var(--text)]/10",
@@ -402,9 +400,9 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
                     >
                       Configuration
                     </Button>
-                    <Button // Assuming Button has a 'settingsPanelAction' variant
+                    <Button
                        size="default" onClick={handleHistoryClick}
-                       className={cn( // Manually applying if Button not refactored
+                       className={cn(
                         "text-[var(--text)] rounded-xl shadow-md w-full justify-start font-medium h-9",
                         "bg-[rgba(255,250,240,0.4)] dark:bg-[rgba(255,255,255,0.1)]",
                         "border-[var(--text)]/10",
@@ -523,7 +521,6 @@ const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
     </Dialog>
   );
 };
-
 
 interface HeaderProps {
   chatTitle?: string | null;
