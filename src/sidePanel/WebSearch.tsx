@@ -139,7 +139,7 @@ const WikipediaSettingsPanel = ({ config, updateConfig }: WikipediaSettingsPanel
           checked={rerankEnabled}
           onCheckedChange={(checked) => updateConfig({ wikiRerank: !!checked })}
           className={cn(
-            "border-[var(--text)] data-[state=checked]:bg-[var(--active)] data-[state=checked]:text-[var(--bg)]",
+            "border-[var(--text)] data-[state=checked]:bg-[var(--active)] data-[state=checked]:text-[var(--text)]",
             "focus-visible:ring-1 focus-visible:ring-[var(--active)] focus-visible:ring-offset-0"
           )}
         />
@@ -274,7 +274,6 @@ const GoogleCustomSearchSettingsPanel = ({ config, updateConfig }: GoogleCustomS
 
 export const WebSearch = () => {
   const { config, updateConfig } = useConfig();
-  const isDark = config?.theme === 'dark';
 
   useEffect(() => {
     if (config?.webMode === 'Wikipedia') {
@@ -313,9 +312,7 @@ export const WebSearch = () => {
 
 
   const subtleBorderClass = 'border-[var(--text)]/10';
-  const controlBg = isDark
-    ? 'bg-[rgba(255,255,255,0.1)]'
-    : 'bg-[rgba(255,250,240,0.4)]';
+  const controlBg = "bg-[rgba(255,250,240,0.4)] dark:bg-[rgba(255,255,255,0.1)]";
   const itemShadow = 'shadow-md';
   const itemRounded = 'rounded-xl';
   

@@ -139,15 +139,33 @@ export const themes: Theme[] = [
   },
 ];
 
+function isColorDark(hex: string): boolean {
+  hex = hex.replace('#', '');
+  if (hex.length === 3) hex = hex.split('').map(x => x + x).join('');
+  if (hex.length !== 6) return false;
+  const r = parseInt(hex.substring(0,2), 16);
+  const g = parseInt(hex.substring(2,4), 16);
+  const b = parseInt(hex.substring(4,6), 16);
+  const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+  return brightness < 128;
+}
+
 export const setTheme = (c: Theme, paperTextureEnabled: boolean = true) => {
   const root = document.documentElement;
   document.documentElement.dataset.paperTexture = String(paperTextureEnabled);
-  if (c && c.name) {
-  }
 
   if (!c) {
     console.error("setTheme called with undefined theme object");
     return;
+  }
+
+  // Simplified dark theme detection
+  const isDarkTheme = c.name === 'dark' || (c.name === 'custom' && c.bg && isColorDark(c.bg));
+  
+  if (isDarkTheme) {
+    root.classList.add('dark');
+  } else {
+    root.classList.remove('dark');
   }
 
   const bg = c.bg || '#ffffff';
@@ -255,11 +273,9 @@ const DEFAULT_CUSTOM_THEME_FALLBACK: Theme = {
 export const Themes = () => {
   const { config, updateConfig } = useConfig();
   const currentFontSize = config?.fontSize || 14;
-  const isDark = config?.theme === 'dark';
 
   const subtleBorderClass = 'border-[var(--text)]/10';
-  const controlBg = isDark ? 'bg-[rgba(255,255,255,0.1)]' : 'bg-[rgba(255,250,240,0.4)]';
-  const itemShadow = 'shadow-md';
+  const controlBg = "bg-[rgba(255,250,240,0.4)] dark:bg-[rgba(255,255,255,0.1)]";  const itemShadow = 'shadow-md';
   const itemRounded = 'rounded-xl';
   
   const [pickerVisibleForKey, setPickerVisibleForKey] = useState<keyof Omit<Theme, 'name'> | null>(null);

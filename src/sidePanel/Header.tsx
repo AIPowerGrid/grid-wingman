@@ -102,6 +102,7 @@ const WelcomeModal: React.FC<WelcomeModalProps> = ({ isOpen, onClose, setSetting
             The game is afoot!<br />
           </p>
           <div className="flex justify-center">
+
                 <Button
                   variant="ghost"
                   className="fingerprint-pulse-btn"
@@ -259,7 +260,7 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
              </div>
              <SheetTitle className="text-center font-['Orbitron',_sans-serif] tracking-tight -mt-10">
                <a href="https://github.com/3-ark/Cognito" target="_blank" rel="noopener noreferrer" className="text-xl font-semibold text-[var(--text)] bg-[var(--active)] inline-block px-3 py-1 rounded-md no-underline">
-                 COGNITO <sub className="italic contrast-200 text-[0.5em]">v3.4</sub>
+                 COGNITO <sub className="italic contrast-200 text-[0.5em]">v3.5</sub>
                </a>
              </SheetTitle>
              <SheetDescription className="text-center text-xl font-bold text-[var(--text)] leading-tight mt-0">
@@ -390,6 +391,7 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
                  <div className="space-y-3">
                     <Button
                       size="default" onClick={handleConfigClick}
+                      variant="outline"
                       className={cn(
                         "text-[var(--text)] rounded-xl shadow-md w-full justify-start font-medium h-9",
                         "bg-[rgba(255,250,240,0.4)] dark:bg-[rgba(255,255,255,0.1)]",
@@ -401,6 +403,7 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
                       Configuration
                     </Button>
                     <Button
+                       variant="outline"
                        size="default" onClick={handleHistoryClick}
                        className={cn(
                         "text-[var(--text)] rounded-xl shadow-md w-full justify-start font-medium h-9",
@@ -512,7 +515,7 @@ const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
           </Button>
           <Button
             onClick={handleSave}
-            className="bg-[var(--active)] text-[var(--bg)] hover:brightness-110"
+            className="bg-[var(--active)] text-[var(--text)] hover:brightness-110"
           >
             Save Changes
           </Button>

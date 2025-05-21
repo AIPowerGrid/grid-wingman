@@ -25,10 +25,8 @@ export const TtsSettings = () => {
   const [loadingVoices, setLoadingVoices] = useState(true);
   const [errorLoading, setErrorLoading] = useState<string | null>(null);
 
-  const isDark = config?.theme === 'dark';
   const subtleBorderClass = 'border-[var(--text)]/10';
-  const controlBg = isDark ? 'bg-[rgba(255,255,255,0.1)]' : 'bg-[rgba(255,250,240,0.4)]';
-  const itemShadow = 'shadow-md';
+  const controlBg = "bg-[rgba(255,250,240,0.4)] dark:bg-[rgba(255,255,255,0.1)]";  const itemShadow = 'shadow-md';
   const itemRounded = 'rounded-xl';
   const inputHeight = 'h-9';
 
@@ -152,7 +150,7 @@ export const TtsSettings = () => {
                       key={voice.name}
                       value={voice.name}
                       className={cn(
-                        "hover:brightness-95 focus:bg-[var(--active)] focus:text-[var(--bg)]",
+                        "hover:brightness-95 focus:bg-[var(--active)] focus:text-[var(--text)]",
                         "text-[var(--text)]"
                       )}
                     >

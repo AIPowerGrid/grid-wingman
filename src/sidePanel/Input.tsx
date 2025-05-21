@@ -29,9 +29,13 @@ export const AutoResizeTextarea = (
     className,
     minRows,
     maxRows,
+    onFocus,
+    onBlur,
     ...props
   }: AutoResizeTextareaProps & {
     ref: RefObject<HTMLTextAreaElement | null>;
+    onFocus?: React.FocusEventHandler<HTMLTextAreaElement>;
+    onBlur?: React.FocusEventHandler<HTMLTextAreaElement>;
   }
 ) => {
   const ReactTextareaAutosize = require('react-textarea-autosize').default; 
@@ -42,6 +46,8 @@ export const AutoResizeTextarea = (
       minRows={minRows}
       maxRows={maxRows}
       {...props}
+      onFocus={onFocus}
+      onBlur={onBlur}
       className={cn(
         "flex w-full bg-transparent text-sm ring-offset-background",
         "focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0",
@@ -72,6 +78,7 @@ export const Input: FC<InputProps> = ({ isLoading, message, setMessage, onSend }
   const { config } = useConfig();
   const ref = useRef<HTMLTextAreaElement>(null);
   const [isListening, setIsListening] = useState(false);
+  const [isFocused, setIsFocused] = useState(false); // <-- Add this
 
   const setMessageRef = useRef<Dispatch<SetStateAction<string>>>(setMessage);
   useEffect(() => {
@@ -195,7 +202,8 @@ export const Input: FC<InputProps> = ({ isLoading, message, setMessage, onSend }
   return (
     <div className={cn(
       "flex w-full items-center gap-0 p-0 bg-[var(--card,var(--bg-secondary))] rounded-lg shadow-md",
-      config?.theme === 'dark' ? 'border border-[var(--active)]' : 'border border-[var(--text)]/20'
+      config?.theme === 'dark' ? 'border border-[var(--active)]' : 'border border-[var(--text)]/20',
+      isFocused && "input-breathing" // <-- Add this
     )}>
       <AddToChat /> 
       <AutoResizeTextarea
@@ -210,6 +218,8 @@ export const Input: FC<InputProps> = ({ isLoading, message, setMessage, onSend }
         onChange={event => setMessage(event.target.value)}
         onKeyDown={handleTextareaKeyDown}
         className="flex-grow !bg-transparent px-0 py-1"
+        onFocus={() => setIsFocused(true)}   // <-- Add this
+        onBlur={() => setIsFocused(false)}   // <-- Add this
       />
       {isSpeechRecognitionSupported && (
         <TooltipProvider delayDuration={500}>

@@ -30,13 +30,12 @@ import { SettingTitle } from './SettingsTitle';
 import { cn } from "@/src/background/util";
 
 const commonSubtleBorderClass = 'border-[var(--text)]/10';
-const commonControlBg = (isDark: boolean) => isDark ? 'bg-[rgba(255,255,255,0.1)]' : 'bg-[rgba(255,250,240,0.4)]';
+const commonControlBg = "bg-[rgba(255,250,240,0.4)] dark:bg-[rgba(255,255,255,0.1)]";
 const commonItemShadow = 'shadow-md';
 const commonItemRounded = 'rounded-xl';
 const commonInputHeight = 'h-9';
 
 interface AutoResizeTextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
-  isDark: boolean;
   onTextAreaFocus?: () => void;
   isEffectivelyReadOnly?: boolean;
 }
@@ -44,7 +43,6 @@ interface AutoResizeTextareaProps extends TextareaHTMLAttributes<HTMLTextAreaEle
 const AutoResizeTextarea = React.forwardRef(
   (
     {
-      isDark,
       onTextAreaFocus,
       isEffectivelyReadOnly,
       className,
@@ -52,8 +50,6 @@ const AutoResizeTextarea = React.forwardRef(
     }: AutoResizeTextareaProps,
     ref: ForwardedRef<HTMLTextAreaElement>
   ) => {
-    const currentControlBg = commonControlBg(isDark ?? false);
-
     return (
       <ResizeTextarea
         ref={ref}
@@ -66,7 +62,7 @@ const AutoResizeTextarea = React.forwardRef(
         }}
         className={cn(
           "flex w-full min-h-[80px] px-3 py-2 text-sm ring-offset-[var(--bg)] placeholder:text-[var(--muted-foreground)]",
-          currentControlBg,
+          commonControlBg,
           commonItemRounded,
           commonItemShadow,
           "text-[var(--text)]",
@@ -143,7 +139,7 @@ const SaveButtons = ({
 };
 
 const PersonaModal = ({
-  isOpen, onOpenChange, personaPrompt, personas, updateConfig, onModalClose, isDark
+  isOpen, onOpenChange, personaPrompt, personas, updateConfig, onModalClose
 }: {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
@@ -151,10 +147,8 @@ const PersonaModal = ({
   personas: Record<string, string>;
   updateConfig: (config: any) => void;
   onModalClose: () => void;
-  isDark: boolean;
 }) => {
   const [name, setName] = useState('');
-  const controlBgClass = commonControlBg(isDark);
 
   const handleCreate = () => {
     if (!name.trim()) return;
@@ -192,7 +186,9 @@ const PersonaModal = ({
             value={name}
             onChange={e => setName(e.target.value)}
             className={cn(
-              controlBgClass, commonSubtleBorderClass, commonInputHeight,
+              commonControlBg,
+              commonSubtleBorderClass,
+              commonInputHeight,
               "text-[var(--text)]", commonItemRounded, commonItemShadow, "w-full px-3",
               "focus:border-[var(--active)] focus:ring-1 focus:ring-[var(--active)]",
               "hover:border-[var(--active)] hover:brightness-98"
@@ -267,14 +263,12 @@ const DeleteModal = ({
 };
 
 const PersonaSelect = ({
-  personas, persona, updateConfig, isDark
+  personas, persona, updateConfig
 }: {
   personas: Record<string, string>;
   persona: string;
   updateConfig: (config: any) => void;
-  isDark: boolean;
 }) => {
-  const controlBgClass = commonControlBg(isDark);
   return (
     <Select
       value={persona}
@@ -282,7 +276,9 @@ const PersonaSelect = ({
     >
       <SelectTrigger
         className={cn(
-          controlBgClass, commonSubtleBorderClass, commonInputHeight,
+          commonControlBg,
+          commonSubtleBorderClass,
+          commonInputHeight,
           "text-[var(--text)]", commonItemRounded, commonItemShadow, "w-[180px]",
           "focus:border-[var(--active)] focus:ring-1 focus:ring-[var(--active)]",
           "hover:border-[var(--active)] hover:brightness-98",
@@ -310,16 +306,14 @@ const PersonaSelect = ({
 };
 
 const PersonaTextareaWrapper = ({
-  personaPrompt, setPersonaPrompt, isDark, isEditing, setIsEditing
+  personaPrompt, setPersonaPrompt, isEditing, setIsEditing
 }: {
   personaPrompt: string;
   setPersonaPrompt: (value: string) => void;
-  isDark: boolean;
   isEditing: boolean;
   setIsEditing: Dispatch<SetStateAction<boolean>>;
 }) => (
   <AutoResizeTextarea
-    isDark={isDark}
     value={personaPrompt}
     onChange={(e: ChangeEvent<HTMLTextAreaElement>) => {
         if (!isEditing) setIsEditing(true);
@@ -335,7 +329,6 @@ const PersonaTextareaWrapper = ({
 
 export const Persona = () => {
   const { config, updateConfig } = useConfig();
-  const isDark = config?.theme === 'dark';
 
   const [isPersonaModalOpen, setIsPersonaModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -373,13 +366,12 @@ export const Persona = () => {
     setIsPersonaModalOpen(true);
   };
 
-  const controlBgClass = commonControlBg(isDark);
-
   return (
     <AccordionItem
       value="persona"
       className={cn(
-        controlBgClass, commonSubtleBorderClass, commonItemRounded, commonItemShadow,
+        commonControlBg,
+        commonSubtleBorderClass, commonItemRounded, commonItemShadow,
         "transition-all duration-150 ease-in-out",
         "hover:border-[var(--active)] hover:brightness-105"
       )}
@@ -400,7 +392,6 @@ export const Persona = () => {
               persona={currentPersonaName}
               personas={personas}
               updateConfig={updateConfig}
-              isDark={isDark}
             />
             <Button variant="ghost" size="sm" aria-label="Add new persona"
               className={cn("text-[var(--text)] hover:text-[var(--active)] hover:bg-[var(--text)]/10 p-1.5 rounded-md", "focus-visible:ring-1 focus-visible:ring-[var(--active)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--bg)]")}
@@ -417,7 +408,6 @@ export const Persona = () => {
           <PersonaTextareaWrapper
             personaPrompt={personaPrompt}
             setPersonaPrompt={setPersonaPrompt}
-            isDark={isDark}
             isEditing={isEditingPersona}
             setIsEditing={setIsEditingPersona}
           />
@@ -444,7 +434,6 @@ export const Persona = () => {
         personas={personas}
         updateConfig={updateConfig}
         onModalClose={() => setIsPersonaModalOpen(false)}
-        isDark={isDark}
       />
       <DeleteModal
         isOpen={isDeleteModalOpen}

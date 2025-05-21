@@ -237,7 +237,7 @@ const WebSearchIconButton = ({ children, onClick, isActive, title }: { children:
           "w-10 h-10 flex-shrink-0",
           "transition-colors duration-200 ease-in-out",
           isActive 
-            ? "bg-[var(--active)] text-[var(--bg)] border-[var(--active)] hover:brightness-95" 
+            ? "bg-[var(--active)] text-[var(--text)] border-[var(--active)] hover:brightness-95" 
             : "bg-transparent border-[var(--text)]/50 hover:bg-[rgba(var(--text-rgb),0.1)]",
         )}
         onClick={onClick}

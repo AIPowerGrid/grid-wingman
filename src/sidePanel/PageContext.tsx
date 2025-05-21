@@ -44,13 +44,9 @@ const ContextLimitSlider = ({ size, updateConfig }: ContextLimitSliderProps) => 
 export const PageContext = () => {
   const { config, updateConfig } = useConfig();
   const size = config?.contextLimit || 1;
-  const isDark = config?.theme === 'dark';
 
   const subtleBorderClass = 'border-[var(--text)]/10';
-  const controlBg = isDark
-    ? 'bg-[rgba(255,255,255,0.1)]'
-    : 'bg-[rgba(255,250,240,0.4)]';
-  const itemShadow = 'shadow-md';
+  const controlBg = "bg-[rgba(255,250,240,0.4)] dark:bg-[rgba(255,255,255,0.1)]";  const itemShadow = 'shadow-md';
   const itemRounded = 'rounded-xl';
 
   return (

@@ -11,9 +11,7 @@ export const ConnectOllama = () => {
   const [url, setUrl] = useState(config?.ollamaUrl || 'http://localhost:11434');
   const [isLoading, setIsLoading] = useState(false);
 
-  const isDark = config?.theme === 'dark';
-  const controlBg = isDark ? 'bg-[rgba(255,255,255,0.1)]' : 'bg-[rgba(255,250,240,0.4)]';
-  const subtleBorderClass = 'border-[var(--text)]/10';
+  const controlBg = "bg-[rgba(255,250,240,0.4)] dark:bg-[rgba(255,255,255,0.1)]";  const subtleBorderClass = 'border-[var(--text)]/10';
   const inputHeightClass = 'h-8';
   const buttonHeightClass = 'h-8';
 
@@ -93,7 +91,7 @@ export const ConnectOllama = () => {
             buttonHeightClass, 
             "px-3",
             "text-sm font-medium whitespace-nowrap",
-            "bg-[var(--active)] text-[var(--bg)] hover:bg-[var(--active)]/90",
+            "bg-[var(--active)] text-[var(--text)] hover:bg-[var(--active)]/90",
             "rounded-md shadow-sm",
             "focus-visible:ring-1 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--bg)]"
           )}

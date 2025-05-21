@@ -13,12 +13,6 @@ export const ConnectCustom = () => {
   const [visibleApiKey, setVisibleApiKey] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const isDark = config?.theme === 'dark';
-  const controlBg = isDark ? 'bg-[rgba(255,255,255,0.1)]' : 'bg-[rgba(255,250,240,0.4)]';
-  const subtleBorderClass = 'border-[var(--text)]/10';
-  const inputHeightClass = 'h-8';
-  const buttonHeightClass = 'h-8';
-
   const onSaveSettings = () => {
     if (!endpoint) {
         toast.error("Custom endpoint URL is required.");
@@ -65,10 +59,6 @@ export const ConnectCustom = () => {
         value={endpoint}
         onChange={e => setEndpoint(e.target.value)}
         className={cn(
-          "w-full", inputHeightClass, controlBg, subtleBorderClass,
-          "text-[var(--text)] rounded-md shadow-sm text-sm px-2.5",
-          "focus:border-[var(--active)] focus:ring-1 focus:ring-[var(--active)] focus:ring-offset-0",
-          "hover:border-[var(--active)]"
         )}
         disabled={isLoading}
       />
@@ -82,10 +72,6 @@ export const ConnectCustom = () => {
             value={apiKey}
             onChange={e => setApiKey(e.target.value)}
             className={cn(
-                "w-full", inputHeightClass, controlBg, subtleBorderClass,
-                "text-[var(--text)] rounded-md shadow-sm text-sm px-2.5",
-                "focus:border-[var(--active)] focus:ring-1 focus:ring-[var(--active)] focus:ring-offset-0",
-                "hover:border-[var(--active)]",
                 {"pr-8": true}
             )}
             disabled={isLoading}
@@ -94,7 +80,7 @@ export const ConnectCustom = () => {
                 variant="ghost" size="sm"
                 className={cn(
                     "absolute inset-y-0 right-0 flex items-center justify-center",
-                    buttonHeightClass, "w-8 text-[var(--text)]/70 hover:text-[var(--text)]"
+                    "h-8 w-8 text-[var(--text)]/70 hover:text-[var(--text)]"
                 )}
                 onClick={() => setVisibleApiKey(!visibleApiKey)}
                 aria-label={visibleApiKey ? "Hide API key" : "Show API key"}
@@ -106,10 +92,11 @@ export const ConnectCustom = () => {
 
         {!isConnected && (
           <Button
+            variant="ghost" size="sm"
             onClick={onSaveSettings}
             className={cn(
-              buttonHeightClass, "px-3 text-sm font-medium whitespace-nowrap",
-              "bg-[var(--active)] text-[var(--bg)] hover:bg-[var(--active)]/90 rounded-md shadow-sm",
+              "px-3 text-sm h-8 font-medium whitespace-nowrap",
+              "bg-[var(--active)] text-[var(--text)] hover:bg-[var(--active)]/90 rounded-md shadow-sm",
               "focus-visible:ring-1 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--bg)]"
             )}
             disabled={saveButtonDisabled}
@@ -121,14 +108,14 @@ export const ConnectCustom = () => {
           <>
             <Button
               variant="ghost" size="sm" aria-label="Custom Endpoint Settings Saved"
-              className={cn(buttonHeightClass, "w-8 rounded-md text-[var(--success)]")}
+              className={cn( "w-8 h-8 rounded-md text-[var(--success)]")}
             >
               <FaCheck className="h-5 w-5" />
             </Button>
             <Button
               variant="ghost" size="sm" aria-label="Reset Custom Endpoint Settings"
               onClick={onResetSettings}
-              className={cn(buttonHeightClass, "w-8 rounded-md text-[var(--error)] hover:bg-[var(--error)]/10")}
+              className={cn( "h-8 w-8 rounded-md text-[var(--error)] hover:bg-[var(--error)]/10")}
               disabled={isLoading}
             >
               <FaTimes className="h-4 w-4" />

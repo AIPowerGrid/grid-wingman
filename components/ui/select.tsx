@@ -5,7 +5,7 @@ import { cn } from "@/src/background/util";
 
 const selectTriggerVariants = {
   default:
-    "border-input bg-transparent data-[placeholder]:text-muted-foreground [&_svg:not([class*='text-'])]:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 dark:hover:bg-input/50 shadow-xs data-[size=default]:h-9 data-[size=sm]:h-8",
+    "border-input bg-transparent data-[placeholder]:text-muted-foreground [&_svg:not([class*='text-'])]:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive shadow-xs data-[size=default]:h-9 data-[size=sm]:h-8",
   settingsPanel: cn(
     "text-[var(--text)] rounded-xl shadow-md",
     "focus:border-[var(--active)] focus:ring-1 focus:ring-[var(--active)]",

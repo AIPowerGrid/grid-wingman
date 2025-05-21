@@ -458,3 +458,22 @@ html[data-paper-texture="true"] #root::before {
   }
 }
 
+
+@keyframes input-breathing {
+  0% {
+    box-shadow: 0 0 0 0 var(--active, var(--primary)), 0 2px 0 #00000000;
+    border-color: var(--active, var(--primary));
+  }
+  50% {
+    box-shadow: 0 0 12px 2px var(--active, var(--primary)), 0 2px 0 #00000000;
+    border-color: var(--active, var(--primary));
+  }
+  100% {
+    box-shadow: 0 0 0 0 var(--active, var(--primary)), 0 2px 0 #00000000;
+    border-color: var(--active, var(--primary));
+  }
+}
+
+.dark .input-breathing {
+  animation: input-breathing 9s ease-in-out infinite;
+}
