@@ -335,11 +335,6 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
                        onBlur={() => setTimeout(() => setInputFocused(false), 200)}
                        className={cn(
                          "text-[var(--text)] rounded-xl shadow-md h-9",
-                         "bg-[rgba(255,250,240,0.4)] dark:bg-[rgba(255,255,255,0.1)]",
-                         "border-[var(--text)]/10",
-                         "focus:border-[var(--active)] focus:ring-1 focus:ring-[var(--active)]",
-                         "hover:border-[var(--active)] hover:brightness-98",
-                         "placeholder:text-muted-foreground"
                        )}
                     />
                     {inputFocused && (
@@ -477,12 +472,6 @@ const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
               value={currentUserName}
               onChange={(e) => setCurrentUserName(e.target.value)}
               className={cn(
-                "text-[var(--text)] rounded-md shadow-sm w-full h-10",
-                "bg-[rgba(255,250,240,0.4)] dark:bg-[rgba(255,255,255,0.1)]",
-                "border-[var(--text)]/10",
-                "focus:border-[var(--active)] focus:ring-1 focus:ring-[var(--active)]",
-                "hover:border-[var(--active)] hover:brightness-98",
-                "placeholder:text-muted-foreground"
               )}
             />
           </div>
@@ -495,12 +484,6 @@ const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
               value={currentUserProfile}
               onChange={(e) => setCurrentUserProfile(e.target.value)}              
               className={cn(
-                "text-[var(--text)] rounded-md shadow-sm w-full h-10",
-                "bg-[rgba(255,250,240,0.4)] dark:bg-[rgba(255,255,255,0.1)]",
-                "border-[var(--text)]/10",
-                "focus:border-[var(--active)] focus:ring-1 focus:ring-[var(--active)]",
-                "hover:border-[var(--active)] hover:brightness-98",
-                "placeholder:text-muted-foreground"
               )}
             />
           </div>
