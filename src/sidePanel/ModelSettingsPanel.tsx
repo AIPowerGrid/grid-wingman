@@ -8,17 +8,12 @@ import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { Input } from '@/components/ui/input';
 import { SettingTitle } from './SettingsTitle';
-import { cn } from "@/src/background/util"; // Ensure cn is imported
+import { cn } from "@/src/background/util";
 
 type ModelParamKey = 'temperature' | 'maxTokens' | 'topP' | 'presencepenalty';
 
 export const ModelSettingsPanel = () => {
   const { config, updateConfig } = useConfig();
-
-  const subtleBorderClass = 'border-[var(--text)]/10';
-  const controlBg = "bg-[rgba(255,250,240,0.4)] dark:bg-[rgba(255,255,255,0.1)]";  const itemShadow = 'shadow-md';
-  const itemRounded = 'rounded-xl';
-  const inputHeight = 'h-9';
 
   const sliderClass = cn(
     "w-full",
@@ -44,10 +39,6 @@ export const ModelSettingsPanel = () => {
     <AccordionItem
       value="model-params"
       className={cn(
-        controlBg,
-        subtleBorderClass,
-        itemRounded,
-        itemShadow,
         "transition-all duration-150 ease-in-out",
         "hover:border-[var(--active)] hover:brightness-105"
       )}
@@ -75,7 +66,7 @@ export const ModelSettingsPanel = () => {
               min={0} max={1} step={0.01}
               value={[temperature]}
               onValueChange={handleChange('temperature')}
-              className={sliderClass} // Apply consistent slider class
+              className={sliderClass}
             />
           </div>
 
@@ -91,12 +82,7 @@ export const ModelSettingsPanel = () => {
               max={1280000}
               onChange={(e) => handleChange('maxTokens')(parseInt(e.target.value, 10) || 0)}
               className={cn(
-                controlBg,
-                subtleBorderClass,
-                inputHeight,
-                "text-[var(--text)] rounded-xl shadow-md w-full px-3",
-                "focus:border-[var(--active)] focus:ring-1 focus:ring-[var(--active)]",
-                "hover:border-[var(--active)] hover:brightness-98"
+                "hide-number-spinners"
               )}
             />
           </div>

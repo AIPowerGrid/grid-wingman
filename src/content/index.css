@@ -509,3 +509,14 @@ html[data-paper-texture="true"] #root::before {
   animation: input-breathing 9000ms cubic-bezier(0.4, 0, 0.6, 1) infinite;
   transition: all 0ms ease-in-out;
 }
+
+/* Hide spinners from number inputs */
+.hide-number-spinners::-webkit-outer-spin-button,
+.hide-number-spinners::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.hide-number-spinners {
+  -moz-appearance: textfield; /* Firefox */
+}
