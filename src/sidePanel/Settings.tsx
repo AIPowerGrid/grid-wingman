@@ -10,6 +10,7 @@ import { WebSearch } from './WebSearch';
 import { Button } from '@/components/ui/button';
 import { cn } from 'src/background/util';
 import { useState } from 'react';
+import AnimatedBackground from './AnimatedBackground'; 
 
 export const Settings = () => {
   const { config } = useConfig();
@@ -20,7 +21,7 @@ export const Settings = () => {
       id="settings"
       className="relative z-[1] top-0 w-full h-full flex-1 flex-col overflow-y-auto overflow-x-hidden bg-transparent text-foreground px-6 pb-10 pt-[56px] scrollbar-hidden"
       >
-      {/* Add warning box at the top */}
+      <AnimatedBackground />
       {showWarning && (
         <div className={cn(
           "mb-4 p-4 rounded-xl",

@@ -58,7 +58,9 @@ const AutoResizeTextarea = React.forwardRef(
           "flex w-full min-h-[80px] border border-[var(--text)]/10 px-3 py-2 text-sm ring-offset-[var(--bg)] placeholder:text-[var(--muted-foreground)]",
           "text-[var(--text)]",
           "no-scrollbar",
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2",
+          "focus-visible:outline-none focus-visible:ring-0",
+          "focus-visible:box-shadow-[inset_0_0_0_1px_rgba(255,255,255,0.1),_0_0_8px_rgba(168,123,255,0.3)]",
+          "rounded-[12px]",
           isEffectivelyReadOnly
             ? "opacity-75 cursor-default"
             : "hover:border-[var(--active)] focus:border-[var(--active)]",

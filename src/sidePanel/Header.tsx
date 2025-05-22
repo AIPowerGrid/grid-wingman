@@ -9,6 +9,7 @@ import { themes as appThemes, type Theme as AppTheme } from './Themes';
 import { cn } from "@/src/background/util";
 import { toast } from 'react-hot-toast';
 import { Button } from "@/components/ui/button";
+import AnimatedBackground from './AnimatedBackground';
 import {
   Sheet,
   SheetContent,
@@ -237,7 +238,14 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
               sheetContentRef.current?.focus({ preventScroll: true });
             }}
         >
-          <SheetHeader className="px-4 pt-3 pb-3">
+        <AnimatedBackground />
+        <div
+          className={cn(
+            config?.theme === 'dark' ? 'border border-[var(--active)]' : 'border border-[var(--text)]/20',
+            "sticky top-0 z-10 p-0"
+          )}
+        ></div>
+          <SheetHeader className="px-4 pt-4 pb-4">
             <div className="flex items-center justify-between mb-2 relative z-10">
                <Tooltip>
                  <TooltipTrigger asChild>
@@ -258,8 +266,12 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
                  <TooltipContent side="bottom" className={sharedTooltipContentStyle}> Close Settings </TooltipContent>
                </Tooltip>
              </div>
-             <SheetTitle className="text-center font-['Bruno_Ace_SC'] tracking-tight -mt-10">
-               <a href="https://github.com/3-ark/Cognito" target="_blank" rel="noopener noreferrer" className="text-xl font-semibold text-[var(--text)] bg-[var(--active)] inline-block px-3 py-1 rounded-md no-underline">
+             <SheetTitle className="text-center font-['Bruno_Ace_SC'] tracking-tight -mt-10 cognito-title-container">
+               <a href="https://github.com/3-ark/Cognito" target="_blank" rel="noopener noreferrer"
+                  className={cn(
+                    "text-xl font-semibold text-[var(--text)] bg-[var(--active)] inline-block px-3 py-1 rounded-md no-underline",
+                    "cognito-title-blade-glow" // Apply the glow effect class
+                  )}>
                  COGNITO <sub className="italic contrast-200 text-[0.5em]">v3.5</sub>
                </a>
              </SheetTitle>
@@ -270,9 +282,9 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
            <div className={cn("flex flex-col h-full overflow-y-auto settings-drawer-body", "no-scrollbar")}>
               <div className={cn("flex flex-col space-y-5 flex-1", sectionPaddingX, "py-4",)}>
                 <div>
-                  <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center justify-between mt-5 mb-3">
                     <div className="flex items-center space-x-2">
-                      <label htmlFor="persona-select" className="text-[var(--text)] opacity-80 text-lg font-medium uppercase shrink-0">
+                      <label htmlFor="persona-select" className="text-[var(--text)] opacity-80 font-['Bruno_Ace_SC'] text-lg shrink-0">
                         Persona
                       </label>
                       <Avatar className="h-8 w-8 border border-[var(--active)]">
@@ -316,7 +328,7 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
                 </div>
 
                 <div>
-                  <label htmlFor="model-input" className="block text-[var(--text)] opacity-80 text-lg font-medium uppercase">Model</label>
+                  <label htmlFor="model-input" className="block text-[var(--text)] opacity-80 text-lg font-['Bruno_Ace_SC']">Model</label>
                   <div className="relative">
                     <Input
                        id="model-input"
@@ -334,9 +346,11 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
                        }}
                        onBlur={() => setTimeout(() => setInputFocused(false), 200)}
                        className={cn(
-                         "text-[var(--text)] rounded-xl shadow-md w-full justify-start font-medium h-9",
+                         "text-[var(--text)] rounded-xl shadow-md w-full justify-start font-medium h-9 font-['Space_Mono',_monospace]",
                          "focus:border-[var(--active)] focus:ring-1 focus:ring-[var(--active)]",
-                         "hover:border-[var(--active)] hover:brightness-98",
+                         "hover:border-[var(--active)] hover:brightness-95",
+                         "mb-2 mt-3",
+                         "ring-1 ring-inset ring-[var(--active)]/50",
                        )}
                     />
                     {inputFocused && (
@@ -352,7 +366,7 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
                             filteredModels.map((model) => (
                               <div
                                 key={model.id}
-                                className={cn(
+                                className={cn("font-['Space_Mono',_monospace]",
                                     "p-3 cursor-pointer text-[var(--text)] text-sm rounded",
                                     "hover:bg-[var(--active)]"
                                 )}
@@ -394,7 +408,8 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
                         "bg-[rgba(255,250,240,0.4)] dark:bg-[rgba(255,255,255,0.1)]",
                         "border-[var(--text)]/10",
                         "hover:border-[var(--active)] hover:brightness-98 active:bg-[var(--active)] active:brightness-95",
-                        "focus:ring-1 focus:ring-[var(--active)]"
+                        "focus:ring-1 focus:ring-[var(--active)]",
+                        "mb-3",
                       )}
                     >
                       Configuration
@@ -407,7 +422,8 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
                         "bg-[rgba(255,250,240,0.4)] dark:bg-[rgba(255,255,255,0.1)]",
                         "border-[var(--text)]/10",
                         "hover:border-[var(--active)] hover:brightness-98 active:bg-[var(--active)] active:brightness-95",
-                        "focus:ring-1 focus:ring-[var(--active)]"
+                        "focus:ring-1 focus:ring-[var(--active)]",
+                        "mb-3 mt-3",
                        )}
                     >
                       Chat History
@@ -638,10 +654,10 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <TooltipProvider delayDuration={500}>
-      <div
+      <div 
         className={cn(
-          config?.theme === 'dark' ? 'border border-[var(--active)]' : 'border border-[var(--text)]/20',
-          "sticky top-0 z-10 p-0"
+          "dark: 'border border-[var(--active)]' 'border border-[var(--text)]/20'",
+          "sticky top-0 z-10 p-0",
         )}
       >
         <div className="flex items-center h-auto py-0.5 px-2">
