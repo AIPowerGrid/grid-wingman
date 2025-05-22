@@ -273,10 +273,6 @@ const DEFAULT_CUSTOM_THEME_FALLBACK: Theme = {
 export const Themes = () => {
   const { config, updateConfig } = useConfig();
   const currentFontSize = config?.fontSize || 14;
-
-  const subtleBorderClass = 'border-[var(--text)]/10';
-  const controlBg = "bg-[rgba(255,250,240,0.4)] dark:bg-[rgba(255,255,255,0.1)]";  const itemShadow = 'shadow-md';
-  const itemRounded = 'rounded-xl';
   
   const [pickerVisibleForKey, setPickerVisibleForKey] = useState<keyof Omit<Theme, 'name'> | null>(null);
   const [customThemeColors, setCustomThemeColors] = useState<Omit<Theme, 'name'>>(() => { /* ...initialization logic... */
@@ -401,7 +397,6 @@ export const Themes = () => {
     <AccordionItem
       value="themes"
       className={cn(
-        controlBg, subtleBorderClass, itemRounded, itemShadow,
         "transition-all duration-150 ease-in-out",
         "hover:border-[var(--active)] hover:brightness-105"
       )}

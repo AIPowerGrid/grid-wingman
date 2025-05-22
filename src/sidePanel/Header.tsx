@@ -334,7 +334,9 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
                        }}
                        onBlur={() => setTimeout(() => setInputFocused(false), 200)}
                        className={cn(
-                         "text-[var(--text)] rounded-xl shadow-md h-9",
+                         "text-[var(--text)] rounded-xl shadow-md w-full justify-start font-medium h-9",
+                         "focus:border-[var(--active)] focus:ring-1 focus:ring-[var(--active)]",
+                         "hover:border-[var(--active)] hover:brightness-98",
                        )}
                     />
                     {inputFocused && (
@@ -472,6 +474,8 @@ const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
               value={currentUserName}
               onChange={(e) => setCurrentUserName(e.target.value)}
               className={cn(
+                "focus:border-[var(--active)] focus:ring-1 focus:ring-[var(--active)]",
+                "hover:border-[var(--active)] hover:brightness-98",
               )}
             />
           </div>
@@ -484,6 +488,8 @@ const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
               value={currentUserProfile}
               onChange={(e) => setCurrentUserProfile(e.target.value)}              
               className={cn(
+                "focus:border-[var(--active)] focus:ring-1 focus:ring-[var(--active)]",
+                "hover:border-[var(--active)] hover:brightness-98",
               )}
             />
           </div>

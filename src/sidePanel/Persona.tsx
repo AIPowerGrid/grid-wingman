@@ -29,12 +29,6 @@ import { useConfig } from './ConfigContext';
 import { SettingTitle } from './SettingsTitle';
 import { cn } from "@/src/background/util";
 
-const commonSubtleBorderClass = 'border-[var(--text)]/10';
-const commonControlBg = "bg-[rgba(255,250,240,0.4)] dark:bg-[rgba(255,255,255,0.1)]";
-const commonItemShadow = 'shadow-md';
-const commonItemRounded = 'rounded-xl';
-const commonInputHeight = 'h-9';
-
 interface AutoResizeTextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
   onTextAreaFocus?: () => void;
   isEffectivelyReadOnly?: boolean;
@@ -62,12 +56,8 @@ const AutoResizeTextarea = React.forwardRef(
         }}
         className={cn(
           "flex w-full min-h-[80px] px-3 py-2 text-sm ring-offset-[var(--bg)] placeholder:text-[var(--muted-foreground)]",
-          commonControlBg,
-          commonItemRounded,
-          commonItemShadow,
           "text-[var(--text)]",
           "no-scrollbar",
-          commonSubtleBorderClass,
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2",
           isEffectivelyReadOnly
             ? "opacity-75 cursor-default"
@@ -101,7 +91,6 @@ const SaveButtons = ({
         variant="default"
         size="sm"
         className={cn(
-          commonItemRounded,
           "bg-[var(--active)] text-[var(--text)] border border-[var(--text)] hover:brightness-110",
           "focus-visible:ring-1 focus-visible:ring-[var(--active)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--bg)]"
         )}
@@ -113,7 +102,6 @@ const SaveButtons = ({
         variant="default"
         size="sm"
         className={cn(
-          commonItemRounded,
           "bg-[var(--active)] text-[var(--text)] border border-[var(--text)] hover:brightness-110",
           "focus-visible:ring-1 focus-visible:ring-[var(--active)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--bg)]"
         )}
@@ -125,7 +113,6 @@ const SaveButtons = ({
         variant="outline"
         size="sm"
         className={cn(
-          commonItemRounded,
           "text-[var(--text)] border-[var(--text)]/50",
           "hover:bg-[var(--text)]/10 hover:border-[var(--text)]/70",
           "focus-visible:ring-1 focus-visible:ring-[var(--active)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--bg)]"
@@ -166,10 +153,6 @@ const PersonaModal = ({
         className={cn(
           "sm:max-w-[425px]",
           "bg-[var(--bg)]",
-          "border", commonSubtleBorderClass,
-          commonItemRounded,
-          commonItemShadow,
-          "text-[var(--text)]"
         )}
         onCloseAutoFocus={(e) => e.preventDefault()}
       >
@@ -186,10 +169,6 @@ const PersonaModal = ({
             value={name}
             onChange={e => setName(e.target.value)}
             className={cn(
-              commonControlBg,
-              commonSubtleBorderClass,
-              commonInputHeight,
-              "text-[var(--text)]", commonItemRounded, commonItemShadow, "w-full px-3",
               "focus:border-[var(--active)] focus:ring-1 focus:ring-[var(--active)]",
               "hover:border-[var(--active)] hover:brightness-98"
             )}
@@ -197,11 +176,11 @@ const PersonaModal = ({
         </div>
         <DialogFooter className="sm:justify-end">
           <Button type="button" variant="outline" size="sm"
-            className={cn(commonItemRounded, "text-[var(--text)] border-[var(--text)]/50", "hover:bg-[var(--text)]/10 hover:border-[var(--text)]/70")}
+            className={cn("text-[var(--text)] border-[var(--text)]/50", "hover:bg-[var(--text)]/10 hover:border-[var(--text)]/70")}
             onClick={onModalClose}
           > Cancel </Button>
           <Button type="button" variant="default" size="sm"
-            className={cn(commonItemRounded, "bg-[var(--active)] text-[var(--active-foreground)]", "disabled:opacity-60")}
+            className={cn("bg-[var(--active)] text-[var(--active-foreground)]", "disabled:opacity-60")}
             disabled={!name.trim()} onClick={handleCreate}
           > Create </Button>
         </DialogFooter>
@@ -237,8 +216,7 @@ const DeleteModal = ({
         className={cn(
           "sm:max-w-[425px]",
           "bg-[var(--bg)]",
-          "border", commonSubtleBorderClass,
-          commonItemRounded, commonItemShadow,
+          "border",
           "text-[var(--text)]"
         )}
       >
@@ -250,11 +228,11 @@ const DeleteModal = ({
         </DialogHeader>
         <DialogFooter className="sm:justify-end pt-4">
            <Button type="button" variant="outline" size="sm"
-            className={cn(commonItemRounded, "text-[var(--text)] border-[var(--text)]/50", "hover:bg-[var(--text)]/10 hover:border-[var(--text)]/70")}
+            className={cn("text-[var(--text)] border-[var(--text)]/50", "hover:bg-[var(--text)]/10 hover:border-[var(--text)]/70")}
             onClick={onModalClose}
           > Cancel </Button>
           <Button type="button" variant="destructive" size="sm"
-            className={cn(commonItemRounded)} onClick={handleDelete}
+            className={cn()} onClick={handleDelete}
           > Delete </Button>
         </DialogFooter>
       </DialogContent>
@@ -276,10 +254,7 @@ const PersonaSelect = ({
     >
       <SelectTrigger
         className={cn(
-          commonControlBg,
-          commonSubtleBorderClass,
-          commonInputHeight,
-          "text-[var(--text)]", commonItemRounded, commonItemShadow, "w-[180px]",
+          "text-[var(--text)]", "w-[180px]",
           "focus:border-[var(--active)] focus:ring-1 focus:ring-[var(--active)]",
           "hover:border-[var(--active)] hover:brightness-98",
           "data-[placeholder]:text-muted-foreground"
@@ -290,7 +265,6 @@ const PersonaSelect = ({
       <SelectContent
         className={cn(
           "bg-[var(--bg)] text-[var(--text)] border",
-          commonSubtleBorderClass,
           "rounded-md shadow-lg"
         )}
       >
@@ -370,8 +344,6 @@ export const Persona = () => {
     <AccordionItem
       value="persona"
       className={cn(
-        commonControlBg,
-        commonSubtleBorderClass, commonItemRounded, commonItemShadow,
         "transition-all duration-150 ease-in-out",
         "hover:border-[var(--active)] hover:brightness-105"
       )}

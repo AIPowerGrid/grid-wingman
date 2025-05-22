@@ -45,18 +45,10 @@ export const PageContext = () => {
   const { config, updateConfig } = useConfig();
   const size = config?.contextLimit || 1;
 
-  const subtleBorderClass = 'border-[var(--text)]/10';
-  const controlBg = "bg-[rgba(255,250,240,0.4)] dark:bg-[rgba(255,255,255,0.1)]";  const itemShadow = 'shadow-md';
-  const itemRounded = 'rounded-xl';
-
   return (
     <AccordionItem
       value="page-context"
       className={cn(
-        controlBg,
-        subtleBorderClass,
-        itemRounded,
-        itemShadow,
         "overflow-hidden",
         "transition-all duration-150 ease-in-out",
         "hover:border-[var(--active)] hover:brightness-105"

@@ -98,7 +98,7 @@ export const NotePopover = () => {
               onClick={handleClearNote}
               disabled={!editableNote && !config.noteContent}
               className={cn(
-                "border-[var(--border)] text-[var(--text)]", // Base style for consistency
+                "border-[var(--border)] text-[var(--text)]",
                 "text-xs px-2 py-1 h-auto w-16"
               )}
             >
@@ -108,7 +108,7 @@ export const NotePopover = () => {
               variant="outline"
               onClick={handleSaveNote}
               className={cn(
-                "border-[var(--border)] text-[var(--text)]", // Removed custom hover, ensure base text
+                "border-[var(--border)] text-[var(--text)]",
                 "text-xs px-2 py-1 h-auto",
                 "w-16"
               )}
