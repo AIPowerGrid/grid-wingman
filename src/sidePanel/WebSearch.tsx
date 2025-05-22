@@ -82,13 +82,13 @@ const SerpSettingsPanel = ({ config, updateConfig }: SerpSettingsPanelProps) => 
           onValueChange={value => updateConfig({ serpMaxLinksToVisit: value[0] })}
         />
         <p className="text-[var(--text)]/70 text-xs pt-1">
-          Number of search result links to fetch and summarize content from.
+          Number of search result links to fetch.
         </p>
       </div>
 
       <div className="pt-2">
         <p className="text-[var(--text)] text-base font-medium pb-2 text-left">
-          Content Char Limit per Page:{' '}
+          Content Char Limit:{' '}
           <span className="font-normal">{charLimit === 128 ? 'Unlimited (Full)' : `${charLimit}k`}</span>
         </p>
         <Slider
@@ -100,7 +100,7 @@ const SerpSettingsPanel = ({ config, updateConfig }: SerpSettingsPanelProps) => 
           onValueChange={value => updateConfig({ webLimit: value[0] })}
         />
          <p className="text-[var(--text)]/70 text-xs pt-1">
-          Max characters (in thousands) of content to use from each visited page. 128k for 'Unlimited'.
+          Max characters (in thousands) of content to use. 128k for 'Unlimited'.
         </p>
       </div>
     </div>
@@ -121,7 +121,7 @@ const WikipediaSettingsPanel = ({ config, updateConfig }: WikipediaSettingsPanel
     <div className="w-full space-y-4">
       <div>
         <p className="text-[var(--text)] text-base font-medium pb-2 text-left">
-          Number of Results: <span className="font-normal">{numBlocks}</span>
+          Results Num: <span className="font-normal">{numBlocks}</span>
         </p>
         <Slider
           value={[numBlocks]}
@@ -154,7 +154,7 @@ const WikipediaSettingsPanel = ({ config, updateConfig }: WikipediaSettingsPanel
       {rerankEnabled && (
         <div>
           <p className="text-[var(--text)] text-base font-medium pb-2 text-left pt-2">
-            Number to Rerank: <span className="font-normal">{numBlocksToRerank}</span>
+            Rerank Num: <span className="font-normal">{numBlocksToRerank}</span>
           </p>
           <Slider
             value={[numBlocksToRerank]} 
@@ -310,12 +310,6 @@ export const WebSearch = () => {
     }
   }, [config?.webMode, config?.googleApiKey, config?.googleCx, updateConfig]);
 
-
-  const subtleBorderClass = 'border-[var(--text)]/10';
-  const controlBg = "bg-[rgba(255,250,240,0.4)] dark:bg-[rgba(255,255,255,0.1)]";
-  const itemShadow = 'shadow-md';
-  const itemRounded = 'rounded-xl';
-  
   const renderRightPanel = () => {
     const panelWrapperClass = "w-[45%] pl-4 flex flex-col space-y-6"; 
 
@@ -354,10 +348,6 @@ export const WebSearch = () => {
     <AccordionItem
       value="web-search"
       className={cn(
-        controlBg,
-        subtleBorderClass,
-        itemRounded,
-        itemShadow,
         "overflow-hidden",
         "transition-all duration-150 ease-in-out",
         "hover:border-[var(--active)] hover:brightness-105"
