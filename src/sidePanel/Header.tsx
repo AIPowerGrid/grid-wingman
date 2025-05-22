@@ -258,12 +258,12 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
                  <TooltipContent side="bottom" className={sharedTooltipContentStyle}> Close Settings </TooltipContent>
                </Tooltip>
              </div>
-             <SheetTitle className="text-center font-['Orbitron',_sans-serif] tracking-tight -mt-10">
+             <SheetTitle className="text-center font-['Bruno_Ace_SC'] tracking-tight -mt-10">
                <a href="https://github.com/3-ark/Cognito" target="_blank" rel="noopener noreferrer" className="text-xl font-semibold text-[var(--text)] bg-[var(--active)] inline-block px-3 py-1 rounded-md no-underline">
                  COGNITO <sub className="italic contrast-200 text-[0.5em]">v3.5</sub>
                </a>
              </SheetTitle>
-             <SheetDescription className="text-center text-xl font-bold text-[var(--text)] leading-tight mt-0">
+             <SheetDescription className="text-center font-['Bruno_Ace_SC'] text-[var(--text)] leading-tight mt-0">
                Settings
              </SheetDescription>
           </SheetHeader>
@@ -669,7 +669,7 @@ export const Header: React.FC<HeaderProps> = ({
                       </Avatar>
                       <div className="flex flex-col items-start -space-y-0.5">
                         <span className="text-[13px] font-medium text-[var(--text)] leading-tight">
-                          {currentPersona === 'default' ? 'Cognito' : currentPersona}
+                          {currentPersona === 'default' ? 'Jet' : currentPersona}
                         </span>
                         <span className="text-[10px] text-muted-foreground leading-tight flex items-center pt-0.5">
                           {chatStatus === 'idle' && (
