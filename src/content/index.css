@@ -270,7 +270,7 @@ white-space: pre-wrap;
 
 /* Customizing scrollbar within elements (override by the previous setting */
 .markdown-body pre, textarea.autosize-textarea::-webkit-scrollbar {
-    width: auto; /* Adjust as needed */
+    width: auto;
     height: auto;
 }
 
