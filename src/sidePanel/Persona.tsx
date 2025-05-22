@@ -55,7 +55,7 @@ const AutoResizeTextarea = React.forwardRef(
           if (onTextAreaFocus) onTextAreaFocus();
         }}
         className={cn(
-          "flex w-full min-h-[80px] px-3 py-2 text-sm ring-offset-[var(--bg)] placeholder:text-[var(--muted-foreground)]",
+          "flex w-full min-h-[80px] border border-[var(--text)]/10 px-3 py-2 text-sm ring-offset-[var(--bg)] placeholder:text-[var(--muted-foreground)]",
           "text-[var(--text)]",
           "no-scrollbar",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2",
@@ -254,7 +254,7 @@ const PersonaSelect = ({
     >
       <SelectTrigger
         className={cn(
-          "text-[var(--text)]", "w-[180px]",
+          "text-[var(--text)]", "flex w-full", "border-[var(--text)]/10",
           "focus:border-[var(--active)] focus:ring-1 focus:ring-[var(--active)]",
           "hover:border-[var(--active)] hover:brightness-98",
           "data-[placeholder]:text-muted-foreground"
