@@ -10,14 +10,14 @@ function Input({ className, type, ...props }: React.ComponentProps<"input">) {
       data-slot="input"
       className={cn(
         "file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground flex h-8 w-full min-w-0 rounded-md bg-transparent px-3 py-1 text-sm transition-[color,box-shadow,border-color] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
-        "border border-[var(--text)]/10",
+        "border border-[var(--text)]/10 dark:border-0",
         "focus-visible:border-ring",
         "text-[var(--text)] px-2.5",
-        "focus:border-[var(--active)] focus:ring-1 focus:ring-[var(--active)] focus:ring-offset-0",
-        "hover:border-[var(--active)]",
+        "focus:border-[var(--active)] dark:focus:border-0 focus:ring-1 focus:ring-[var(--active)] focus:ring-offset-0",
+        "hover:border-[var(--active)] dark:hover:border-0",
         "bg-[rgba(255,250,240,0.4)] dark:bg-[rgba(255,255,255,0.1)]",
         "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
-        "shadow-[0_4px_24px_0_rgba(0,0,0,0.12)]",
+        "shadow-[var(--input-base-shadow)]",
         className,
         isFocused && "input-breathing"
       )}

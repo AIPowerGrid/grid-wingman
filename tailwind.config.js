@@ -10,15 +10,6 @@ module.exports = {
         'subtle-light': 'rgba(0, 0, 0, 0.3)',
         'subtle-dark': 'rgba(255, 255, 255, 0.3)',
       },
-      keyframes: {
-        "border-pulse": {
-          "0%, 100%": { borderColor: "oklch(from var(--ring) L C H / 0.5)" },
-          "50%": { borderColor: "oklch(from var(--ring) L C H / 1)" },
-        },
-      },
-      animation: {
-        "input-focus": "border-pulse 1.5s ease-in-out infinite",
-      },
     },
   },
   plugins: [require('tailwindcss-animate'), require('tailwind-scrollbar-hide'), require('tailwind-scrollbar')],

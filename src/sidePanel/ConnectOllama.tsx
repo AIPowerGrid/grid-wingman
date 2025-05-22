@@ -11,8 +11,6 @@ export const ConnectOllama = () => {
   const [url, setUrl] = useState(config?.ollamaUrl || 'http://localhost:11434');
   const [isLoading, setIsLoading] = useState(false);
 
-  const controlBg = "bg-[rgba(255,250,240,0.4)] dark:bg-[rgba(255,255,255,0.1)]";  const subtleBorderClass = 'border-[var(--text)]/10';
-  const inputHeightClass = 'h-8';
   const buttonHeightClass = 'h-8';
 
   const onConnect = () => {
@@ -73,14 +71,7 @@ export const ConnectOllama = () => {
         onChange={e => setUrl(e.target.value)}
         placeholder="http://localhost:11434"
         className={cn(
-          "flex-grow",
-          inputHeightClass,
-          controlBg,
-          subtleBorderClass,
-          "text-[var(--text)] rounded-md shadow-sm text-sm",
-          "focus:border-[var(--active)] focus:ring-1 focus:ring-[var(--active)] focus:ring-offset-0",
-          "hover:border-[var(--active)]",
-          "px-2.5" 
+          {"pr-8": true}
         )}
         disabled={isLoading}
       />

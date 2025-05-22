@@ -59,6 +59,7 @@ export const ConnectCustom = () => {
         value={endpoint}
         onChange={e => setEndpoint(e.target.value)}
         className={cn(
+           {"pr-8": true}
         )}
         disabled={isLoading}
       />

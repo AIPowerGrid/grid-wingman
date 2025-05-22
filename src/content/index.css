@@ -436,14 +436,14 @@ html[data-paper-texture="true"] #root::before {
 
 .fingerprint-pulse-btn {
   position: relative;
-  padding: 0.75rem;
+  padding: 0.5rem;
   border-radius: 50%;
   border: 0px solid var(--active);
   background: var(--bg, #fff);
   overflow: visible;
   box-shadow: 0 0 0 0 var(--active);
-  animation: fingerprint-shadow-pulse 1.5s infinite cubic-bezier(.66,0,0,1);
-  transition: border-color 0.3s;
+  animation: fingerprint-shadow-pulse 2s infinite cubic-bezier(.66,0,0,1);
+  transition: border-color 0.5s;
 }
 
 @keyframes fingerprint-shadow-pulse {
@@ -458,22 +458,54 @@ html[data-paper-texture="true"] #root::before {
   }
 }
 
+:root {
+  --input-base-shadow: 0 4px 24px 0 rgba(0,0,0,0.12);
+  --input-anim-static-shadow: 0 2px 0 rgba(0,0,0,0); /* Your transparent shadow */
+  --input-pulse-color: var(--active, var(--primary));
+}
 
 @keyframes input-breathing {
   0% {
-    box-shadow: 0 0 0 0 var(--active, var(--primary)), 0 2px 0 #00000000;
-    border-color: var(--active, var(--primary));
+    box-shadow:
+      0 0 0 1px var(--input-pulse-color),
+      var(--input-anim-static-shadow),
+      var(--input-base-shadow);
+  }
+  25% {
+    box-shadow:
+      0 0 6px 2px var(--input-pulse-color),
+      var(--input-anim-static-shadow),
+      var(--input-base-shadow);
   }
   50% {
-    box-shadow: 0 0 12px 2px var(--active, var(--primary)), 0 2px 0 #00000000;
-    border-color: var(--active, var(--primary));
+    box-shadow:
+      0 0 12px 3px var(--input-pulse-color),
+      var(--input-anim-static-shadow),
+      var(--input-base-shadow);
+  }
+  75% {
+    box-shadow:
+      0 0 6px 2px var(--input-pulse-color),
+      var(--input-anim-static-shadow),
+      var(--input-base-shadow);
   }
   100% {
-    box-shadow: 0 0 0 0 var(--active, var(--primary)), 0 2px 0 #00000000;
-    border-color: var(--active, var(--primary));
+    box-shadow:
+      0 0 0 1px var(--input-pulse-color),
+      var(--input-anim-static-shadow),
+      var(--input-base-shadow);
   }
 }
 
+.dark .input-breathing:focus,
+.dark .input-breathing.focus-visible {
+  box-shadow:
+    var(--input-anim-static-shadow),
+    var(--input-base-shadow);
+  outline: none;
+}
+
 .dark .input-breathing {
-  animation: input-breathing 9s ease-in-out infinite;
+  animation: input-breathing 9000ms cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  transition: all 0ms ease-in-out;
 }
