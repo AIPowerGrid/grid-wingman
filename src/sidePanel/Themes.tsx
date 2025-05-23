@@ -139,13 +139,31 @@ export const themes: Theme[] = [
   },
 ];
 
-function isColorDark(hex: string): boolean {
-  hex = hex.replace('#', '');
-  if (hex.length === 3) hex = hex.split('').map(x => x + x).join('');
-  if (hex.length !== 6) return false;
-  const r = parseInt(hex.substring(0,2), 16);
-  const g = parseInt(hex.substring(2,4), 16);
-  const b = parseInt(hex.substring(4,6), 16);
+function isColorDark(color: string): boolean {
+  // Handle empty/invalid input
+  if (!color) return false;
+
+  // Remove opacity if present
+  const hex = color.replace(/[^0-9a-f]/gi, '');
+  
+  // Handle 3, 4, 6 or 8 digit hex
+  let r, g, b;
+  if (hex.length <= 4) {
+    // 3 or 4 digits (RGB or RGBA)
+    r = parseInt(hex[0] + hex[0], 16);
+    g = parseInt(hex[1] + hex[1], 16);
+    b = parseInt(hex[2] + hex[2], 16);
+  } else {
+    // 6 or 8 digits (RRGGBB or RRGGBBAA)
+    r = parseInt(hex.substring(0, 2), 16);
+    g = parseInt(hex.substring(2, 4), 16);
+    b = parseInt(hex.substring(4, 6), 16);
+  }
+
+  // Check if parsing was successful
+  if (isNaN(r) || isNaN(g) || isNaN(b)) return false;
+
+  // Calculate perceived brightness using YIQ formula
   const brightness = (r * 299 + g * 587 + b * 114) / 1000;
   return brightness < 128;
 }
@@ -159,8 +177,10 @@ export const setTheme = (c: Theme, paperTextureEnabled: boolean = true) => {
     return;
   }
 
-  // Simplified dark theme detection
-  const isDarkTheme = c.name === 'dark' || (c.name === 'custom' && c.bg && isColorDark(c.bg));
+  // Improved dark theme detection
+  const isDarkBg = c.bg && isColorDark(c.bg);
+  const isDarkTheme = c.name === 'dark' || (c.name === 'custom' && isDarkBg);
+  root.dataset.theme = isDarkTheme ? 'dark' : 'light';
   
   if (isDarkTheme) {
     root.classList.add('dark');
@@ -168,21 +188,30 @@ export const setTheme = (c: Theme, paperTextureEnabled: boolean = true) => {
     root.classList.remove('dark');
   }
 
-  const bg = c.bg || '#ffffff';
-  const text = c.text || '#000000';
-  const active = c.active || '#007bff';
-  const bold = c.bold || '#000000';
-  const italic = c.italic || '#000000';
-  const link = c.link || '#007bff';
-  const codeBg = c.codeBg || text;
-  const codeFg = c.codeFg || bg;
-  const preBg = c.preBg || text; 
-  const preFg = c.preFg || bg;  
-  const mute = c.mute || (text === '#000000' ? '#757575' : '#A9A9A9'); // Fallback based on typical text color
-  const tableBorder = c.tableBorder || text;
-  const errorColor = c.error || '#d32f2f';
-  const successColor = c.success || '#388e3c';
-  const warningColor = c.warning || '#fbc02d';
+  const convertHexToRGBA = (hex: string) => {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    const a = hex.length === 9 ? parseInt(hex.slice(7, 9), 16) / 255 : 1;
+    return `rgba(${r}, ${g}, ${b}, ${a})`;
+  };
+
+  // When getting colors, convert 8-digit hex to rgba
+  const bg = convertHexToRGBA(c.bg || '#ffffff');
+  const text = convertHexToRGBA(c.text || '#000000');
+  const active = convertHexToRGBA(c.active || '#007bff');
+  const bold = convertHexToRGBA(c.bold || '#000000');
+  const italic = convertHexToRGBA(c.italic || '#000000');
+  const link = convertHexToRGBA(c.link || '#007bff');
+  const codeBg = convertHexToRGBA(c.codeBg || text);
+  const codeFg = convertHexToRGBA(c.codeFg || bg);
+  const preBg = convertHexToRGBA(c.preBg || text);
+  const preFg = convertHexToRGBA(c.preFg || bg);
+  const mute = convertHexToRGBA(c.mute || '#75757580');
+  const tableBorder = convertHexToRGBA(c.tableBorder || text);
+  const errorColor = convertHexToRGBA(c.error || '#d32f2f');
+  const successColor = convertHexToRGBA(c.success || '#388e3c');
+  const warningColor = convertHexToRGBA(c.warning || '#fbc02d');
 
   root.style.setProperty('--background', bg);
   root.style.setProperty('--foreground', text);
@@ -238,26 +267,41 @@ const PaletteColorPicker = ({
   onColorChangeComplete: (key: keyof Omit<Theme, 'name'>, color: IColor) => void;
   themeKey: keyof Omit<Theme, 'name'>;
 }) => {
-  let safeInitialColor = initialColor;
-  if (typeof initialColor !== 'string' || !initialColor.match(/^#([0-9a-f]{3}){1,2}$/i)) {
-     console.error(`PaletteColorPicker received invalid initialColor: "${initialColor}" for key: ${themeKey}. Using fallback #FF00FF.`);
-     safeInitialColor = '#FF00FF';
-  }
-  const [color, setColor] = useColor(safeInitialColor);
+  // Always normalize to #RRGGBBAA
+  const normalizedHex = normalizeColor(initialColor);
+
+  // Use the color-palette hook directly
+  const [color, setColor] = useColor(normalizedHex);
+
+  const handleChange = (newColor: IColor) => {
+    setColor(newColor);
+  };
+
+  const handleComplete = (finalColor: IColor) => {
+    // Always output #RRGGBBAA (never longer)
+    let hex = finalColor.hex.slice(0, 7);
+    if (finalColor.rgb.a !== undefined && finalColor.rgb.a < 1) {
+      const alphaHex = Math.round(finalColor.rgb.a * 255)
+        .toString(16)
+        .padStart(2, '0');
+      hex += alphaHex;
+    } else {
+      hex += 'ff';
+    }
+    hex = hex.slice(0, 9);
+
+    // Don't mutate finalColor, create a new object
+    onColorChangeComplete(themeKey, { ...finalColor, hex });
+  };
 
   return (
-    <ColorPicker
-      color={color} 
-      onChange={(newColor) => {
-        console.log(`PaletteColorPicker INTERNAL onChange for key "${themeKey}":`, newColor.hex);
-        setColor(newColor);
-      }}
-      onChangeComplete={(finalColor) => {
-        console.log(`PaletteColorPicker INTERNAL onChangeComplete for key "${themeKey}":`, finalColor.hex);
-        onColorChangeComplete(themeKey, finalColor);
-      }}
-      hideInput={["rgb", "hsv"]}
-    />
+    <div className="p-3">
+      <ColorPicker
+        color={color}
+        onChange={handleChange}
+        onChangeComplete={handleComplete}
+      />
+    </div>
   );
 };
 
@@ -453,19 +497,32 @@ export const Themes = () => {
             <div className="space-y-3">
               {editableColorKeys.map((key) => {
                 const colorValue = effectiveCustomThemeForPickers[key];
-                const isValidHex = typeof colorValue === 'string' && !!colorValue.match(/^#([0-9a-f]{3}){1,2}$/i);
+                const normalizedColor = normalizeColor(colorValue);
+                const isValid = isValidColor(colorValue);
 
-                if (!isValidHex) {
+                if (!isValid) {
                   console.error(`Themes UI: Invalid color value for key "${key}":`, colorValue);
-                  return ( <div key={key} className="flex items-center justify-between p-2 text-red-500 bg-red-100 rounded-md"> <Label className="capitalize text-sm font-medium text-red-600">{key}</Label> <span>Error: Invalid color data ("{String(colorValue)}")</span> </div> );
+                  return (
+                    <div key={key} className="flex items-center justify-between p-2 text-red-500 bg-red-100 rounded-md">
+                      <Label className="capitalize text-sm font-medium text-red-600">{key}</Label>
+                      <span>Invalid color: "{String(colorValue)}"</span>
+                    </div>
+                  );
                 }
 
                 return (
                   <div key={key} className="flex items-center justify-between">
                     <Label className="capitalize text-sm font-medium text-foreground">{key}</Label>
-                    <Popover open={pickerVisibleForKey === key} onOpenChange={(isOpen) => { setPickerVisibleForKey(isOpen ? key : null); }} >
+                    <Popover 
+                      open={pickerVisibleForKey === key} 
+                      onOpenChange={(isOpen) => setPickerVisibleForKey(isOpen ? key : null)}
+                    >
                       <PopoverTrigger asChild>
-                        <button className="w-20 h-8 border border-border rounded-sm cursor-pointer hover:opacity-80 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background" style={{ backgroundColor: colorValue }} aria-label={`Pick color for ${key}: ${colorValue}`} onClick={() => setPickerVisibleForKey(pickerVisibleForKey === key ? null : key)} />
+                        <button 
+                          className="w-20 h-8 border border-border rounded-sm cursor-pointer hover:opacity-80 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background" 
+                          style={{ backgroundColor: normalizedColor }} 
+                          aria-label={`Pick color for ${key}: ${normalizedColor}`}
+                        />
                       </PopoverTrigger>
                       <PopoverContent className="w-auto p-0 bg-popover border border-border shadow-lg z-[51]" side="right" align="start" sideOffset={10} onOpenAutoFocus={(e) => e.preventDefault()} >
                         {pickerVisibleForKey === key && (
@@ -483,3 +540,38 @@ export const Themes = () => {
     </AccordionItem>
   );
 };
+
+// Update the color validation function
+function isValidColor(color: string): boolean {
+  if (!color) return false;
+  
+  // Remove any non-hex characters
+  const hex = color.replace(/[^0-9a-f]/gi, '');
+  
+  // Check if the remaining hex digits are valid length
+  return [6, 8].includes(hex.length);
+}
+
+// Update the normalize function
+function normalizeColor(color: string): string {
+  if (!color) return '#000000ff';
+
+  // Remove non-hex characters
+  let hex = color.replace(/[^0-9a-f]/gi, '');
+
+  // Only keep the first 8 digits (RRGGBBAA)
+  hex = hex.slice(0, 8);
+
+  // Pad to 6 or 8 digits
+  if (hex.length < 6) {
+    hex = hex.padEnd(6, '0');
+  }
+  if (hex.length === 6) {
+    hex += 'ff'; // opaque
+  }
+
+  // Only allow 8 digits (RRGGBBAA)
+  hex = hex.slice(0, 8);
+
+  return `#${hex}`;
+}

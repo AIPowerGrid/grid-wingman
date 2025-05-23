@@ -37,7 +37,11 @@ function Badge({
   return (
     <Comp
       data-slot="badge"
-      className={cn(badgeVariants({ variant }), className)}
+      className={cn(
+        "font-mono",
+        badgeVariants({ variant }),
+        className
+      )}
       {...props}
     />
   )

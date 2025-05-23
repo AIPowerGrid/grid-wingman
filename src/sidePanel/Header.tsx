@@ -194,8 +194,8 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
     ) || [];
 
   const toggleTheme = () => {
-    const currentThemeName = config?.theme || 'paper';
-    const nextThemeName = currentThemeName === 'dark' ? 'paper' : 'dark';
+    const isDarkTheme = document.documentElement.classList.contains('dark');
+    const nextThemeName = isDarkTheme ? 'paper' : 'dark';
     const nextTheme = appThemes.find((t) => t.name === nextThemeName);
     if (nextTheme) {
       updateConfig({ theme: nextThemeName });
@@ -250,7 +250,7 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
                <Tooltip>
                  <TooltipTrigger asChild>
                    <Button variant="ghost" size="sm" aria-label={isDark ? 'Light' : 'Dark'} onClick={toggleTheme} className="text-[var(--text)] hover:bg-black/10 dark:hover:bg-white/10 rounded-md ">
-                     {isDark ? <IoSunnyOutline size="20px" /> : <IoMoonOutline size="20px" />}
+                     {document.documentElement.classList.contains('dark') ? <IoSunnyOutline size="20px" /> : <IoMoonOutline size="20px" />}
                    </Button>
                  </TooltipTrigger>
                  <TooltipContent side="bottom" className={sharedTooltipContentStyle}>
@@ -310,7 +310,7 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
                       <SelectTrigger
                         id="persona-select"
                         variant="settingsPanel"
-                        className="w-full data-[placeholder]:text-muted-foreground"
+                        className="w-full font-['Space_Mono',_monospace] data-[placeholder]:text-muted-foreground"
                       >
                         <SelectValue placeholder="Select Persona..." />
                       </SelectTrigger>
@@ -318,7 +318,10 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
                         variant="settingsPanel"
                       >
                         {Object.keys(config?.personas || {}).map((p) => (
-                          <SelectItem key={p} value={p} className="hover:brightness-95 focus:bg-[var(--active)]">
+                          <SelectItem key={p} value={p} 
+                          className={cn("hover:brightness-95 focus:bg-[var(--active)]", 
+                          "font-['Space_Mono',_monospace]")}
+                          >
                             {p}
                           </SelectItem>
                         ))}
@@ -407,6 +410,7 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
                         "text-[var(--text)] rounded-xl shadow-md w-full justify-start font-medium h-9",
                         "bg-[rgba(255,250,240,0.4)] dark:bg-[rgba(255,255,255,0.1)]",
                         "border-[var(--text)]/10",
+                        "font-['Space_Mono',_monospace]",
                         "hover:border-[var(--active)] hover:brightness-98 active:bg-[var(--active)] active:brightness-95",
                         "focus:ring-1 focus:ring-[var(--active)]",
                         "mb-3",
@@ -421,6 +425,7 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
                         "text-[var(--text)] rounded-xl shadow-md w-full justify-start font-medium h-9",
                         "bg-[rgba(255,250,240,0.4)] dark:bg-[rgba(255,255,255,0.1)]",
                         "border-[var(--text)]/10",
+                        "font-['Space_Mono',_monospace]",
                         "hover:border-[var(--active)] hover:brightness-98 active:bg-[var(--active)] active:brightness-95",
                         "focus:ring-1 focus:ring-[var(--active)]",
                         "mb-3 mt-3",
@@ -656,7 +661,7 @@ export const Header: React.FC<HeaderProps> = ({
     <TooltipProvider delayDuration={500}>
       <div 
         className={cn(
-          "dark: 'border border-[var(--active)]' 'border border-[var(--text)]/20'",
+          ".dark: 'border border-[var(--active)]' 'border border-[var(--text)]/20'",
           "sticky top-0 z-10 p-0",
         )}
       >
@@ -713,7 +718,7 @@ export const Header: React.FC<HeaderProps> = ({
             )}
             {!visibleTitle && !historyMode && !settingsMode && (
               <Badge>
-                {config?.selectedModel || 'No Model Selected'}
+                  {config?.selectedModel || 'No Model Selected'}
               </Badge>
             )}
             {settingsMode && (
