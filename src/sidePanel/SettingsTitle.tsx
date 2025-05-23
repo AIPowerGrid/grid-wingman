@@ -28,8 +28,8 @@ export const SettingTitle = ({
         className={cn(
           "text-foreground",
           "opacity-90",
+          "font-['Space_Mono',_monospace]",
           "text-base",
-          "font-medium"
         )}
       >
         {text}

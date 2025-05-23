@@ -183,11 +183,11 @@ export const ChatHistory = ({ loadChat, onDeleteAll, className }: ChatHistoryPro
             placeholder="Search chat history..."
             value={searchQuery}
             onChange={handleSearchChange}
-            className="w-full bg-background rounded-none text-foreground placeholder:text-muted-foreground"
+            className="w-full bg-background rounded-none font-['Space_Mono',_monospace] text-foreground placeholder:text-muted-foreground"
           />
         </div>
         <ScrollArea className="flex-1 w-full min-h-0">
-          <div className="px-4 pb-4 pt-5 text-center text-foreground/70 h-full flex items-center justify-center">
+          <div className="px-4 pb-4 pt-5 text-center font-['Space_Mono',_monospace] text-foreground/70 h-full flex items-center justify-center">
             No chat history found.
           </div>
         </ScrollArea>
@@ -204,11 +204,11 @@ export const ChatHistory = ({ loadChat, onDeleteAll, className }: ChatHistoryPro
             placeholder="Search chat history..."
             value={searchQuery}
             onChange={handleSearchChange}
-            className="w-full bg-background text-foreground placeholder:text-muted-foreground"
+            className="w-full bg-background text-foreground font-['Space_Mono',_monospace] placeholder:text-muted-foreground"
           />
         </div>
         <ScrollArea className="flex-1 w-full min-h-0">
-          <div className="px-4 pb-4 pt-5 text-center text-foreground/70 h-full flex items-center justify-center">
+          <div className="px-4 pb-4 pt-5 text-center font-['Space_Mono',_monospace] text-foreground/70 h-full flex items-center justify-center">
             No results found for "{searchQuery}".
           </div>
         </ScrollArea>
@@ -224,17 +224,17 @@ export const ChatHistory = ({ loadChat, onDeleteAll, className }: ChatHistoryPro
           placeholder="Search chat history (titles & content)..."
           value={searchQuery}
           onChange={handleSearchChange}
-          className="w-full bg-background rounded-none text-foreground placeholder:text-muted-foreground"
+          className="w-full bg-background rounded-none text-foreground placeholder:text-muted-foreground font-['Space_Mono',_monospace]"
         />
       </div>     
       <ScrollArea
         className="flex-1 w-full min-h-0"
       >
-        <div className="px-4 pb-4">
+        <div className="px-4 pb-4 font-['Space_Mono',_monospace]">
           {uniqueDates.map(date => (
             <div key={date} className="mb-3 mt-3">
               <p
-                className="text-foreground text-xl font-extrabold overflow-hidden pl-4 pb-1 text-left text-ellipsis whitespace-nowrap w-[90%]"
+                className="text-foreground text-lg font-bold overflow-hidden pl-4 pb-1 text-left text-ellipsis whitespace-nowrap w-[90%]"
               >
                 {date === dateToString(new Date()) ? 'Today' : date}
               </p>
@@ -243,19 +243,19 @@ export const ChatHistory = ({ loadChat, onDeleteAll, className }: ChatHistoryPro
                 .map(message => (
                   <div
                     key={message.id}
-                    className="flex items-center group"
+                    className="flex items-center group font-['Space_Mono',_monospace]"
                     onMouseEnter={() => setHoverId(message.id)}
                     onMouseLeave={() => setHoverId(null)}
                   >
-                    <span className="text-foreground text-lg font-normal pl-4 w-[4.5rem] flex-shrink-0">
+                    <span className="text-foreground text-base font-normal pl-4 w-[4.5rem] flex-shrink-0 font-['Space_Mono',_monospace]">
                       {new Date(message.last_updated).getHours().toString().padStart(2, '0')}:
                       {new Date(message.last_updated).getMinutes().toString().padStart(2, '0')}
                     </span>
-                    <button className={`text-foreground text-lg font-semibold overflow-hidden px-4 py-2 text-left text-ellipsis whitespace-nowrap flex-grow hover:underline hover:underline-offset-4 hover:decoration-2 ${message.id === removeId ? 'line-through decoration-2' : ''}`} onClick={() => loadChat(message)}>
+                    <button className={`text-foreground text-base font-normal overflow-hidden px-4 py-2 text-left text-ellipsis whitespace-nowrap flex-grow hover:underline hover:underline-offset-4 hover:decoration-2 ${message.id === removeId ? 'line-through decoration-2' : ''} font-['Space_Mono',_monospace]`} onClick={() => loadChat(message)}>
                       {message.title || 'Untitled Chat'}
                     </button>
                     <motion.div className={`shrink-0 transition-opacity duration-150 ${hoverId === message.id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`} whileHover={{ rotate: '15deg' }} onMouseEnter={() => setRemoveId(message.id)} onMouseLeave={() => setRemoveId(null)}>
-                      <Button variant="ghost" size="sm" aria-label="Delete chat" className="rounded-full w-8 h-8" onClick={(e) => { e.stopPropagation(); deleteMessage(message.id); }}>
+                      <Button variant="ghost" size="sm" aria-label="Delete chat" className="rounded-full w-8 h-8 font-['Space_Mono',_monospace]" onClick={(e) => { e.stopPropagation(); deleteMessage(message.id); }}>
                         <FiTrash2 className="h-4 w-4 text-foreground" />
                       </Button>
                     </motion.div>
@@ -267,10 +267,10 @@ export const ChatHistory = ({ loadChat, onDeleteAll, className }: ChatHistoryPro
       </ScrollArea>
 
       {totalPages > 1 && (
-        <div className="flex justify-center items-center space-x-2 p-2 border-t border-border">
-          <Button onClick={handlePrevPage} disabled={currentPage === 1} variant="outline">Prev</Button>
+        <div className="flex justify-center items-center space-x-2 p-2 border-t border-border font-['Space_Mono',_monospace]">
+          <Button onClick={handlePrevPage} disabled={currentPage === 1} variant="outline" className="font-['Space_Mono',_monospace]">Prev</Button>
           <span>Page {currentPage} of {totalPages}</span>
-          <Button onClick={handleNextPage} disabled={currentPage === totalPages} variant="outline">Next</Button>
+          <Button onClick={handleNextPage} disabled={currentPage === totalPages} variant="outline" className="font-['Space_Mono',_monospace]">Next</Button>
         </div>
       )}
     </div>
