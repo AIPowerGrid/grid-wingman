@@ -42,13 +42,11 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Avatar,
   AvatarFallback,
   AvatarImage,
 } from "@/components/ui/avatar";
-import { Portal } from "@radix-ui/react-portal";
 
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 import { IoChevronBack } from "react-icons/io5";
@@ -377,7 +375,7 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
                   <div className="relative">
                     <Input
                        id="model-input"
-                       ref={inputRef} // <-- make sure this is set!
+                       ref={inputRef}
                        value={inputFocused ? searchQuery : config?.selectedModel || ''}
                        placeholder={
                          inputFocused
@@ -390,7 +388,6 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
                          setInputFocused(true);
                          fetchAllModels();
                        }}
-                       onBlur={() => setTimeout(() => setInputFocused(false), 200)}
                        className={cn(
                          "text-[var(--text)] rounded-xl shadow-md w-full justify-start font-medium h-9 font-['Space_Mono',_monospace]",
                          "focus:border-[var(--active)] focus:ring-1 focus:ring-[var(--active)]",
@@ -400,55 +397,70 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
                        )}
                     />
                     {inputFocused && (
-                      <Portal>
-                        <ScrollArea
+                      <div 
+                        className="fixed inset-0 z-50"
+                        onClick={() => setInputFocused(false)}
+                      >
+                        <div 
                           className={cn(
-                            "max-h-[200px] overflow-y-auto",
-                            "bg-[var(--bg)] border-[var(--text)] rounded-md shadow-md z-50",
-                            "no-scrollbar"
+                            "absolute left-0 right-0",
+                            "bg-[var(--bg)]",
+                            "border border-[var(--active)]/20", // Reduced border opacity
+                            "rounded-xl shadow-lg",
+                            "max-h-[200px]",
+                            "no-scrollbar",
+                            "overflow-y-auto"
                           )}
                           style={{
-                            position: "fixed",
-                            top: dropdownPosition.top,
-                            left: dropdownPosition.left,
-                            width: dropdownPosition.width,
+                            top: `${dropdownPosition.top}px`,
+                            left: `${dropdownPosition.left}px`,
+                            width: `${dropdownPosition.width}px`,
                           }}
+                          onClick={(e) => e.stopPropagation()}
                         >
-                          <div className="p-1">
+                          <div className="py-0.5"> {/* Reduced padding */}
                             {filteredModels.length > 0 ? (
                               filteredModels.map((model) => (
-                                <div
+                                <button
                                   key={model.id}
-                                  className={cn("font-['Space_Mono',_monospace]",
-                                    "p-3 cursor-pointer text-[var(--text)] text-sm rounded",
-                                    "hover:bg-[var(--active)]"
+                                  type="button"
+                                  className={cn(
+                                    "w-full text-left",
+                                    "px-4 py-1.5",
+                                    "text-[var(--text)] text-sm",
+                                    "hover:bg-[var(--active)]/20",
+                                    "focus:bg-[var(--active)]/30",
+                                    "transition-colors duration-150",
+                                    "font-['Space_Mono',_monospace]"
                                   )}
-                                  onMouseDown={() => {
+                                  onClick={() => {
                                     updateConfig({ selectedModel: model.id });
                                     setSearchQuery('');
                                     setInputFocused(false);
                                   }}
                                 >
-                                  {model.host ? `(${model.host}) ${model.id}` : model.id}
-                                  {model.context_length ? (
-                                    <span
-                                      className="text-xs text-[var(--text)] opacity-60 ml-2"
-                                    >
-                                      [ctx: {model.context_length}]
+                                  <div className="flex items-center">
+                                    <span>
+                                      {model.host ? `(${model.host}) ` : ''}
+
+                                      {model.id}
+                                      {model.context_length && (
+                                        <span className="text-xs text-[var(--text)] opacity-50 ml-1">
+                                          [ctx: {model.context_length}]
+                                        </span>
+                                      )}
                                     </span>
-                                  ) : (
-                                    ''
-                                  )}
-                                </div>
+                                  </div>
+                                </button>
                               ))
                             ) : (
-                              <div className="p-2 text-[var(--text)] opacity-60 text-sm">
+                              <div className="px-4 py-1.5 text-[var(--text)] opacity-50 text-sm">
                                 No models found
                               </div>
                             )}
                           </div>
-                        </ScrollArea>
-                      </Portal>
+                        </div>
+                      </div>
                     )}
                   </div>
                 </div>
