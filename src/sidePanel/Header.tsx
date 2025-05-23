@@ -48,6 +48,7 @@ import {
   AvatarFallback,
   AvatarImage,
 } from "@/components/ui/avatar";
+import { Portal } from "@radix-ui/react-portal";
 
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 import { IoChevronBack } from "react-icons/io5";
@@ -182,6 +183,8 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
   const [inputFocused, setInputFocused] = React.useState(false);
   const { fetchAllModels } = useUpdateModels();
   const sheetContentRef = React.useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [dropdownPosition, setDropdownPosition] = React.useState<{ top: number; left: number; width: number }>({ top: 0, left: 0, width: 0 });
 
   const currentPersona = config?.persona || 'default';
   const personaImageSrc = personaImages[currentPersona] || personaImages.default;
@@ -216,6 +219,45 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
   };
 
   const presetThemesForSheet = appThemes.filter(t => t.name !== 'custom' && t.name !== config?.customTheme?.name);
+
+  useEffect(() => {
+    if (isOpen) {
+      setSearchQuery('');
+      setInputFocused(false);
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (inputFocused && inputRef.current) {
+      const rect = inputRef.current.getBoundingClientRect();
+      setDropdownPosition({
+        top: rect.bottom + window.scrollY,
+        left: rect.left + window.scrollX,
+        width: rect.width,
+      });
+    }
+  }, [inputFocused]);
+
+  // Optional: recalculate on window resize/scroll
+  useEffect(() => {
+    if (!inputFocused) return;
+    const handle = () => {
+      if (inputRef.current) {
+        const rect = inputRef.current.getBoundingClientRect();
+        setDropdownPosition({
+          top: rect.bottom + window.scrollY,
+          left: rect.left + window.scrollX,
+          width: rect.width,
+        });
+      }
+    };
+    window.addEventListener('resize', handle);
+    window.addEventListener('scroll', handle, true);
+    return () => {
+      window.removeEventListener('resize', handle);
+      window.removeEventListener('scroll', handle, true);
+    };
+  }, [inputFocused]);
 
   return (
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
@@ -335,6 +377,7 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
                   <div className="relative">
                     <Input
                        id="model-input"
+                       ref={inputRef} // <-- make sure this is set!
                        value={inputFocused ? searchQuery : config?.selectedModel || ''}
                        placeholder={
                          inputFocused
@@ -357,47 +400,55 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
                        )}
                     />
                     {inputFocused && (
-                       <ScrollArea
-                         className={cn(
-                            "w-full mt-1 max-h-[200px] overflow-y-auto",
-                            "bg-[var(--bg)] border-[var(--text)] rounded-md shadow-md z-10",
+                      <Portal>
+                        <ScrollArea
+                          className={cn(
+                            "max-h-[200px] overflow-y-auto",
+                            "bg-[var(--bg)] border-[var(--text)] rounded-md shadow-md z-50",
                             "no-scrollbar"
-                         )}
-                       >
+                          )}
+                          style={{
+                            position: "fixed",
+                            top: dropdownPosition.top,
+                            left: dropdownPosition.left,
+                            width: dropdownPosition.width,
+                          }}
+                        >
                           <div className="p-1">
-                          {filteredModels.length > 0 ? (
-                            filteredModels.map((model) => (
-                              <div
-                                key={model.id}
-                                className={cn("font-['Space_Mono',_monospace]",
+                            {filteredModels.length > 0 ? (
+                              filteredModels.map((model) => (
+                                <div
+                                  key={model.id}
+                                  className={cn("font-['Space_Mono',_monospace]",
                                     "p-3 cursor-pointer text-[var(--text)] text-sm rounded",
                                     "hover:bg-[var(--active)]"
-                                )}
-                                onMouseDown={() => {
-                                  updateConfig({ selectedModel: model.id });
-                                  setSearchQuery('');
-                                  setInputFocused(false);
-                                }}
-                              >
-                                {model.host ? `(${model.host}) ${model.id}` : model.id}
-                                {model.context_length ? (
-                                  <span
-                                    className="text-xs text-[var(--text)] opacity-60 ml-2"
-                                  >
-                                    [ctx: {model.context_length}]
-                                  </span>
-                                ) : (
-                                  ''
-                                )}
+                                  )}
+                                  onMouseDown={() => {
+                                    updateConfig({ selectedModel: model.id });
+                                    setSearchQuery('');
+                                    setInputFocused(false);
+                                  }}
+                                >
+                                  {model.host ? `(${model.host}) ${model.id}` : model.id}
+                                  {model.context_length ? (
+                                    <span
+                                      className="text-xs text-[var(--text)] opacity-60 ml-2"
+                                    >
+                                      [ctx: {model.context_length}]
+                                    </span>
+                                  ) : (
+                                    ''
+                                  )}
+                                </div>
+                              ))
+                            ) : (
+                              <div className="p-2 text-[var(--text)] opacity-60 text-sm">
+                                No models found
                               </div>
-                            ))
-                          ) : (
-                             <div className="p-2 text-[var(--text)] opacity-60 text-sm">
-                              No models found
-                            </div>
-                          )}
+                            )}
                           </div>
-                       </ScrollArea>
+                        </ScrollArea>
+                      </Portal>
                     )}
                   </div>
                 </div>
