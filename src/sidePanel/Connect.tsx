@@ -77,7 +77,6 @@ export const Connect: FC = () => {
           "flex items-center justify-between w-full px-3 py-2 hover:no-underline",
           "text-[var(--text)] font-medium",
           "hover:brightness-95",
-          "data-[state=open]:border-b data-[state=open]:border-[var(--text)]/5"
         )}
       >
         <SettingTitle icon="♾️" text="Connect" />

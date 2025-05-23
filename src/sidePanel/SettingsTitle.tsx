@@ -30,6 +30,7 @@ export const SettingTitle = ({
           "opacity-90",
           "font-['Space_Mono',_monospace]",
           "text-base",
+          "font-bold",
         )}
       >
         {text}
