@@ -236,27 +236,6 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
     }
   }, [inputFocused]);
 
-  // Optional: recalculate on window resize/scroll
-  useEffect(() => {
-    if (!inputFocused) return;
-    const handle = () => {
-      if (inputRef.current) {
-        const rect = inputRef.current.getBoundingClientRect();
-        setDropdownPosition({
-          top: rect.bottom + window.scrollY,
-          left: rect.left + window.scrollX,
-          width: rect.width,
-        });
-      }
-    };
-    window.addEventListener('resize', handle);
-    window.addEventListener('scroll', handle, true);
-    return () => {
-      window.removeEventListener('resize', handle);
-      window.removeEventListener('scroll', handle, true);
-    };
-  }, [inputFocused]);
-
   return (
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
         <SheetOverlay />
