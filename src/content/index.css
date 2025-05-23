@@ -133,6 +133,13 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
+@theme {
+  --tracking-1: 0em;
+  --tracking-2: 0.025em;
+  --tracking-3: 0.05em;
+  --tracking-4: 0.1em;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

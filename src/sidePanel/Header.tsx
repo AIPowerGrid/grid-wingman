@@ -275,7 +275,7 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
                  COGNITO <sub className="italic contrast-200 text-[0.5em]">v3.5</sub>
                </a>
              </SheetTitle>
-             <SheetDescription className="text-center font-['Bruno_Ace_SC'] text-[var(--text)] leading-tight mt-0">
+             <SheetDescription className="text-center font-['Bruno_Ace_SC'] text-[var(--text)] leading-tight mt-2">
                Settings
              </SheetDescription>
           </SheetHeader>
@@ -435,7 +435,7 @@ const SettingsSheet: React.FC<SettingsSheetProps> = ({
                     </Button>
                  </div>
               </div>
-              <div className={cn("mt-auto text-center text-[var(--text)] opacity-70 text-xs font-normal pb-4", sectionPaddingX)}>
+              <div className={cn("mt-auto --tracking-4 text-center text-[var(--text)] opacity-70 shrink-0 text-xs font-normal pb-4")}>
                   Made with ❤️ by @3-Arc
               </div>
            </div>
