@@ -38,7 +38,7 @@ export const AddToChat = () => {
               className={cn(
                 "border-none shadow-none bg-transparent",
                 "hover:bg-[var(--text)]/10",
-                "text-foreground font-extrabold",
+                "text-foreground font-['space_mono']",
                 "px-2 h-9 w-fit",
                 "not-focus-visible",
                 "focus-visible:ring-1 focus-visible:ring-[var(--active)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--bg)]",
@@ -46,7 +46,7 @@ export const AddToChat = () => {
               )}
             >
               {!currentModeInConfig ? (
-                <span className="text-sm">Mode</span>
+                <span className="text-sm">MODE</span>
               ) : (
                 <span className="text-sm">{currentModeInConfig.toUpperCase()}</span>
               )}
@@ -64,7 +64,7 @@ export const AddToChat = () => {
           align="end"
           sideOffset={5}
           className={cn(
-            "bg-[var(--bg)] text-[var(--text)] border border-[var(--text)]/10 rounded-md shadow-lg",
+            "bg-[var(--bg)] text-[var(--text)] border border-[var(--text)]/10 font-['space_mono'] rounded-md shadow-lg",
             "min-w-[80px] z-50"
           )}
         >
