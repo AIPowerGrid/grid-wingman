@@ -1,5 +1,4 @@
 import { useState, useLayoutEffect, useRef, useEffect } from 'react';
-import toast from 'react-hot-toast';
 import { FiCopy, FiRepeat, FiPlay, FiPause, FiSquare } from 'react-icons/fi';
 import { MessageTurn } from './ChatHistory';
 import { EditableMessage } from './Message'; 
@@ -48,24 +47,19 @@ export const Messages: React.FC<MessagesProps> = ({
 
   useEffect(() => {
     const interval = setInterval(() => {
-      const currentlyPaused = isCurrentlyPaused();
-      const currentlySpeaking = isCurrentlySpeaking();
+      const speaking = isCurrentlySpeaking();
+      const paused = isCurrentlyPaused();
 
-      if (!currentlySpeaking && speakingIndex !== -1) {
+      if (!speaking && speakingIndex !== -1) {
         setSpeakingIndex(-1);
         setTtsIsPaused(false);
+      } else if (speaking) {
+        setTtsIsPaused(paused);
       }
-      else if (currentlySpeaking && ttsIsPaused !== currentlyPaused) {
-        setTtsIsPaused(currentlyPaused);
-      }
-      else if (currentlyPaused && speakingIndex === -1) {
-         setTtsIsPaused(true);
-      }
-
     }, 250);
 
     return () => clearInterval(interval);
-  }, [speakingIndex, ttsIsPaused]);
+  }, [speakingIndex]);
 
   useLayoutEffect(() => {
     const container = containerRef.current;
@@ -80,25 +74,62 @@ export const Messages: React.FC<MessagesProps> = ({
 
   const copyMessage = (text: string) => {
     navigator.clipboard.writeText(text)
-      .then(() => toast.success('Copied to clipboard'))
-      .catch(() => toast.error('Failed to copy'));
+  };
+
+  const handlePause = () => {
+    console.log("Handle pause called");
+    if (!ttsIsPaused) {
+      pauseSpeech();
+    }
+  };
+
+  const handleResume = () => {
+    console.log("Handle resume called");
+    if (ttsIsPaused) {
+      resumeSpeech();
+    }
   };
 
   const handlePlay = (index: number, text: string) => {
     console.log(`Attempting to play index: ${index}`);
+    
+    if (index === speakingIndex && ttsIsPaused) {
+      console.log('Attempting to resume paused speech');
+      handleResume();
+      return;
+    }
+    
     const textToSpeak = cleanTextForTTS(text);
-    console.log(`Cleaned text for TTS: "${textToSpeak}"`);
+    console.log(`Starting new speech for index: ${index}`);
+    setSpeakingIndex(index);
     speakMessage(textToSpeak, config?.tts?.selectedVoice, config?.tts?.rate, {
-      onStart: () => { console.log(`Speech started for index: ${index}`); setSpeakingIndex(index); setTtsIsPaused(false); },
-      onEnd: () => { console.log(`Speech ended for index: ${index}`); if (speakingIndex === index) { setSpeakingIndex(-1); setTtsIsPaused(false); } },
-      onPause: () => { console.log(`Speech paused for index: ${index}`); if (speakingIndex === index) { setTtsIsPaused(true); } },
-      onResume: () => { console.log(`Speech resumed for index: ${index}`); if (speakingIndex === index) { setTtsIsPaused(false); } },
+      onStart: () => {
+        console.log(`Speech started for index: ${index}`);
+        setSpeakingIndex(index);
+        setTtsIsPaused(false);
+      },
+      onEnd: () => {
+        console.log(`Speech ended for index: ${index}`);
+        setSpeakingIndex(-1);
+        setTtsIsPaused(false);
+      },
+      onPause: () => {
+        console.log(`Speech paused for index: ${index}`);
+        setTtsIsPaused(true);
+      },
+      onResume: () => {
+        console.log(`Speech resumed for index: ${index}`);
+        setTtsIsPaused(false);
+      },
     });
   };
 
-  const handlePause = () => { console.log("Handle pause called"); pauseSpeech(); };
-  const handleResume = () => { console.log("Handle resume called"); resumeSpeech(); };
-  const handleStop = () => { console.log("Handle stop called"); stopSpeech(); setSpeakingIndex(-1); setTtsIsPaused(false); };
+  const handleStop = () => {
+    console.log("Handle stop called");
+    stopSpeech();
+    setSpeakingIndex(-1);
+    setTtsIsPaused(false);
+  };
 
   const startEdit = (index: number, currentContent: string) => { setEditingIndex(index); setEditText(currentContent); };
   const cancelEdit = () => { setEditingIndex(null); setEditText(''); };
@@ -129,43 +160,44 @@ export const Messages: React.FC<MessagesProps> = ({
             onMouseLeave={() => setHoveredIndex(-1)}
           >
             {turn.role === 'assistant' && (
-              (<div
+              <div
                 className={cn(
-                  "flex flex-col items-center self-end space-y-0 mr-1 pb-3 transition-opacity duration-200",
-                  (hoveredIndex === i || speakingIndex === i) ? 'opacity-100' : 'opacity-0'
+                  "flex flex-col items-center self-end space-y-0 mr-0 pb-3 transition-opacity duration-100",
+                  hoveredIndex === i ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
                 )}
               >
                 {editingIndex !== i && (
-                  <Button aria-label="Copy" variant="ghost" size="sm" onClick={() => copyMessage(turn.rawContent)} title="Copy message">
-                    <FiCopy className="h-4 w-4 text-[var(--text)]" />
-                  </Button>
-                )}
-                {speakingIndex === i ? (
-                  ttsIsPaused ? (
-                    <Button aria-label="Resume" variant="ghost" size="sm" onClick={handleResume} title="Resume speech">
-                      <FiPlay className="h-4 w-4 text-[var(--text)]" />
-                    </Button>
-                  ) : (
-                    <Button aria-label="Pause" variant="ghost" size="sm" onClick={handlePause} title="Pause speech">
-                      <FiPause className="h-4 w-4 text-[var(--text)]" />
-                    </Button>
-                  )
-                ) : (
-                  <Button aria-label="Speak" variant="ghost" size="sm" onClick={() => handlePlay(i, turn.rawContent)} title="Speak message">
-                    <FiPlay className="h-4 w-4 text-[var(--text)]" />
+                  <Button aria-label="Copy" variant="message-action" size="xs" onClick={() => copyMessage(turn.rawContent)} title="Copy message">
+                    <FiCopy className="text-[var(--text)]" />
                   </Button>
                 )}
                 {speakingIndex === i && (
-                   <Button aria-label="Stop" variant="ghost" size="sm" onClick={handleStop} title="Stop speech">
-                     <FiSquare className="h-4 w-4 text-[var(--text)]" />
-                   </Button>
+                  <>
+                    <Button 
+                      aria-label={ttsIsPaused ? "Resume" : "Pause"} 
+                      variant="message-action" 
+                      size="xs" 
+                      onClick={ttsIsPaused ? handleResume : handlePause} 
+                      title={ttsIsPaused ? "Resume speech" : "Pause speech"}
+                    >
+                      {ttsIsPaused ? <FiPlay className="text-[var(--text)]" /> : <FiPause className="text-[var(--text)]" />}
+                    </Button>
+                    <Button aria-label="Stop" variant="message-action" size="xs" onClick={handleStop} title="Stop speech">
+                      <FiSquare className="text-[var(--text)]" />
+                    </Button>
+                  </>
                 )}
-                {i === turns.length - 1 && (
-                  <Button aria-label="Reload" variant="ghost" size="sm" onClick={onReload} title="Reload last prompt">
-                    <FiRepeat className="h-4 w-4 text-[var(--text)]" />
+                {speakingIndex !== i && (
+                  <Button aria-label="Speak" variant="message-action" size="xs" onClick={() => handlePlay(i, turn.rawContent)} title="Speak message">
+                    <FiPlay className="text-[var(--text)]" />
                   </Button>
                 )}
-              </div>)
+                {i === turns.length - 1 && (
+                  <Button aria-label="Reload" variant="message-action" size="xs" onClick={onReload} title="Reload last prompt">
+                    <FiRepeat className="text-[var(--text)]" />
+                  </Button>
+                )}
+              </div>
             )}
             <EditableMessage
               turn={turn}
@@ -179,13 +211,13 @@ export const Messages: React.FC<MessagesProps> = ({
             {turn.role === 'user' && (
               (<div
                  className={cn(
-                  "flex flex-col items-center self-end space-y-0 ml-1 pb-1 transition-opacity duration-200",
-                  hoveredIndex === i ? 'opacity-100' : 'opacity-0'
-                )}
+                    "flex flex-col items-center self-end space-y-0 ml-0 pb-1 transition-opacity duration-100",
+                    hoveredIndex === i ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+                  )}
               >
                 {editingIndex !== i && (
-                  <Button aria-label="Copy" variant="ghost" size="sm" onClick={() => copyMessage(turn.rawContent)} title="Copy message">
-                    <FiCopy className="h-4 w-4 text-[var(--text)]" />
+                  <Button aria-label="Copy" variant="message-action" size="sm" onClick={() => copyMessage(turn.rawContent)} title="Copy message">
+                    <FiCopy className="text-[var(--text)]" />
                   </Button>
                 )}
               </div>)

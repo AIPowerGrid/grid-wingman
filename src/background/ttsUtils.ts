@@ -28,8 +28,15 @@ let onStartCallback: (() => void) | null = null;
 let onPauseCallback: (() => void) | null = null;
 let onResumeCallback: (() => void) | null = null;
 
+// Add these state tracking variables at the top
+let isSpeechPaused = false;
+let currentText = '';
+let currentVoice: SpeechSynthesisVoice | null = null;
+let currentRate = 1;
+
 export const isCurrentlySpeaking = (): boolean => window.speechSynthesis.speaking;
-export const isCurrentlyPaused = (): boolean => window.speechSynthesis.paused;
+export const isCurrentlyPaused = (): boolean => 
+  isSpeechPaused || window.speechSynthesis.paused;
 
 export const speakMessage = (
   text: string,
@@ -67,7 +74,7 @@ export const speakMessage = (
 
   utterance.onstart = () => {
     console.log('Speech started');
-    currentUtterance = utterance; // Set current utterance on actual start
+    currentUtterance = utterance; // Move this here to ensure it's set when speech actually starts
     if (onStartCallback) onStartCallback();
   };
 
@@ -99,7 +106,6 @@ export const speakMessage = (
      }
   };
 
-  currentUtterance = null;
   window.speechSynthesis.speak(utterance);
 };
 
@@ -110,6 +116,9 @@ export const stopSpeech = () => {
   console.log('Stopping speech');
   const callback = onEndCallback; // Capture callback before clearing
   currentUtterance = null;
+  currentText = '';
+  currentVoice = null;
+  isSpeechPaused = false;
   onStartCallback = onEndCallback = onPauseCallback = onResumeCallback = null;
 
   window.speechSynthesis.cancel(); // Stop speaking and clear queue
@@ -121,13 +130,51 @@ export const stopSpeech = () => {
 };
 
 export const pauseSpeech = () => {
-  if (isCurrentlySpeaking() && !isCurrentlyPaused()) {
-    window.speechSynthesis.pause();
+  if (currentUtterance && isCurrentlySpeaking() && !isSpeechPaused) {
+    console.log('Pausing speech');
+    try {
+      isSpeechPaused = true;
+      window.speechSynthesis.pause();
+      if (onPauseCallback) onPauseCallback();
+    } catch (error) {
+      console.error('Error pausing speech:', error);
+      // Fallback: Store current state for manual resume
+      if (currentUtterance) {
+        currentText = currentUtterance.text;
+        currentVoice = currentUtterance.voice;
+        currentRate = currentUtterance.rate;
+      }
+    }
   }
 };
 
 export const resumeSpeech = () => {
-  if (isCurrentlyPaused()) {
+  console.log('Attempting to resume speech, isPaused:', isSpeechPaused);
+  if (!isSpeechPaused) return;
+
+  try {
     window.speechSynthesis.resume();
+    isSpeechPaused = false;
+    if (onResumeCallback) onResumeCallback();
+  } catch (error) {
+    console.error('Error resuming speech, attempting fallback:', error);
+    // Fallback: Recreate utterance and start from approximate position
+    if (currentText && currentUtterance) {
+      window.speechSynthesis.cancel();
+      const newUtterance = new SpeechSynthesisUtterance(currentText);
+      newUtterance.voice = currentVoice;
+      newUtterance.rate = currentRate;
+      
+      newUtterance.onend = currentUtterance.onend;
+      newUtterance.onstart = currentUtterance.onstart;
+      newUtterance.onpause = currentUtterance.onpause;
+      newUtterance.onresume = currentUtterance.onresume;
+      newUtterance.onerror = currentUtterance.onerror;
+      
+      currentUtterance = newUtterance;
+      window.speechSynthesis.speak(newUtterance);
+      isSpeechPaused = false;
+      if (onResumeCallback) onResumeCallback();
+    }
   }
 };
