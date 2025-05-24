@@ -267,10 +267,10 @@ export const ChatHistory = ({ loadChat, onDeleteAll, className }: ChatHistoryPro
       </ScrollArea>
 
       {totalPages > 1 && (
-        <div className="flex justify-center items-center space-x-2 p-2 border-t border-border font-['Space_Mono',_monospace]">
-          <Button onClick={handlePrevPage} disabled={currentPage === 1} variant="outline" className="font-['Space_Mono',_monospace]">Prev</Button>
+        <div className="flex justify-center items-center space-x-2 p-2 border-t border-[var(--text)]/20 font-['Space_Mono',_monospace]">
+          <Button onClick={handlePrevPage} disabled={currentPage === 1} size="sm" variant="outline" className="font-['Space_Mono',_monospace]">Prev</Button>
           <span>Page {currentPage} of {totalPages}</span>
-          <Button onClick={handleNextPage} disabled={currentPage === totalPages} variant="outline" className="font-['Space_Mono',_monospace]">Next</Button>
+          <Button onClick={handleNextPage} disabled={currentPage === totalPages} size="sm" variant="outline" className="font-['Space_Mono',_monospace]">Next</Button>
         </div>
       )}
     </div>
