@@ -31,7 +31,7 @@ const AnimatedBackground: React.FC = () => {
 
       // Matrix characters and colors
       const MATRIX_CHARACTERS = [
-        'ﾊ','ﾐ','ﾋ','ｰ','ｳ','ｼ','ﾅ','ﾓ','ﾆ','ｻ','ﾜ','ﾂ','ｵ','ﾘ','ｱ','ﾎ','ﾃ','ﾏ','ｹ','ﾒ','ｴ','ｶ','ｷ','ﾑ','ﾕ','ﾗ','ｾ','ﾈ','ｽ','ﾀ','ﾇ','ﾍ','ｦ','ｲ','ｸ','ｺ','ｿ','ﾁ','ﾄ','ﾉ','ﾌ','ﾔ','ﾖ','ﾙ','ﾚ','ﾛ','ﾝ','0','1','2','3','4','5','7','8','9','Z','*','+','-','<','>','¦','|','ç','ﾘ','ｸ',
+        'N','ﾐ','ﾋ','𐌊','ｳ','ｼ','ﾅ','𐌔','X','ｻ','ﾜ','ㄘ','𑖖','𑖃','𑖆','𐌈','J','ｱ','ﾎ','ﾃ','M','π','Σ','Y','ㄭ','ｷ','ㄠ','ﾕ','ﾗ','ｾ','ﾈ','Ω','ﾀ','ﾇ','ﾍ','ｦ','ｲ','ｸ','W','𐌙','ﾁ','ﾄ','ﾉ','Δ','ﾔ','ㄖ','ﾙ','ﾚ','王','Ж','ﾝ','0','1','2','3','4','5','7','8','9','A','B','Z','*','+','д','Ⱟ','𑗁','T','|','ç','ﾘ','Ѯ',
       ];
       const GREENS = ['#15803d', '#16a34a', '#22c55e', '#4ade80'];
       const WHITE = '#f0fdf4';
@@ -47,10 +47,10 @@ const AnimatedBackground: React.FC = () => {
       // Each column gets its own speed (higher = slower)
       let speeds: number[] = Array(columns)
         .fill(0)
-        .map(() => Math.floor(Math.random() * 2) + 1); // random between 10 and 20 frames per step, frame lower = faster
+        .map(() => Math.floor(Math.random() * 2) + 1); // frame lower = faster
       let columnFrames: number[] = Array(columns).fill(0);
 
-      const TRAIL_LENGTH = 15;
+      const TRAIL_LENGTH = 12;
 
       function drawMatrixRain() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -72,7 +72,7 @@ const AnimatedBackground: React.FC = () => {
             ctx.fillStyle = j === 0
               ? WHITE
               : cell.color;
-            ctx.globalAlpha = 0.8 * (1 - j / TRAIL_LENGTH);
+            ctx.globalAlpha = 0.3 * (1 - j / TRAIL_LENGTH);
             ctx.fillText(
               cell.char,
               i * columnWidth + columnWidth / 2,

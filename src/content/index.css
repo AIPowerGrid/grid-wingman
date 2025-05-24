@@ -173,7 +173,6 @@
   scrollbar-width: none;  /* Firefox */
 }
 
-
 :root {
 --markdown-h1: var(--foreground);
 --markdown-h2: var(--foreground);
@@ -576,4 +575,76 @@ html[data-paper-texture="true"] #root::before {
   position: absolute;
   border-radius: 100%;
   opacity: 0.7;
+}
+
+/* City Nights Text Effect Animation */
+@keyframes cityLights {
+  0% {
+    color: hsl(230, 40%, 80%);
+    text-shadow:
+      0 0 1em hsla(320, 100%, 50%, 0.2),
+      0 0 0.125em hsla(320, 100%, 60%, 0.3),
+      -1em -0.125em 0.5em hsla(40, 100%, 60%, 0),
+      1em 0.125em 0.5em hsla(200, 100%, 60%, 0);
+  }
+  
+  30% { 
+    color: hsl(230, 80%, 90%);
+    text-shadow:
+      0 0 1em hsla(320, 100%, 50%, 0.5),
+      0 0 0.125em hsla(320, 100%, 60%, 0.5),
+      -0.5em -0.125em 0.25em hsla(40, 100%, 60%, 0.2),
+      0.5em 0.125em 0.25em hsla(200, 100%, 60%, 0.4);
+  }
+  
+  40% { 
+    color: hsl(230, 100%, 95%);
+    text-shadow:
+      0 0 1em hsla(320, 100%, 50%, 0.5),
+      0 0 0.125em hsla(320, 100%, 90%, 0.5),
+      -0.25em -0.125em 0.125em hsla(40, 100%, 60%, 0.2),
+      0.25em 0.125em 0.125em hsla(200, 100%, 60%, 0.4);
+  }
+  
+  70% {
+    color: hsl(230, 80%, 90%);
+    text-shadow:
+      0 0 1em hsla(320, 100%, 50%, 0.5),
+      0 0 0.125em hsla(320, 100%, 60%, 0.5),
+      0.5em -0.125em 0.25em hsla(40, 100%, 60%, 0.2),
+      -0.5em 0.125em 0.25em hsla(200, 100%, 60%, 0.4);
+  }
+  
+  100% {
+    color: hsl(230, 40%, 80%);
+    text-shadow:
+      0 0 1em hsla(320, 100%, 50%, 0.2),
+      0 0 0.125em hsla(320, 100%, 60%, 0.3),
+      1em -0.125em 0.5em hsla(40, 100%, 60%, 0),
+      -1em 0.125em 0.5em hsla(200, 100%, 60%, 0);
+  }
+}
+
+/* Base header title styles */
+.header-title-glow {
+  font-weight: 300;
+  transition: all 0.3s ease;
+}
+
+/* Apply animation only when background is dark (via .dark class) */
+.dark .header-title-glow {
+  animation: cityLights 5s 750ms linear infinite;
+}
+
+/* Light theme default styling */
+:not(.dark) .header-title-glow {
+  color: var(--text);
+  text-shadow: none;
+}
+
+/* Apply to specific header elements */
+.configuration-title,
+.chat-history-title {
+  font-size: 1.5rem;
+  font-weight: 300;
 }

@@ -203,8 +203,7 @@ export const Input: FC<InputProps> = ({ isLoading, message, setMessage, onSend }
   return (
     <div className={cn(
       "flex w-full items-center gap-0 p-0 bg-[var(--card,var(--bg-secondary))] rounded-lg shadow-md",
-      config?.theme === 'dark' ? 'border border-[var(--active)]' : 'border border-[var(--text)]/20',
-      isFocused && "input-breathing" // <-- Add this
+      isFocused && "input-breathing"
     )}>
       <AddToChat /> 
       <AutoResizeTextarea

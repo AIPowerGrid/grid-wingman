@@ -385,14 +385,14 @@ export const Header: React.FC<HeaderProps> = ({
             )}
             {settingsMode && (
               <div className="flex items-center justify-center">
-                 <p className="relative top-0 text-lg font-['Bruno_Ace_SC'] text-[var(--text)] text-center">
-                   Configuration
-                 </p>
+                <p className="relative top-0 text-lg font-['Bruno_Ace_SC'] header-title-glow">
+                  Configuration
+                </p>
               </div>
             )}
             {historyMode && (
               <div className="flex items-center justify-center">
-                <p className="font-['Bruno_Ace_SC'] text-lg text-[var(--text)] whitespace-nowrap text-center">
+                <p className="font-['Bruno_Ace_SC'] text-lg header-title-glow">
                   Chat History
                 </p>
               </div>
