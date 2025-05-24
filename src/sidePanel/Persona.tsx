@@ -259,14 +259,16 @@ const PersonaSelect = ({
           "text-[var(--text)]", "flex w-full", "border-[var(--text)]/10",
           "focus:border-[var(--active)] focus:ring-1 focus:ring-[var(--active)]",
           "hover:border-[var(--active)] hover:brightness-98",
-          "data-[placeholder]:text-muted-foreground"
+          "bg-[rgba(255,250,240,0.4)] dark:bg-[rgba(255,255,255,0.1)]",
+          "data-[placeholder]:text-muted-foreground",
+          "h-8"
         )}
       >
         <SelectValue placeholder="Select persona" />
       </SelectTrigger>
       <SelectContent
         className={cn(
-          "bg-[var(--bg)] text-[var(--text)] border",
+          "bg-[var(--bg)] text-[var(--text)] border-[var(--text)]/10",
           "rounded-md shadow-lg"
         )}
       >

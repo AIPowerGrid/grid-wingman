@@ -5,14 +5,14 @@ import { cn } from "@/src/background/util";
 
 const selectTriggerVariants = {
   default:
-    "bg-transparent data-[placeholder]:text-muted-foreground [&_svg:not([class*='text-'])]:text-muted-foreground aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive shadow-xs data-[size=default]:h-9 data-[size=sm]:h-8",
+    "bg-transparent data-[placeholder]:text-muted-foreground [&_svg:not([class*='text-'])]:text-muted-foreground aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive shadow-xs data-[size=sm]:h-8",
   settingsPanel: cn(
     "text-[var(--text)] rounded-xl shadow-md",
     "focus:border-[var(--active)] focus:ring-1 focus:ring-[var(--active)]",
     "hover:border-[var(--active)] hover:brightness-98",
     "bg-[rgba(255,250,240,0.4)] dark:bg-[rgba(255,255,255,0.1)]", // This needs to align with your `controlBg` logic
     "border-[var(--text)]/10", // subtleBorderClass
-    "h-9"
+    "h-8"
   ),
 };
 

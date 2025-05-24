@@ -26,9 +26,9 @@ export const TtsSettings = () => {
   const [errorLoading, setErrorLoading] = useState<string | null>(null);
 
   const subtleBorderClass = 'border-[var(--text)]/10';
-  const controlBg = "bg-[rgba(255,250,240,0.4)] dark:bg-[rgba(255,255,255,0.1)]";  const itemShadow = 'shadow-md';
+  const controlBg = "bg-[rgba(255,250,240,0.4)] dark:bg-[rgba(255,255,255,0.1)]";  
+  const itemShadow = 'shadow-md';
   const itemRounded = 'rounded-xl';
-  const inputHeight = 'h-9';
 
   const sliderClass = cn(
     "w-full",
@@ -129,11 +129,11 @@ export const TtsSettings = () => {
                   className={cn(
                     controlBg,
                     subtleBorderClass,
-                    inputHeight,
-                    "text-[var(--text)] rounded-xl shadow-md w-full",
+                    "text-[var(--text)] rounded-md shadow-md w-full",
                     "focus:border-[var(--active)] focus:ring-1 focus:ring-[var(--active)]",
                     "hover:border-[var(--active)] hover:brightness-98",
-                    "data-[placeholder]:text-muted-foreground"
+                    "data-[placeholder]:text-muted-foreground",
+                    "h-8"
                   )}
                 >
                   <SelectValue placeholder="Select voice" />

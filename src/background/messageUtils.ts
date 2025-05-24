@@ -89,7 +89,8 @@ export const downloadImage = (turns: MessageTurn[]) => {
   wrapper.style.paddingBottom = '1rem';
   wrapper.style.background = document.documentElement.style.getPropertyValue('--bg');
   if (nodes[0]) {
-      wrapper.style.width = `${nodes[0].offsetWidth}px`;
+      const widthMultiplier = 1.2; // Adjust this value to control width ratio
+      wrapper.style.width = `${nodes[0].offsetWidth * widthMultiplier}px`;
   }
 
 
