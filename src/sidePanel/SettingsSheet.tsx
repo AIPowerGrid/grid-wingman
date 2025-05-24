@@ -405,7 +405,7 @@ export const SettingsSheet: React.FC<SettingsSheetProps> = ({
                     </Button>
                  </div>
               </div>
-              <div className={cn("mt-auto --tracking-4 text-center text-[var(--text)] opacity-70 shrink-0 text-xs font-normal pb-4")}>
+              <div className={cn("mt-auto text-center text-[var(--text)] opacity-70 shrink-0 text-xs font-mono pb-4")}>
                   Made with ❤️ by @3-Arc
               </div>
            </div>
