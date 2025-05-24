@@ -1,11 +1,29 @@
 ![title.png](docs/title.png)
-# Cognito: Your All-in-One AI Companion for Browser LLMs
+# Cognito: Your Browser's AI Brain. Free, Fast, and Always On
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Cognito is your FREE, all-in-one AI companion, now available directly from the Chrome Extension Store! This powerful extension brings the capabilities of Large Language Models (LLMs) to your browser, allowing you to summarize web pages, interact directly with page content, conduct context-aware web searches, read out the responses, and more. Choose between cloud-based services like OpenAI and Gemini or run models locally with Ollama and LM Studio. **Install Cognito today and enjoy AI in your browser!**
+Get instant summaries, intelligent searches, and AI interactions directly in your Chrome browser. Tired of information overload? Cognito cuts through the noise. Get instant summaries of any webpage, ask questions about what you're reading, and conduct smarter searches—all without leaving your browser. No subscriptions, no complex setups. Cognito is free and runs right in your Chrome browser.
+
+Run powerful AI models directly on your computer with Ollama, LM Studio, and more – or connect to cloud services like OpenAI and Gemini. *You choose the power.*
 
 Built on [sidellama](https://github.com/gyopak/sidellama).
+
+## Screenshot
+
+![](docs/screenshot.png)
+
+## Key Features
+
+*   **Note** You can save context in the note and inject it into LLM as you want, it's convenient for you to compare or to embed context. Memory coming soon!
+*   **Instant Summaries:** Get the gist of any webpage in seconds.
+*   **Intelligent Interactions:** Ask questions and get answers directly from page content.
+*   **Smart Web Search:** Context-aware searches using Google, DuckDuckGo, and Wikipedia.
+*   **Flexible AI Power:** Use local models (Ollama, LM Studio) or cloud services (OpenAI, Gemini).
+*   **Customizable Personas:** Choose from 7 pre-built AI personalities (researcher, strategist, etc.).
+*   **Advanced Problem Solving:** Unique 'Computation Levels' for simple queries to complex tasks.
+*   **Reads Aloud:** Hear responses with built-in text-to-speech.
+
 ## Roadmap
 
 *   Bug fixes and improvements.
@@ -17,74 +35,7 @@ Built on [sidellama](https://github.com/gyopak/sidellama).
 *   "Short Memory"(state) for web search and page parsing in the same task. Comparison mode.
 *   Edit text content directly from sidepanel. Basically, I want to extend this to the "AI agent".
 *   Add to note function (webpage, chat)
-*   Better local TTS/STT by API. [add https://github.com/rhulha/StreamingKokoroJS to my extension, thanks for your code in advance.] 
-
-
-[^1]: Consider it's done. Kiwix search plan abandoned, because it's less useful when it comes to LLM search. Just use the Zim browser locally. LLM won't be helpful if there is no embedding process. For local search, the best/easiest solution I think is to set up a local search index based on https://github.com/stanford-oval/WikiChat option 2, then change the links inside the network.tsx to HTTP://localhost:[your_port_number]. 
-## Screenshot
-
-![](docs/screenshot.png)
-
-## Key Features
-
-*   **Versatile LLM Support:**
-    *   **Cloud LLMs:** Compatible with any OpenAI API-compliant service: OpenAI, Gemini, GROQ, OPENROUTER. Plus one.
-    *   **Local LLMs:** Seamlessly integrates with:
-        *   Ollama
-        *   LM Studio
-        *   GPT4All
-        *   Jan
-        *   Open WebUI
-        *   ...and any other platform that exposes an OpenAI-compatible API!
-
-*   **Diverse Personas:** Seven pre-built personas designed to cater to specific needs (see below).
-*   **Note** You can save context in the note and inject it to LLM as you want, it's convenient for you to compare or to embed context. This will be developed into a comprehensive memory system with RAG.  
-*   **Web Search Integration:** Enhanced access to information for context-aware AI interactions. Google Custom Search, Google Brave, DuckDuckGo, and Wikipedia Search are done in natural language.
-*   **Page context reading** Transcripts reading included for Bloomberg, YouTube, or other providers who put the transcripts in their HTML. PDF supports.
-*   **Enhanced Summarization** More granular control over summary length and detail over personas.
-*   **TTS** Currently, there is only basic TTS from the browser, so if you want some natural voices, you should use Edge or you have integrated TTS API from elsewhere. https://github.com/ken107/piper-browser-extension Here is an excellent Chrome extension that can add a local TTS service directly to Chrome, so you can find the downloaded models in the select dropdown in settings. And I found some https://github.com/remsky/Kokoro-FastAPI https://github.com/Lex-au/Orpheus-FastAPI, maybe we can integrate with them too. I have put a .tsx like that in the files anyway. I will look into this further. I hope someone can add this if possible, because so far it's good enough for me. But still, it's better to have some more choices without breaking anything.
-*   **Computation Levels** New function, https://github.com/AlexBefest/highCompute.py, I use this idea and some of his code. Thanks. **WARN: STILL TESTING - Please use your local LLM, it will trigger resource exhaustion. Even though I add one second decay to every prompt to avoid concurrent prompts. And from the [readme](https://github.com/AlexBefest/highCompute.py) it might be good for coding, but the result is meh for paperwork, I guess.** check my test 'making 3k in one day' [low](https://github.com/user-attachments/assets/ea26cf72-393b-4027-a26a-058086b1dd71) check [medium](https://github.com/user-attachments/assets/9ebfd187-4f3f-4370-846e-3c7c3c5e5c19) After checking logs, it appears to be my code and prompt are fine, it just needs a better model. QWEN 3 8B is good enough for simple QA, but it falls short when it comes to complex instructions in automatic procedures. So you need a good local model to run it here, or you can just use the 'deep research' function directly in their websites. I will try to optimize the query processing and prompts.
-
-## Computation Levels: Tailor AI Power to Your Task (Beta)
-
-Cognito now offers adjustable Computation Levels, allowing you to fine-tune the AI's processing power to match the complexity of your query. This groundbreaking feature lets you choose between **Low, Medium, and High** compute modes, each strategically designed for different task types. By decomposing complex problems into smaller, manageable parts, Cognito can achieve more accurate and nuanced results.
-
-*   **Low:** Direct query to the LLM for a quick response. Ideal for simple questions and standard chat.
-*   **Medium:** Single-level task decomposition for moderately complex queries, breaking down the task into subtasks and synthesizing the results.
-*   **High:** Two-level task decomposition (stages → steps) for highly complex, multi-component tasks. This mode allows for in-depth planning and problem-solving.
-
-**How It Works:**
-
-*   **Low:** `User Query → LLM (single call) → Response`
-*   **Medium:** `User Query → LLM (decomposition) → Subtasks → LLM (solve subtasks) → Synthesis → Final Answer`
-*   **High:** `User Query → LLM (Level 1 decomposition) → Stages → LLM (Level 2 decomposition) → Steps → LLM (solve steps) → Synthesis → Stage Results → Synthesis → Final Answer`
-
-**Flexible Adjustment:** You can seamlessly switch between Compute Levels within a single conversation to optimize performance and resource usage.
-
-**Important Considerations (Beta Phase):**
-
-*   **Experimental Feature:** The Computation Levels feature is currently in **beta**. We encourage experimentation and feedback!
-*   **Token Usage:** Higher Compute Levels significantly increase token consumption. **High Compute can use 100-150x more tokens than Low Compute for the same query.**
-*   **Cost Implications:** If you're using a paid LLM API (e.g., OpenAI), be mindful of the potential cost increase with Medium and High Compute. Monitor your API usage closely.
-*   **Processing Time:** Expect longer processing times with Medium and High Compute as the AI performs multiple decomposition and synthesis steps.
-*   **Potential Instability:** As a beta feature, unexpected behavior may occur. Please report any issues you encounter.
-
-By carefully selecting the appropriate Computation Level, you can unlock the full potential of Cognito while managing your resources effectively. We believe this feature will provide a significant boost in the quality of AI-driven problem-solving.
-   
-## Available Personas
-
-Cognito offers the following personas to tailor the AI's behavior to your specific needs:
-
-*   **Ein:** Academic researcher
-*   **Warren:** Business analyst
-*   **Jet:** Friendly assistant
-*   **Agatha:** Creative thinker
-*   **Jan:** Strategist
-*   **Sherlock:** Detective
-*   **Spike:** All-around assistant
-
-See the [documentation](DOCs.md) for a complete overview of each persona's capabilities.
-
+*   Better local TTS/STT by API. [add https://github.com/rhulha/StreamingKokoroJS to my extension, thanks for your code in advance.]
 ## Installation
 
 ### Download the Latest Release
@@ -105,8 +56,36 @@ or a updated version before installation:
 2. then `ncu -u` or `npx ncu -u`
 3. load package
 
+## Furter tweaks
+**TTS** Currently, there is only basic TTS from the browser, so if you want some natural voices, you should use Edge or you have integrated TTS API from elsewhere. https://github.com/ken107/piper-browser-extension Here is an excellent Chrome extension that can add a local TTS service directly to Chrome, so you can find the downloaded models in the select dropdown in settings. And I found some https://github.com/remsky/Kokoro-FastAPI https://github.com/Lex-au/Orpheus-FastAPI, maybe we can integrate with them too. I have put a .tsx like that in the files anyway. I will look into this further. I hope someone can add this if possible, because so far it's good enough for me. But still, it's better to have some more choices without breaking anything.
 
+**Computation Levels** Need deeper insights? Cognito's unique 'Computation Levels' let you adjust the AI's thinking power. From quick answers to complex problem-solving, tailor the AI to your task.
 
+*   **Low:** Direct query to the LLM for a quick response. Ideal for simple questions and standard chat.
+*   **Medium:** Single-level task decomposition for moderately complex queries, breaking down the task into subtasks and synthesizing the results.
+*   **High:** Two-level task decomposition (stages → steps) for highly complex, multi-component tasks. This mode allows for in-depth planning and problem-solving.
+
+**Important Considerations (Beta Phase):**
+
+*   **Experimental Feature:** The Computation Levels feature is currently in **beta**. We encourage experimentation and feedback!
+*   **Token Usage:** Higher Compute Levels significantly increase token consumption. **High Compute can use 100-150x more tokens than Low Compute for the same query.** That means time and cost, too.
+*   **Potential Instability:** As a beta feature, unexpected behavior may occur. Please report any issues you encounter.
+
+By carefully selecting the appropriate Computation Level, you can unlock the full potential of Cognito while managing your resources effectively. We believe this feature will provide a significant boost in the quality of AI-driven problem-solving.
+   
+## Available Personas
+
+Cognito offers the following personas to tailor the AI's behavior to your specific needs:
+
+*   **Ein:** Academic researcher
+*   **Warren:** Business analyst
+*   **Jet:** Friendly assistant
+*   **Agatha:** Creative thinker
+*   **Jan:** Strategist
+*   **Sherlock:** Detective
+*   **Spike:** All-around assistant
+
+See the [documentation](DOCs.md) for a complete overview of each persona's capabilities.
 
 ## Documentation
 
