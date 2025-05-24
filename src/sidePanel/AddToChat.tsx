@@ -40,15 +40,15 @@ export const AddToChat = () => {
                 "hover:bg-[var(--text)]/10",
                 "text-foreground font-['space_mono']",
                 "px-2 h-9 w-fit",
+                "gap-0",
                 "not-focus-visible",
-                "focus-visible:ring-1 focus-visible:ring-[var(--active)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--bg)]",
                 "[&>svg]:text-[var(--text)]"
               )}
             >
               {!currentModeInConfig ? (
-                <span className="text-sm">MODE</span>
+                <span className="text-sm">mode</span>
               ) : (
-                <span className="text-sm">{currentModeInConfig.toUpperCase()}</span>
+                <span className="text-sm">{currentModeInConfig}</span>
               )}
             </SelectTrigger>
           </TooltipTrigger>

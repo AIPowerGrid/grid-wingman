@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FiX, FiTrash2 } from 'react-icons/fi';
 import { PiShareFatLight } from "react-icons/pi";
+import { TbReload } from "react-icons/tb";
 import { useConfig } from './ConfigContext';
 import { cn } from "@/src/background/util";
 import { toast } from 'react-hot-toast';
@@ -412,7 +413,7 @@ export const Header: React.FC<HeaderProps> = ({
                       className="text-[var(--text)] hover:bg-black/10 dark:hover:bg-white/10 rounded-md"
                       onClick={reset}
                     >
-                      <FiTrash2 size="18px" />
+                      <TbReload size="18px" />
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent side="bottom" className="bg-[var(--active)]/50 text-[var(--text)] border-[var(--text)]">

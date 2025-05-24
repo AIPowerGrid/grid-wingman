@@ -114,7 +114,7 @@ export const themes: Theme[] = [
   },
   {
     name: 'dark',
-    active: '#7473af',
+    active: '#5d5ca7dc',
     bg: '#373737',
     text: '#e3e3e3',
     bold: '#eb9500',
