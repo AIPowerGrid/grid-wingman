@@ -36,6 +36,7 @@ Built on [sidellama](https://github.com/gyopak/sidellama).
 *   Edit text content directly from sidepanel. Basically, I want to extend this to the "AI agent".
 *   Add to note function (webpage, chat)
 *   Better local TTS/STT by API. [add https://github.com/rhulha/StreamingKokoroJS to my extension, thanks for your code in advance.]
+*   Image, voice api support.
 ## Installation
 
 ### Download the Latest Release
