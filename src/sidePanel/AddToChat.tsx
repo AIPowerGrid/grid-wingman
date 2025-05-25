@@ -46,7 +46,7 @@ export const AddToChat = () => {
               )}
             >
               {!currentModeInConfig ? (
-                <span className="text-sm font-bold">Mode</span>
+                <span className="text-sm mr-1 font-bold">Mode</span>
               ) : (
                 <span className="text-sm font-bold">{currentModeInConfig}</span>
               )}
