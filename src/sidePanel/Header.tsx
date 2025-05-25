@@ -338,31 +338,17 @@ export const Header: React.FC<HeaderProps> = ({
                   variant="ghost"
                   size={showBackButton ? "sm" : undefined}
                   className={cn(
-                    "text-[var(--text)] hover:bg-black/10 dark:hover:bg-white/10 rounded-md",
-                    !showBackButton && "px-2 py-[3px] h-auto"
+                    "text-[var(--text)] hover:bg-black/10 dark:hover:bg-white/10 rounded-md p-0 h-8 w-8 flex items-center justify-center"
                   )}
                   onClick={handleLeftButtonClick}
                 >
                   {showBackButton ? (
                     <FiX size="22px" />
                   ) : (
-                    <div className="flex items-center space-x-1.5">
-                      <Avatar className="h-8 w-8 border border-[var(--active)]">
-                        <AvatarImage src={personaImageSrc} alt={currentPersona} />
-                        <AvatarFallback>{(currentPersona === 'default' ? 'C' : currentPersona.substring(0, 1)).toUpperCase()}</AvatarFallback>
-                      </Avatar>
-                      <div className="flex flex-col items-start -space-y-0.5">
-                        <span className="text-[13px] font-medium text-[var(--text)] leading-tight">
-                          {currentPersona === 'default' ? 'Jet' : currentPersona}
-                        </span>
-                        <span className="text-[10px] text-muted-foreground leading-tight flex items-center pt-0.5">
-                          {chatStatus === 'idle' && (
-                            <span className="h-1.5 w-1.5 bg-green-600 rounded-full mr-1"></span>
-                          )}
-                          {getStatusText(chatMode, chatStatus)}
-                        </span>
-                      </div>
-                    </div>
+                    <Avatar className="h-8 w-8 border border-[var(--active)]">
+                      <AvatarImage src={personaImageSrc} alt={currentPersona} />
+                      <AvatarFallback>{(currentPersona === 'default' ? 'C' : currentPersona.substring(0, 1)).toUpperCase()}</AvatarFallback>
+                    </Avatar>
                   )}
                 </Button>
               </TooltipTrigger>
@@ -370,6 +356,20 @@ export const Header: React.FC<HeaderProps> = ({
                 {leftButtonLabel}
               </TooltipContent>
             </Tooltip>
+            {/* Name and status are NOT hoverable, just next to avatar */}
+            {!showBackButton && (
+              <div className="flex flex-col justify-center ml-1">
+                <span className="text-[13px] font-medium text-[var(--text)] leading-tight">
+                  {currentPersona === 'default' ? 'Jet' : currentPersona}
+                </span>
+                <span className="text-[10px] text-muted-foreground leading-tight flex items-center pt-0.5">
+                  {chatStatus === 'idle' && (
+                    <span className="h-1.5 w-1.5 bg-green-600 rounded-full mr-1"></span>
+                  )}
+                  {getStatusText(chatMode, chatStatus)}
+                </span>
+              </div>
+            )}
           </div>
 
           {/* Middle Content Area */}
@@ -433,7 +433,7 @@ export const Header: React.FC<HeaderProps> = ({
                           aria-label="Share Options"
                           variant="ghost"
                           size="sm"
-                          className="-ml-2 text-[var(--text)] hover:text-foreground hover:bg-black/10 dark:hover:bg-white/10 rounded-md" // -ml-2 here is on the button, which is fine for inter-button spacing
+                          className="text-[var(--text)] hover:text-foreground hover:bg-black/10 dark:hover:bg-white/10 rounded-md" // -ml-2 here is on the button, which is fine for inter-button spacing
                         >
                           <PiShareFat size="18px" />
                         </Button>

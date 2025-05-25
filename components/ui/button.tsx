@@ -25,7 +25,7 @@ const buttonVariants = cva(
           "bg-transparent text-muted-foreground p-0 shadow-none hover:bg-transparent focus:bg-transparent active:text-muted active:[&_svg]:text-muted-foreground transition-colors duration-75",      },
       size: {
         default: "h-9 px-3 py-2 has-[>svg]:px-3 [&_svg:not([class*='size-'])]:size-5", // Default icons are size-5 (1.25rem)
-        sm: "h-8 rounded-md px-3 has-[>svg]:px-3 [&_svg:not([class*='size-'])]:size-4",    // Small icons are size-4 (1rem)
+        sm: "h-8 rounded-md px-2 has-[>svg]:px-2 [&_svg:not([class*='size-'])]:size-4",    // Small icons are size-4 (1rem)
         lg: "h-10 rounded-md px-3 py-2 has-[>svg]:px-3 [&_svg:not([class*='size-'])]:size-5",    // Large icons are size-5 (1.25rem), adjust if needed e.g. to size-6
         icon: "size-8 [&_svg:not([class*='size-'])]:size-7",
         xs: "h-6 w-6 p-0 rounded-sm [&_svg:not([class*='size-'])]:size-3.5 text-xs", // Extra small
