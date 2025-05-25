@@ -111,7 +111,6 @@ const Pre = (props: CustomPreProps) => {
             title={copied ? "Copied!" : "Copy code"}
             className={cn(
               "absolute right-2 top-2 h-8 w-8 p-0",
-              // "bg-background text-foreground hover:bg-accent hover:text-accent-foreground", // Covered by copy-button
               "transition-opacity duration-200",
               (hovered || copied) ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
             )}
@@ -412,7 +411,6 @@ export const EditableMessage: FC<MessageProps> = ({
             <Button
               variant="destructive-outline" // Changed variant
               size="sm"
-              // className="text-destructive border-destructive hover:text-destructive-foreground hover:bg-destructive" // Covered
               onClick={onCancelEdit}
               title="Discard changes"
             >
