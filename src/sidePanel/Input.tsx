@@ -3,7 +3,7 @@ import { AddToChat } from './AddToChat';
 import type { SpeechRecognition as SpeechRecognitionInstance, SpeechRecognitionEvent as SpeechRecognitionEventInstance, SpeechRecognitionErrorEvent as SpeechRecognitionErrorEventInstance } from '../types/speech';
 import { useEffect, useRef, useState, useCallback, Dispatch, SetStateAction } from 'react';
 import { FaRegStopCircle } from 'react-icons/fa';
-import { SlMicrophone } from "react-icons/sl";
+import { BsMic } from "react-icons/bs";
 import { BsSend } from "react-icons/bs";
 import { Loader2 } from 'lucide-react';
 import { useConfig } from './ConfigContext';
@@ -218,8 +218,8 @@ export const Input: FC<InputProps> = ({ isLoading, message, setMessage, onSend }
         onChange={event => setMessage(event.target.value)}
         onKeyDown={handleTextareaKeyDown}
         className="flex-grow !bg-transparent px-0 py-1"
-        onFocus={() => setIsFocused(true)}   // <-- Add this
-        onBlur={() => setIsFocused(false)}   // <-- Add this
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
       />
       {isSpeechRecognitionSupported && (
         <TooltipProvider delayDuration={500}>
@@ -241,11 +241,11 @@ export const Input: FC<InputProps> = ({ isLoading, message, setMessage, onSend }
                 className={cn(
                   "p-2 rounded-md",
                   "not-focus",
-                  isListening ? "text-red-500 hover:bg-destructive/10" : "text-foreground hover:bg-muted/50",
+                  isListening ? "text-red-500 hover:text-red-300 hover:bg-destructive/10" : "text-foreground hover:text-foreground hover:bg-[var(--text)]/10",
                 )}
               disabled={isLoading}
             >
-                {isListening ? <FaRegStopCircle size={18} /> : <SlMicrophone size={18} />}
+                {isListening ? <FaRegStopCircle size={18} /> : <BsMic size={18} />}
             </Button>
           </TooltipTrigger>
           <TooltipContent
@@ -267,7 +267,7 @@ export const Input: FC<InputProps> = ({ isLoading, message, setMessage, onSend }
               size="sm"
               className={cn(
                 "p-2 rounded-md",
-                !isLoading && "hover:bg-muted/50"
+                !isLoading && "hover:bg-[var(--text)]/10"
               )}
               onClick={handleSendClick}
               disabled={isLoading || !message.trim()}

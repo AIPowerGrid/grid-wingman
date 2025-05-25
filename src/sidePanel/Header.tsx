@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FiX, FiTrash2 } from 'react-icons/fi';
-import { PiShareFatLight } from "react-icons/pi";
+import { PiShareFat } from "react-icons/pi";
 import { TbReload } from "react-icons/tb";
 import { useConfig } from './ConfigContext';
 import { cn } from "@/src/background/util";
@@ -410,10 +410,13 @@ export const Header: React.FC<HeaderProps> = ({
                       aria-label="Reset Chat"
                       variant="ghost"
                       size="sm"
-                      className="text-[var(--text)] hover:bg-black/10 dark:hover:bg-white/10 rounded-md"
+                      className="text-[var(--text)] hover:bg-transparent rounded-md group"
                       onClick={reset}
                     >
-                      <TbReload size="18px" />
+                      <TbReload 
+                        size="18px" 
+                        className="transition-transform duration-300 rotate-0 group-hover:rotate-180 text-[var(--text)]" 
+                      />
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent side="bottom" className="bg-[var(--active)]/50 text-[var(--text)] border-[var(--text)]">
@@ -430,9 +433,9 @@ export const Header: React.FC<HeaderProps> = ({
                           aria-label="Share Options"
                           variant="ghost"
                           size="sm"
-                          className="-ml-2 text-[var(--text)] hover:bg-black/10 dark:hover:bg-white/10 rounded-md" // -ml-2 here is on the button, which is fine for inter-button spacing
+                          className="-ml-2 text-[var(--text)] hover:text-foreground hover:bg-black/10 dark:hover:bg-white/10 rounded-md" // -ml-2 here is on the button, which is fine for inter-button spacing
                         >
-                          <PiShareFatLight size="18px" />
+                          <PiShareFat size="18px" />
                         </Button>
                       </DropdownMenuPrimitive.Trigger>
                     </TooltipTrigger>

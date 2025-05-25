@@ -58,7 +58,7 @@ export const NotePopover = () => {
                 size="sm"
                 className={cn(
                   "rounded-md not-focus-visible",
-                  config.useNote ? "text-[var(--active)] hover:bg-muted/80" : "text-foreground hover:bg-muted/50"
+                  config.useNote ? "text-[var(--active)] hover:bg-muted/80" : "text-foreground hover:text-foreground hover:bg-[var(--text)]/10"
                 )}
                 aria-label="Toggle/Edit Note"
               >
@@ -70,7 +70,7 @@ export const NotePopover = () => {
             <p>Toggle/Edit Note</p>
           </TooltipContent>
         </Tooltip>
-      <PopoverContent className="w-80 p-4 bg-[var(--bg)] border-[var(--border)] shadow-lg rounded-md" side="top" align="end" sideOffset={5}>
+      <PopoverContent className="w-80 p-4 bg-[var(--bg)] border-[var(--text)]/10 shadow-lg rounded-md" side="top" align="end" sideOffset={5}>
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <Label htmlFor="use-note-switch" className="text-[var(--text)] font-medium cursor-pointer">
