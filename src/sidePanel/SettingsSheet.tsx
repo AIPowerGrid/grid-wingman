@@ -196,7 +196,7 @@ export const SettingsSheet: React.FC<SettingsSheetProps> = ({
             <div className="flex items-center justify-between mb-2 relative z-10">
                <Tooltip>
                  <TooltipTrigger asChild>
-                   <Button variant="ghost" size="sm" aria-label={isDark ? 'Light' : 'Dark'} onClick={toggleTheme} className="text-[var(--text)] hover:bg-black/10 dark:hover:bg-white/10 rounded-md ">
+                   <Button variant="ghost" size="sm" aria-label={isDark ? 'Light' : 'Dark'} onClick={toggleTheme} className="text-[var(--text)] rounded-md">
                      {document.documentElement.classList.contains('dark') ? <IoSunnyOutline size="20px" /> : <IoMoonOutline size="20px" />}
                    </Button>
                  </TooltipTrigger>
@@ -206,7 +206,7 @@ export const SettingsSheet: React.FC<SettingsSheetProps> = ({
                </Tooltip>
                <Tooltip>
                  <TooltipTrigger asChild>
-                   <Button variant="ghost" size="sm" aria-label="Close Settings" className="text-[var(--text)] hover:bg-black/10 dark:hover:bg-white/10 rounded-md relative top-[1px]" onClick={() => onOpenChange(false)}>
+                   <Button variant="ghost" size="sm" aria-label="Close Settings" className="text-[var(--text)] rounded-md relative top-[1px]" onClick={() => onOpenChange(false)}>
                      <FiX size="20px" />
                    </Button>
                  </TooltipTrigger>

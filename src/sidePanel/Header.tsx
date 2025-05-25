@@ -279,10 +279,10 @@ export const Header: React.FC<HeaderProps> = ({
               Cancel
             </Button>
             <Button
-              variant="destructive" 
+              variant="destructive" // Changed
               size="sm"
-              className={cn(
-                "focus:ring-1 focus:ring-red-400 focus:ring-offset-1 focus:ring-offset-[var(--bg)]" 
+              className={cn( // Changed
+                "focus:ring-1 focus:ring-red-400 focus:ring-offset-1 focus:ring-offset-[var(--bg)]"
               )}
               onClick={async () => {
                 try {
@@ -336,8 +336,8 @@ export const Header: React.FC<HeaderProps> = ({
                   aria-label={leftButtonLabel}
                   variant="ghost"
                   size={showBackButton ? "sm" : undefined}
-                  className={cn(
-                    "text-[var(--text)] rounded-md p-0 h-8 w-8 flex items-center justify-center" 
+                  className={cn( // Changed
+                    "text-[var(--text)] rounded-md p-0 h-8 w-8 flex items-center justify-center"
                   )}
                   onClick={handleLeftButtonClick}
                 >
@@ -432,7 +432,7 @@ export const Header: React.FC<HeaderProps> = ({
                           aria-label="Share Options"
                           variant="ghost"
                           size="sm"
-                          className="text-[var(--text)] rounded-md" 
+                          className="text-[var(--text)] rounded-md" // Changed
                         >
                           <PiShareFat size="18px" />
                         </Button>
@@ -522,7 +522,7 @@ export const Header: React.FC<HeaderProps> = ({
                     aria-label="Delete All History"
                     variant="ghost"
                     size="sm"
-                    className="text-[var(--text)] rounded-md" 
+                    className="text-[var(--text)] rounded-md" // Changed
                     onClick={handleDeleteAllWithConfirmation}
                   >
                     <FiTrash2 size="18px" />
