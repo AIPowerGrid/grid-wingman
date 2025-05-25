@@ -202,7 +202,7 @@ export const Input: FC<InputProps> = ({ isLoading, message, setMessage, onSend }
 
   return (
     <div className={cn(
-      "flex w-full items-center gap-0 p-0 bg-[var(--card,var(--bg-secondary))] rounded-lg shadow-md",
+      "flex w-full border border-[var(--active)]/50 items-center gap-0 p-0 bg-[var(--card,var(--bg-secondary))] rounded-lg shadow-md",
       isFocused && "input-breathing"
     )}>
       <AddToChat /> 
@@ -239,7 +239,7 @@ export const Input: FC<InputProps> = ({ isLoading, message, setMessage, onSend }
               variant="ghost"
               size="sm"
                 className={cn(
-                  "p-2 rounded-md",
+                  "p-2 mr-1 rounded-md",
                   "not-focus",
                   isListening ? "text-red-500 hover:text-red-300 hover:bg-destructive/10" : "text-foreground hover:text-foreground hover:bg-[var(--text)]/10",
                 )}
@@ -266,7 +266,7 @@ export const Input: FC<InputProps> = ({ isLoading, message, setMessage, onSend }
               variant="ghost"
               size="sm"
               className={cn(
-                "p-2 rounded-md",
+                "p-2 ml-1 rounded-md",
                 !isLoading && "hover:bg-[var(--text)]/10"
               )}
               onClick={handleSendClick}

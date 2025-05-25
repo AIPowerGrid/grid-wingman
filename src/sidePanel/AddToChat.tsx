@@ -38,7 +38,7 @@ export const AddToChat = () => {
               className={cn(
                 "border-none shadow-none bg-transparent",
                 "hover:bg-[var(--text)]/10",
-                "text-foreground font-['space_mono']",
+                "text-foreground",
                 "px-2 h-9 w-fit",
                 "gap-0",
                 "not-focus-visible",
@@ -46,9 +46,9 @@ export const AddToChat = () => {
               )}
             >
               {!currentModeInConfig ? (
-                <span className="text-sm">mode</span>
+                <span className="text-sm font-bold">Mode</span>
               ) : (
-                <span className="text-sm">{currentModeInConfig}</span>
+                <span className="text-sm font-bold">{currentModeInConfig}</span>
               )}
             </SelectTrigger>
           </TooltipTrigger>
@@ -64,7 +64,7 @@ export const AddToChat = () => {
           align="end"
           sideOffset={5}
           className={cn(
-            "bg-[var(--bg)] text-[var(--text)] border border-[var(--text)]/10 font-['space_mono'] rounded-md shadow-lg",
+            "bg-[var(--bg)] text-[var(--text)] border border-[var(--text)]/10 font-semibold rounded-md shadow-lg",
             "min-w-[80px] z-50"
           )}
         >

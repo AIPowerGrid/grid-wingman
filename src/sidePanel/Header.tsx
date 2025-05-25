@@ -362,7 +362,7 @@ export const Header: React.FC<HeaderProps> = ({
                 <span className="text-[13px] font-medium text-[var(--text)] leading-tight">
                   {currentPersona === 'default' ? 'Jet' : currentPersona}
                 </span>
-                <span className="text-[10px] text-muted-foreground leading-tight flex items-center pt-0.5">
+                <span className="text-[10px] text-muted-foreground font-semibold leading-tight flex items-center pt-0.5">
                   {chatStatus === 'idle' && (
                     <span className="h-1.5 w-1.5 bg-green-600 rounded-full mr-1"></span>
                   )}
