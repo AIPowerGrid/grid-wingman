@@ -1,6 +1,6 @@
 import '../content/index.css';
-import type { ComponentPropsWithoutRef, ReactElement, CSSProperties, FC } from 'react';
-import { Children, ClassAttributes, HTMLAttributes, ReactNode, useState } from 'react';
+import type { ComponentPropsWithoutRef, ReactElement, FC } from 'react';
+import { Children, HTMLAttributes, ReactNode, useState } from 'react';
 import Markdown from 'react-markdown';
 import { FiCopy, FiCheck, FiX } from 'react-icons/fi';
 import AutosizeTextarea from 'react-textarea-autosize';
@@ -25,33 +25,17 @@ type ListProps = {
   ordered?: boolean;
 } & HTMLAttributes<HTMLUListElement | HTMLOListElement>;
 
-const Ul = ({ children, ...rest }: ListProps) => (
-  <ul style={{
-    paddingLeft: '2rem',
-    paddingTop: '0.5rem',
-    paddingBottom: '0.5rem',
-    listStyleType: 'disc'
-  }} {...rest}>{children}</ul>
+const Ul = ({ children, className, ...rest }: ListProps) => (
+  <ul className={cn(className)} {...rest}>{children}</ul>
 );
 
-const Ol = ({ children, ...rest }: ListProps) => (
-  <ol style={{
-    paddingLeft: '2rem',
-    paddingTop: '0.5rem',
-    paddingBottom: '0.5rem',
-    listStyleType: 'decimal'
-  }} {...rest}>{children}</ol>
+const Ol = ({ children, className, ...rest }: ListProps) => (
+  <ol className={cn(className)} {...rest}>{children}</ol>
 );
 
 type ParagraphProps = { children?: ReactNode } & HTMLAttributes<HTMLParagraphElement>;
-const P = ({ children, ...rest }: ParagraphProps) => (
-  <p style={{
-    paddingTop: 0,
-    paddingBottom: '0.2rem',
-    wordBreak: 'break-word',
-    overflowWrap: 'break-word',
-    whiteSpace: 'pre-wrap'
-  }} {...rest}>{children}</p>
+const P = ({ children, className, ...rest }: ParagraphProps) => (
+  <p className={cn(className)} {...rest}>{children}</p>
 );
 type CustomPreProps = ComponentPropsWithoutRef<'pre'>;
 
@@ -70,7 +54,6 @@ const Pre = (props: CustomPreProps) => {
     }
     codeString = codeString.trim(); 
   }
-  const languageClass = codeElement?.props?.className || '';
 
   const copyToClipboard = () => {
     if (codeString) {
@@ -78,15 +61,6 @@ const Pre = (props: CustomPreProps) => {
       navigator.clipboard.writeText(codeString);
       setTimeout(() => setCopied(false), 1500);
     }
-  };
-  const preElementStyles: CSSProperties = {
-    overflow: 'auto',
-    padding: '1rem',
-    margin: 0, 
-    background: 'var(--markdown-pre-background)',
-    color: 'var(--markdown-pre-foreground)', 
-    borderRadius: '8px',
-    maxWidth: '100%'
   };
 
   return (
@@ -96,16 +70,14 @@ const Pre = (props: CustomPreProps) => {
       onMouseLeave={() => setHovered(false)}
     >
       <pre
-        style={preElementStyles}
         className={preClassName}
         {...restPreProps}
-        
       >
       {children}
     </pre>
       {codeString && ( 
           (<Button
-            variant="copy-button" // Changed variant
+            variant="copy-button"
             size="sm"
             aria-label={copied ? "Copied!" : "Copy code"}
             title={copied ? "Copied!" : "Copy code"}
@@ -121,7 +93,7 @@ const Pre = (props: CustomPreProps) => {
           )}
     </div>
   );
-    };
+};
 
 type CustomCodeProps = ComponentPropsWithoutRef<'code'> & {
   inline?: boolean;
@@ -133,37 +105,25 @@ const Code = (props: CustomCodeProps) => {
   if (inline) {
     return (
       <code
-        style={{
-          color: 'var(--markdown-inline-code-foreground, var(--foreground))',
-          background: 'var(--markdown-code-background, var(--muted))',
-          padding: '0.2rem 0.4rem',
-          borderRadius: '4px'
-        }}
-        className={className}
+        className={cn(className)}
         {...restCodeProps}
       >
         {children}
       </code>
     );
   }
-
         
-return (
-<code className={className} {...restCodeProps}>
-{children}
-</code>
-);
+  return (
+    <code className={cn(className)} {...restCodeProps}>
+      {children}
+    </code>
+  );
 };
 
 type AnchorProps = { children?: ReactNode; href?: string } & HTMLAttributes<HTMLAnchorElement>;
-const A = ({ children, href, ...rest }: AnchorProps) => (
+const A = ({ children, href, className, ...rest }: AnchorProps) => (
   <a href={href}
-    style={{
-      color: 'var(--markdown-link, var(--primary))', 
-      textDecoration: 'underline',
-      padding: '2px 7px',
-      borderRadius: '6px' 
-    }}
+    className={cn(className)}
     target="_blank"
     rel="noopener noreferrer"
     {...rest}
@@ -173,115 +133,63 @@ const A = ({ children, href, ...rest }: AnchorProps) => (
 );
 
 type HeadingProps = { children?: ReactNode } & HTMLAttributes<HTMLHeadingElement>;
-const H1 = ({ children, ...rest }: HeadingProps) => (
-  <h1 style={{
-    fontSize: '1.5rem',
-    fontWeight: 800,
-    margin: '1rem 0 1rem',
-    borderBottom: '2px solid var(--markdown-h1, var(--foreground))',
-    paddingBottom: '0.5rem',
-    color: 'var(--markdown-h1, var(--foreground))'
-  }} {...rest}>{children}</h1>
+const H1 = ({ children, className, ...rest }: HeadingProps) => (
+  <h1 className={cn(className)} {...rest}>{children}</h1>
 );
 
-const H2 = ({ children, ...rest }: HeadingProps) => (
-  <h2 style={{
-    fontSize: '1.25rem',
-    fontWeight: 700,
-    margin: '1rem 0 0.75rem',
-    borderBottom: '1px solid var(--markdown-h2, var(--foreground))',
-    paddingBottom: '0.4rem',
-    color: 'var(--markdown-h2, var(--foreground))'
-  }} {...rest}>{children}</h2>
+const H2 = ({ children, className, ...rest }: HeadingProps) => (
+  <h2 className={cn(className)} {...rest}>{children}</h2>
 );
 
-const H3 = ({ children, ...rest }: HeadingProps) => (
-  <h3 style={{
-    fontSize: '1.1rem',
-    fontWeight: 600,
-    margin: '0.75rem 0 0.5rem',
-    borderBottom: '1px dashed var(--markdown-h3, var(--foreground))',
-    paddingBottom: '0.3rem',
-    color: 'var(--markdown-h3, var(--foreground))'
-  }} {...rest}>{children}</h3>
+const H3 = ({ children, className, ...rest }: HeadingProps) => (
+  <h3 className={cn(className)} {...rest}>{children}</h3>
 );
 
 type StrongProps = { children?: ReactNode } & HTMLAttributes<HTMLElement>;
-const Strong = ({ children, ...rest }: StrongProps) => (
-  <strong style={{
-    color: 'var(--markdown-strong, var(--foreground))',
-    fontWeight: 700,
-    fontFamily: 'Poppins, sans-serif'
-  }} {...rest}>{children}</strong>
+const Strong = ({ children, className, ...rest }: StrongProps) => (
+  <strong className={cn(className)} {...rest}>{children}</strong>
 );
 
 type EmProps = { children?: ReactNode } & HTMLAttributes<HTMLElement>;
-const Em = ({ children, ...rest }: EmProps) => (
-  <em style={{
-    color: 'var(--markdown-em, var(--foreground))',
-    fontStyle: 'italic'
-  }} {...rest}>{children}</em>
+const Em = ({ children, className, ...rest }: EmProps) => (
+  <em className={cn(className)} {...rest}>{children}</em>
 );
 
 type TableProps = { children?: ReactNode } & HTMLAttributes<HTMLTableElement>;
-const Table = ({ children, ...rest }: TableProps) => (
-  <table style={{
-    border: `2px solid var(--markdown-table-border, var(--foreground))`,
-    borderCollapse: 'collapse',
-    width: '100%',
-    margin: '1rem 0'
-  }} {...rest}>{children}</table>
+const Table = ({ children, className, ...rest }: TableProps) => (
+  <table className={cn(className)} {...rest}>{children}</table>
 );
 
 type THeadProps = { children?: ReactNode } & HTMLAttributes<HTMLTableSectionElement>;
-const THead = ({ children, ...rest }: THeadProps) => (
-  <thead style={{
-    borderBottom: `2px solid var(--markdown-table-border, var(--foreground))`
-  }} {...rest}>{children}</thead>
+const THead = ({ children, className, ...rest }: THeadProps) => (
+  <thead className={cn(className)} {...rest}>{children}</thead>
 );
 
 type TBodyProps = { children?: ReactNode } & HTMLAttributes<HTMLTableSectionElement>;
-const TBody = ({ children, ...rest }: TBodyProps) => (
-  <tbody {...rest}>{children}</tbody>
+const TBody = ({ children, className, ...rest }: TBodyProps) => (
+  <tbody className={cn(className)} {...rest}>{children}</tbody>
 );
 
 type TrProps = { children?: ReactNode } & HTMLAttributes<HTMLTableRowElement>;
-const Tr = (props: TrProps) => <tr {...props} />;
+const Tr = (props: TrProps) => <tr className={cn(props.className)} {...props} />;
 
 type ThProps = { children?: ReactNode } & HTMLAttributes<HTMLTableCellElement>;
-const Th = ({ children, ...rest }: ThProps) => (
-  <th style={{
-    padding: '0.5rem',
-    border: `1px solid var(--markdown-table-border, var(--foreground))`,
-    fontWeight: 700
-  }} {...rest}>{children}</th>
+const Th = ({ children, className, ...rest }: ThProps) => (
+  <th className={cn(className)} {...rest}>{children}</th>
 );
 
 type TdProps = { children?: ReactNode } & HTMLAttributes<HTMLTableCellElement>;
-const Td = ({ children, ...rest }: TdProps) => (
-  <td style={{
-    padding: '0.5rem',
-    border: `1px solid var(--markdown-table-border, var(--foreground))`
-  }} {...rest}>{children}</td>
+const Td = ({ children, className, ...rest }: TdProps) => (
+  <td className={cn(className)} {...rest}>{children}</td>
 );
 
 type BlockquoteProps = { children?: ReactNode } & HTMLAttributes<HTMLElement>;
-const Blockquote = ({ children, ...rest }: BlockquoteProps) => (
-  <blockquote
-    style={{
-      borderLeft: '4px solid var(--markdown-h2, var(--foreground))',
-      margin: '1em 0',
-      padding: '0.5em 1em',
-      background: 'rgba(0,0,0,0.03)',
-      color: 'var(--markdown-h2, var(--foreground))'
-    }}
-    {...rest}
-  >
+const Blockquote = ({ children, className, ...rest }: BlockquoteProps) => (
+  <blockquote className={cn(className)} {...rest}>
     {children}
   </blockquote>
 );
 
-// Thinking block
 const ThinkingBlock = ({ content }: { content: string }) => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -290,11 +198,11 @@ const ThinkingBlock = ({ content }: { content: string }) => {
       <Collapsible open={isOpen} onOpenChange={setIsOpen} className="w-full">
         <CollapsibleTrigger asChild>
           <Button
-            variant="outline" // Keep variant
+            variant="outline" 
             size="sm"
             className={cn(
               "mb-1", 
-              "border-foreground text-foreground hover:text-accent-foreground" // hover:bg-accent is part of outline variant
+              "border-foreground text-foreground hover:text-accent-foreground" 
             )}
           >
             {isOpen ? 'Hide Thoughts' : 'Show Thoughts'}
@@ -314,9 +222,6 @@ const ThinkingBlock = ({ content }: { content: string }) => {
                 remarkPlugins={[remarkGfm]}
                 components={{
                   ...markdownComponents,
-                  h1: H1,
-                  h2: H2,
-                  h3: H3,
                 }}>{content}</Markdown>
             </div>
           </div>
@@ -335,7 +240,7 @@ const markdownComponents = {
   a: A,
   strong: Strong,
   em: Em,
-  h1: H1,
+  h1: H1, 
   h2: H2,
   h3: H3,
   table: Table,
@@ -409,7 +314,7 @@ export const EditableMessage: FC<MessageProps> = ({
               <FiCheck className="h-4 w-4 mr-1" /> Save
             </Button>
             <Button
-              variant="destructive-outline" // Changed variant
+              variant="destructive-outline"
               size="sm"
               onClick={onCancelEdit}
               title="Discard changes"
