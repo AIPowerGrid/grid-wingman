@@ -96,7 +96,7 @@ export const ConnectCustom = () => {
             variant="ghost" size="sm"
             onClick={onSaveSettings}
             className={cn(
-              "px-3 text-sm h-8 font-medium whitespace-nowrap",
+              "px-2 text-sm h-8 font-medium whitespace-nowrap",
               "bg-[var(--active)] text-[var(--text)] hover:bg-[var(--active)]/90 rounded-md shadow-sm",
               "focus-visible:ring-1 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--bg)]"
             )}

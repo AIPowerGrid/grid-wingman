@@ -80,7 +80,6 @@ export const ConnectOllama = () => {
           onClick={onConnect}
           className={cn(
             buttonHeightClass, 
-            "px-3",
             "text-sm font-medium whitespace-nowrap",
             "bg-[var(--active)] text-[var(--text)] hover:bg-[var(--active)]/90",
             "rounded-md shadow-sm",

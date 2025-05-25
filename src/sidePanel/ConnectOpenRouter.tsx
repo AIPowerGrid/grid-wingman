@@ -107,7 +107,7 @@ export const ConnectOpenRouter = () => {
         <Button
           onClick={onConnect}
           className={cn(
-            buttonHeightClass, "px-3 text-sm font-medium whitespace-nowrap",
+            buttonHeightClass, "text-sm font-medium whitespace-nowrap",
             "bg-[var(--active)] text-[var(--text)] hover:bg-[var(--active)]/90 rounded-md shadow-sm",
             "focus-visible:ring-1 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--bg)]"
           )}
