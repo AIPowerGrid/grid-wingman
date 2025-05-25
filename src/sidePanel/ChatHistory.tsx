@@ -268,9 +268,9 @@ export const ChatHistory = ({ loadChat, onDeleteAll, className }: ChatHistoryPro
 
       {totalPages > 1 && (
         <div className="flex justify-center items-center space-x-2 p-2 border-t border-[var(--active)]/50 font-['Space_Mono',_monospace]">
-          <Button onClick={handlePrevPage} disabled={currentPage === 1} size="sm" variant="outline" className="font-['Space_Mono',_monospace]">Prev</Button>
-          <span>Page {currentPage} of {totalPages}</span>
-          <Button onClick={handleNextPage} disabled={currentPage === totalPages} size="sm" variant="outline" className="font-['Space_Mono',_monospace]">Next</Button>
+          <Button onClick={handlePrevPage} disabled={currentPage === 1} variant="ghost" className="font-['Space_Mono',_monospace]">Prev</Button>
+          <span className="text-md">Page {currentPage} of {totalPages}</span>
+          <Button onClick={handleNextPage} disabled={currentPage === totalPages} variant="ghost" className="font-['Space_Mono',_monospace]">Next</Button>
         </div>
       )}
     </div>
