@@ -182,7 +182,7 @@ const PersonaModal = ({
             onClick={onModalClose}
           > Cancel </Button>
           <Button type="button" variant="default" size="sm"
-            className={cn("bg-[var(--active)] text-[var(--active-foreground)]", "disabled:opacity-60")}
+            className={cn("bg-[var(--active)] text-[var(--text)]", "disabled:opacity-60")}
             disabled={!name.trim()} onClick={handleCreate}
           > Create </Button>
         </DialogFooter>
@@ -369,7 +369,7 @@ export const Persona = () => {
               updateConfig={updateConfig}
             />
             <Button variant="ghost" size="sm" aria-label="Add new persona"
-              className={cn("text-[var(--text)] hover:text-[var(--active)] hover:bg-[var(--text)]/10 p-1.5 rounded-md", "focus-visible:ring-1 focus-visible:ring-[var(--active)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--bg)]")}
+              className={cn("text-[var(--text)] p-1.5 rounded-md", "focus-visible:ring-1 focus-visible:ring-[var(--active)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--bg)]")}
               onClick={handleOpenPersonaModalForCreate}
             > <IoAdd className="h-5 w-5" /> </Button>
             {Object.keys(personas).length > 1 && (
