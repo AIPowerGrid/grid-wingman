@@ -219,7 +219,7 @@ export const SettingsSheet: React.FC<SettingsSheetProps> = ({
                     "text-xl font-semibold text-[var(--text)] bg-[var(--active)] inline-block px-3 py-1 rounded-md no-underline",
                     "cognito-title-blade-glow"
                   )}>
-                 COGNITO <sub className="italic contrast-200 text-[0.5em]">v3.5</sub>
+                 COGNITO <sub className="contrast-200 text-[0.5em]">v3.6</sub>
                </a>
              </SheetTitle>
              <SheetDescription className="text-center font-['Bruno_Ace_SC'] text-[var(--text)] leading-tight mt-2">
