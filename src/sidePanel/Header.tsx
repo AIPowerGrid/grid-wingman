@@ -279,11 +279,10 @@ export const Header: React.FC<HeaderProps> = ({
               Cancel
             </Button>
             <Button
-              variant="default"
+              variant="destructive" 
               size="sm"
               className={cn(
-                "bg-red-600 text-white hover:bg-red-700",
-                "focus:ring-1 focus:ring-red-400 focus:ring-offset-1 focus:ring-offset-[var(--bg)]"
+                "focus:ring-1 focus:ring-red-400 focus:ring-offset-1 focus:ring-offset-[var(--bg)]" 
               )}
               onClick={async () => {
                 try {
@@ -338,7 +337,7 @@ export const Header: React.FC<HeaderProps> = ({
                   variant="ghost"
                   size={showBackButton ? "sm" : undefined}
                   className={cn(
-                    "text-[var(--text)] hover:bg-black/10 dark:hover:bg-white/10 rounded-md p-0 h-8 w-8 flex items-center justify-center"
+                    "text-[var(--text)] rounded-md p-0 h-8 w-8 flex items-center justify-center" 
                   )}
                   onClick={handleLeftButtonClick}
                 >
@@ -433,7 +432,7 @@ export const Header: React.FC<HeaderProps> = ({
                           aria-label="Share Options"
                           variant="ghost"
                           size="sm"
-                          className="text-[var(--text)] hover:text-foreground hover:bg-black/10 dark:hover:bg-white/10 rounded-md" // -ml-2 here is on the button, which is fine for inter-button spacing
+                          className="text-[var(--text)] rounded-md" 
                         >
                           <PiShareFat size="18px" />
                         </Button>
@@ -523,7 +522,7 @@ export const Header: React.FC<HeaderProps> = ({
                     aria-label="Delete All History"
                     variant="ghost"
                     size="sm"
-                    className="text-[var(--text)] hover:bg-black/10 dark:hover:bg-white/10 rounded-md"
+                    className="text-[var(--text)] rounded-md" 
                     onClick={handleDeleteAllWithConfirmation}
                   >
                     <FiTrash2 size="18px" />
