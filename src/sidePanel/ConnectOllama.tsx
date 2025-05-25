@@ -11,7 +11,7 @@ export const ConnectOllama = () => {
   const [url, setUrl] = useState(config?.ollamaUrl || 'http://localhost:11434');
   const [isLoading, setIsLoading] = useState(false);
 
-  const buttonHeightClass = 'h-8';
+  // buttonHeightClass will be removed, size="sm" will be used instead
 
   const onConnect = () => {
     setIsLoading(true);
@@ -78,13 +78,8 @@ export const ConnectOllama = () => {
       {!isConnected && (
         <Button
           onClick={onConnect}
-          className={cn(
-            buttonHeightClass, 
-            "text-sm font-medium whitespace-nowrap",
-            "bg-[rgba(255,250,240,0.4)] dark:bg-[rgba(255,255,255,0.1)]  text-[var(--text)] dark:hover:bg-[var(--active)]/90 hover:bg-[var(--active)]/90",
-            "rounded-md shadow-sm",
-            "focus-visible:ring-1 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--bg)]"
-          )}
+          variant="connect" // Use the new variant
+          size="sm" // Standardize size
           disabled={isLoading}
         >
           {isLoading ? "..." : "Connect"}
@@ -92,9 +87,12 @@ export const ConnectOllama = () => {
       )}
       {isConnected && (
         <Button
-          variant="ghost" size="sm" aria-label="Connected to Ollama"
+          variant="ghost"
+          size="sm" // Ensure size is sm
+          aria-label="Connected to Ollama"
           className={cn(
-            buttonHeightClass, "w-8",
+            // buttonHeightClass removed
+            "w-8", // This seems to be for icon button sizing, keeping it
             "rounded-md",
             "text-[var(--success)]"
           )}

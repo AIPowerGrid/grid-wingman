@@ -19,25 +19,61 @@ function RadioGroup({
 
 function RadioGroupItem({
   className,
+import { cva, type VariantProps } from "class-variance-authority" // Import CVA
+
+// Define CVA variants for RadioGroupItem
+const radioGroupItemVariants = cva(
+  // Base styles
+  "aspect-square size-4 shrink-0 rounded-full border shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
+  {
+    variants: {
+      variant: {
+        default: [
+          "border-input dark:bg-input/30 text-primary focus-visible:border-ring focus-visible:ring-ring/50",
+          // Default indicator style is handled by the CircleIcon className directly for fill
+        ],
+        themed: [
+          "border-[var(--text)] text-[var(--active)]", // Base border and text (for icon)
+          "focus-visible:ring-1 focus-visible:ring-[var(--active)] focus-visible:ring-offset-0 focus-visible:border-[var(--active)]", // Themed focus
+          "data-[state=checked]:border-[var(--active)]", // Themed checked border
+          // Themed indicator style will be handled by modifying CircleIcon's fill if needed or ensuring text color is inherited
+        ],
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+    },
+  }
+)
+
+// Define props for RadioGroupItem including variants
+export interface RadioGroupItemProps
+  extends React.ComponentProps<typeof RadioGroupPrimitive.Item>,
+    VariantProps<typeof radioGroupItemVariants> {}
+
+function RadioGroupItem({
+  className,
+  variant, // Add variant prop
   ...props
-}: React.ComponentProps<typeof RadioGroupPrimitive.Item>) {
+}: RadioGroupItemProps) {
   return (
     <RadioGroupPrimitive.Item
       data-slot="radio-group-item"
-      className={cn(
-        "border-input text-primary focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 aspect-square size-4 shrink-0 rounded-full border shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50",
-        className
-      )}
+      className={cn(radioGroupItemVariants({ variant, className }))}
       {...props}
     >
       <RadioGroupPrimitive.Indicator
         data-slot="radio-group-indicator"
         className="relative flex items-center justify-center"
       >
-        <CircleIcon className="fill-primary absolute top-1/2 left-1/2 size-2 -translate-x-1/2 -translate-y-1/2" />
+        {/* Conditional fill for CircleIcon based on variant */}
+        <CircleIcon className={cn(
+          "absolute top-1/2 left-1/2 size-2 -translate-x-1/2 -translate-y-1/2",
+          variant === "themed" ? "fill-[var(--active)]" : "fill-primary"
+        )} />
       </RadioGroupPrimitive.Indicator>
     </RadioGroupPrimitive.Item>
   )
 }
 
-export { RadioGroup, RadioGroupItem }
+export { RadioGroup, RadioGroupItem, radioGroupItemVariants }

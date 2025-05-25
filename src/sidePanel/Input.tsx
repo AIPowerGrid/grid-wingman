@@ -15,58 +15,9 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { Textarea } from "@/components/ui/textarea"; // Import the new Textarea
 import { cn } from "@/src/background/util";
 import { NotePopover } from './NotePopover';
-
-interface AutoResizeTextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
-    minRows?: number;
-    maxRows?: number;
-}
-
-export const AutoResizeTextarea = (
-  {
-    ref,
-    className,
-    minRows,
-    maxRows,
-    onFocus,
-    onBlur,
-    ...props
-  }: AutoResizeTextareaProps & {
-    ref: RefObject<HTMLTextAreaElement | null>;
-    onFocus?: React.FocusEventHandler<HTMLTextAreaElement>;
-    onBlur?: React.FocusEventHandler<HTMLTextAreaElement>;
-  }
-) => {
-  const ReactTextareaAutosize = require('react-textarea-autosize').default; 
-
-  return (
-    <ReactTextareaAutosize
-      ref={ref}
-      minRows={minRows}
-      maxRows={maxRows}
-      {...props}
-      onFocus={onFocus}
-      onBlur={onBlur}
-      className={cn(
-        "flex w-full bg-transparent text-sm ring-offset-background",
-        "focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0",
-        "disabled:cursor-not-allowed disabled:opacity-50",
-        "min-h-[unset]",
-        "overflow-y-auto",
-        "resize-none",
-        "text-foreground",
-        "text-sm placeholder:text-muted-foreground/75", 
-        "font-semibold",
-        "autosize-textarea",
-        "border-none shadow-none outline-none",
-        className
-      )}
-    />
-  );
-};
-AutoResizeTextarea.displayName = 'AutoResizeTextarea';
-
 
 interface InputProps {
     isLoading: boolean;
@@ -206,7 +157,8 @@ export const Input: FC<InputProps> = ({ isLoading, message, setMessage, onSend }
       isFocused && "input-breathing"
     )}>
       <AddToChat /> 
-      <AutoResizeTextarea
+      <Textarea
+        autosize // Enable autosize mode
         ref={ref}
         minRows={1}
         maxRows={8}
@@ -217,7 +169,8 @@ export const Input: FC<InputProps> = ({ isLoading, message, setMessage, onSend }
         autoFocus
         onChange={event => setMessage(event.target.value)}
         onKeyDown={handleTextareaKeyDown}
-        className="flex-grow !bg-transparent px-0 py-1"
+        // Apply minimal styling, ensuring it overrides defaults from ui/textarea when autosize is true
+        className="flex-grow !bg-transparent px-0 py-1 border-none shadow-none outline-none focus-visible:ring-0"
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
       />

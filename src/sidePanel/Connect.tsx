@@ -53,23 +53,21 @@ const ConnectionSection: FC<ConnectionProps> = ({
 );
 
 export const Connect: FC = () => {
-  const { config } = useConfig();
+  // const { config } = useConfig(); // config is not used
 
-  const subtleBorderClass = 'border-[var(--text)]/10';
-  const controlBg = "bg-[rgba(255,250,240,0.4)] dark:bg-[rgba(255,255,255,0.1)]";  const itemShadow = 'shadow-md';
-  const itemRounded = 'rounded-xl';
+  // Removed local style variables, direct classes will be used.
 
   return (
     <AccordionItem
       value="connect"
       className={cn(
-        controlBg,
-        subtleBorderClass,
-        itemRounded,
-        itemShadow,
-        "transition-all duration-150 ease-in-out",
-        "hover:border-[var(--active)] hover:brightness-105",
-        "overflow-hidden"
+        "bg-[var(--input-background)]", // Standard background
+        "border-[var(--text)]/10",    // Standard border
+        "rounded-xl",                 // Standard rounding
+        "shadow-md",                  // Standard shadow
+        "transition-all duration-150 ease-in-out", // Common transition
+        "hover:border-[var(--active)] hover:brightness-105", // Common hover
+        "overflow-hidden" // Specific to this instance
       )}
     >
       <AccordionTrigger

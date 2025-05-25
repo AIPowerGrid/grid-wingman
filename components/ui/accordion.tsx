@@ -19,7 +19,7 @@ function AccordionItem({
       data-slot="accordion-item"
       className={cn(
         "border-b last:border-b-0",
-        "bg-[rgba(255,250,240,0.4)] dark:bg-[rgba(255,255,255,0.1)]",
+        "bg-[var(--input-background)]",
         'shadow-md',
         'rounded-xl',
         'border-[var(--text)]/10',

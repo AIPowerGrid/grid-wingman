@@ -1,27 +1,54 @@
 import * as React from "react"
 import * as SliderPrimitive from "@radix-ui/react-slider"
+import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/src/background/util"
 
-const sliderRootStyles = cn(
+const sliderVariants = cva(
+  // Base styles
   "relative flex w-full touch-none select-none items-center data-[disabled]:opacity-50 data-[orientation=vertical]:h-full data-[orientation=vertical]:min-h-44 data-[orientation=vertical]:w-auto data-[orientation=vertical]:flex-col",
-  "[&>span[data-slot=slider-track]]:bg-[var(--text)]/10",
-  "[&>span[data-slot=slider-track]>span[data-slot=slider-range]]:bg-[var(--active)]",
-  "[&>button[data-slot=slider-thumb]]:bg-white",
-  "[&>button[data-slot=slider-thumb]]:border-primary/50",
-  "[&>button[data-slot=slider-thumb]]:ring-offset-[var(--bg)]",
-  "[&>button[data-slot=slider-thumb]]:focus-visible:ring-[var(--active)]"
-);
+  {
+    variants: {
+      variant: {
+        default: [
+          // Default Track, Range, Thumb styles
+          "[&>span[data-slot=slider-track]]:bg-secondary",
+          "[&>span[data-slot=slider-track]>span[data-slot=slider-range]]:bg-primary",
+          "[&>button[data-slot=slider-thumb]]:bg-background",
+          "[&>button[data-slot=slider-thumb]]:border-primary", // Changed from border-primary/50
+          "[&>button[data-slot=slider-thumb]]:ring-offset-background",
+          "[&>button[data-slot=slider-thumb]]:focus-visible:ring-ring",
+        ],
+        themed: [
+          // Themed Track, Range, Thumb styles
+          "[&>span[data-slot=slider-track]]:bg-[var(--text)]/10",
+          "[&>span[data-slot=slider-track]>span[data-slot=slider-range]]:bg-[var(--active)]",
+          "[&>button[data-slot=slider-thumb]]:bg-[var(--active)]",
+          "[&>button[data-slot=slider-thumb]]:border-[var(--text)]/50",
+          "[&>button[data-slot=slider-thumb]]:ring-offset-[var(--bg)]",
+          "[&>button[data-slot=slider-thumb]]:focus-visible:ring-[var(--active)]",
+        ],
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+    },
+  }
+)
 
+export interface SliderProps
+  extends React.ComponentProps<typeof SliderPrimitive.Root>,
+    VariantProps<typeof sliderVariants> {}
 
 function Slider({
   className,
+  variant,
   defaultValue,
   value,
   min = 0,
   max = 100,
   ...props
-}: React.ComponentProps<typeof SliderPrimitive.Root>) {
+}: SliderProps) {
   const _values = React.useMemo(
     () =>
       Array.isArray(value)
@@ -32,7 +59,6 @@ function Slider({
     [value, defaultValue, min]
   );
 
-
   return (
     <SliderPrimitive.Root
       data-slot="slider"
@@ -40,20 +66,20 @@ function Slider({
       value={value}
       min={min}
       max={max}
-      className={cn(sliderRootStyles, className)}
+      className={cn(sliderVariants({ variant, className }))}
       {...props}
     >
       <SliderPrimitive.Track
         data-slot="slider-track"
         className={cn(
-          "relative h-1.5 w-full grow overflow-hidden rounded-full bg-secondary",
+          "relative h-1.5 w-full grow overflow-hidden rounded-full", // Removed bg-secondary, CVA handles it
           "data-[orientation=vertical]:h-full data-[orientation=vertical]:w-1.5"
         )}
       >
         <SliderPrimitive.Range
           data-slot="slider-range"
           className={cn(
-            "absolute h-full bg-primary",
+            "absolute h-full", // Removed bg-primary, CVA handles it
             "data-[orientation=vertical]:w-full"
           )}
         />
@@ -62,8 +88,10 @@ function Slider({
         <SliderPrimitive.Thumb
           data-slot="slider-thumb"
           key={index}
+          // Base thumb styles. Variant-specific styles (bg, border, ring) are applied by CVA on Root.
           className={cn(
-            "block h-4 w-4 rounded-full border border-primary/50 bg-white shadow-sm transition-colors focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",
+            "block h-4 w-4 rounded-full border shadow-sm transition-colors focus-visible:ring-1 disabled:pointer-events-none disabled:opacity-50"
+            // Removed: bg-background, border-primary, ring-offset-background, focus-visible:ring-ring (now handled by CVA)
           )}
         />
       ))}
@@ -71,4 +99,4 @@ function Slider({
   )
 }
 
-export { Slider }
+export { Slider, sliderVariants }

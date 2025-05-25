@@ -15,15 +15,7 @@ type ModelParamKey = 'temperature' | 'maxTokens' | 'topP' | 'presencepenalty';
 export const ModelSettingsPanel = () => {
   const { config, updateConfig } = useConfig();
 
-  const sliderClass = cn(
-    "w-full",
-    "[&>span:first-child]:bg-[var(--text)]/10",
-    "[&>span:first-child>span:first-child]:bg-[var(--active)]",
-    "[&_button]:bg-[var(--active)]",
-    "[&_button]:border-[var(--text)]/50",
-    "[&_button]:ring-offset-[var(--bg)]",
-    "[&_button:focus-visible]:ring-[var(--active)]"
-  );
+  // sliderClass is removed, variant="themed" will be used instead.
 
   const handleChange = (key: ModelParamKey) => (val: number | number[]) => {
     const valueToSet = Array.isArray(val) ? val[0] : val;
@@ -39,8 +31,9 @@ export const ModelSettingsPanel = () => {
     <AccordionItem
       value="model-params"
       className={cn(
-        "transition-all duration-150 ease-in-out",
-        "hover:border-[var(--active)] hover:brightness-105"
+        "bg-[var(--input-background)] border-[var(--text)]/10 rounded-xl shadow-md", // Standard container styles
+        "transition-all duration-150 ease-in-out", // Common transition
+        "hover:border-[var(--active)] hover:brightness-105" // Common hover
       )}
     >
       <AccordionTrigger
@@ -65,7 +58,7 @@ export const ModelSettingsPanel = () => {
               min={0} max={1} step={0.01}
               value={[temperature]}
               onValueChange={handleChange('temperature')}
-              className={sliderClass}
+              variant="themed" // Apply themed variant
             />
           </div>
 
@@ -95,7 +88,7 @@ export const ModelSettingsPanel = () => {
               min={0} max={1} step={0.01}
               value={[topP]}
               onValueChange={handleChange('topP')}
-              className={sliderClass}
+              variant="themed" // Apply themed variant
             />
           </div>
 
@@ -110,7 +103,7 @@ export const ModelSettingsPanel = () => {
               step={0.01}
               value={[presence_penalty]}
               onValueChange={handleChange('presencepenalty')}
-              className={sliderClass}
+              variant="themed" // Apply themed variant
             />
           </div>
         </div>

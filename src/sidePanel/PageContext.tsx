@@ -8,16 +8,7 @@ import { cn } from "@/src/background/util";
 import { useConfig } from './ConfigContext';
 import { SettingTitle } from './SettingsTitle';
 
-
-const sliderClass = cn(
-  "w-full",
-  "[&>span:first-child]:bg-[var(--text)]/10",
-  "[&>span:first-child>span:first-child]:bg-[var(--active)]",
-  "[&_button]:bg-[var(--active)]",
-  "[&_button]:border-[var(--text)]/50",
-  "[&_button]:ring-offset-[var(--bg)]",
-  "[&_button:focus-visible]:ring-[var(--active)]"
-);
+// sliderClass is removed, variant="themed" will be used instead.
 
 interface ContextLimitSliderProps {
   size: number;
@@ -35,7 +26,7 @@ const ContextLimitSlider = ({ size, updateConfig }: ContextLimitSliderProps) => 
       max={128}
       min={1}
       step={1}
-      className={sliderClass}
+      variant="themed" // Apply themed variant
       onValueChange={(value: number[]) => updateConfig({ contextLimit: value[0] })}
     />
   </div>
@@ -49,9 +40,10 @@ export const PageContext = () => {
     <AccordionItem
       value="page-context"
       className={cn(
-        "overflow-hidden",
-        "transition-all duration-150 ease-in-out",
-        "hover:border-[var(--active)] hover:brightness-105"
+        "bg-[var(--input-background)] border-[var(--text)]/10 rounded-xl shadow-md", // Standard container styles
+        "overflow-hidden", // Specific to this instance
+        "transition-all duration-150 ease-in-out", // Common transition
+        "hover:border-[var(--active)] hover:brightness-105" // Common hover
       )}
     >
       <AccordionTrigger

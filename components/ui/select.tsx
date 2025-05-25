@@ -10,8 +10,16 @@ const selectTriggerVariants = {
     "text-[var(--text)] rounded-xl shadow-md",
     "focus:border-[var(--active)] focus:ring-1 focus:ring-[var(--active)]",
     "hover:border-[var(--active)] hover:brightness-98",
-    "bg-[rgba(255,250,240,0.4)] dark:bg-[rgba(255,255,255,0.1)]", // This needs to align with your `controlBg` logic
+    "bg-[var(--input-background)]", // Use the consistent input background variable
     "border-[var(--text)]/10", // subtleBorderClass
+    "h-8"
+  ),
+  settings: cn( // New "settings" variant
+    "text-[var(--text)] rounded-md shadow-md", // Use rounded-md as requested
+    "focus:border-[var(--active)] focus:ring-1 focus:ring-[var(--active)]",
+    "hover:border-[var(--active)] hover:brightness-98",
+    "bg-[var(--input-background)]",
+    "border-[var(--text)]/10",
     "h-8"
   ),
 };
@@ -130,16 +138,26 @@ function SelectLabel({
   )
 }
 
+interface SelectItemProps extends React.ComponentProps<typeof SelectPrimitive.Item> {
+  focusVariant?: "default" | "activeTheme";
+}
+
 function SelectItem({
   className,
   children,
+  focusVariant = "default", // Default to original behavior
   ...props
-}: React.ComponentProps<typeof SelectPrimitive.Item>) {
+}: SelectItemProps) {
   return (
     <SelectPrimitive.Item
       data-slot="select-item"
       className={cn(
-        "focus:bg-accent focus:text-accent-foreground [&_svg:not([class*='text-'])]:text-muted-foreground relative flex w-full cursor-default items-center gap-2 rounded-sm py-1 pr-8 pl-2 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 *:[span]:last:flex *:[span]:last:items-center *:[span]:last:gap-2",
+        // Base styles (excluding focus)
+        "[&_svg:not([class*='text-'])]:text-muted-foreground relative flex w-full cursor-default items-center gap-2 rounded-sm py-1 pr-8 pl-2 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 *:[span]:last:flex *:[span]:last:items-center *:[span]:last:gap-2",
+        // Conditional focus and text styles
+        focusVariant === "activeTheme"
+          ? "text-[var(--text)] hover:brightness-95 focus:bg-[var(--active)] focus:text-[var(--text)]"
+          : "text-popover-foreground focus:bg-accent focus:text-accent-foreground", // Assuming default text should be popover-foreground
         className
       )}
       {...props}

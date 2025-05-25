@@ -25,20 +25,13 @@ export const TtsSettings = () => {
   const [loadingVoices, setLoadingVoices] = useState(true);
   const [errorLoading, setErrorLoading] = useState<string | null>(null);
 
-  const subtleBorderClass = 'border-[var(--text)]/10';
-  const controlBg = "bg-[rgba(255,250,240,0.4)] dark:bg-[rgba(255,255,255,0.1)]";  
-  const itemShadow = 'shadow-md';
-  const itemRounded = 'rounded-xl';
+  // Removed local style variables for AccordionItem, direct classes will be used.
+  // const subtleBorderClass = 'border-[var(--text)]/10';
+  // const controlBg = "bg-[rgba(255,250,240,0.4)] dark:bg-[rgba(255,255,255,0.1)]";  
+  // const itemShadow = 'shadow-md';
+  // const itemRounded = 'rounded-xl';
 
-  const sliderClass = cn(
-    "w-full",
-    "[&>span:first-child]:bg-[var(--text)]/10",
-    "[&>span:first-child>span:first-child]:bg-[var(--active)]",
-    "[&_button]:bg-[var(--active)]",
-    "[&_button]:border-[var(--text)]/50",
-    "[&_button]:ring-offset-[var(--bg)]",
-    "[&_button:focus-visible]:ring-[var(--active)]"
-  );
+  // sliderClass is removed, variant="themed" will be used instead.
 
   useEffect(() => {
     setLoadingVoices(true);
@@ -86,12 +79,12 @@ export const TtsSettings = () => {
     <AccordionItem
       value="tts-settings"
       className={cn(
-        controlBg,
-        subtleBorderClass,
-        itemRounded,
-        itemShadow,
-        "transition-all duration-150 ease-in-out",
-        "hover:border-[var(--active)] hover:brightness-105"
+        "bg-[var(--input-background)]", // Standard background
+        "border-[var(--text)]/10",    // Standard border
+        "rounded-xl",                 // Standard rounding
+        "shadow-md",                  // Standard shadow
+        "transition-all duration-150 ease-in-out", // Common transition
+        "hover:border-[var(--active)] hover:brightness-105" // Common hover
       )}
     >
       <AccordionTrigger
@@ -126,32 +119,25 @@ export const TtsSettings = () => {
                 onValueChange={handleVoiceChange}
               >
                 <SelectTrigger
+                  variant="settings" // Use the new "settings" variant
                   className={cn(
-                    controlBg,
-                    subtleBorderClass,
-                    "text-[var(--text)] rounded-md shadow-md w-full",
-                    "focus:border-[var(--active)] focus:ring-1 focus:ring-[var(--active)]",
-                    "hover:border-[var(--active)] hover:brightness-98",
-                    "data-[placeholder]:text-muted-foreground",
-                    "h-8"
+                    // Most styles are covered by the variant.
+                    "w-full", // Keep w-full as it's specific to this layout
+                    "data-[placeholder]:text-muted-foreground" // Keep if specific
                   )}
                 >
                   <SelectValue placeholder="Select voice" />
                 </SelectTrigger>
                 <SelectContent
-                  className={cn(
-                    "bg-[var(--bg)] text-[var(--text)] border border-[var(--text)]/10 ",
-                    "rounded-md shadow-lg"
-                  )}
+                  variant="settingsPanel" // Use existing variant for content styling
+                  // className is likely not needed if settingsPanel variant is sufficient
                 >
                   {voices.map((voice) => (
                     <SelectItem
                       key={voice.name}
                       value={voice.name}
-                      className={cn(
-                        "hover:brightness-95 focus:bg-[var(--active)] focus:text-[var(--text)]",
-                        "text-[var(--text)]"
-                      )}
+                      focusVariant="activeTheme" // Use the new focus variant
+                      // className for SelectItem might not be needed if focusVariant covers all
                     >
                       {voice.name} ({voice.lang})
                     </SelectItem>
@@ -176,7 +162,7 @@ export const TtsSettings = () => {
                 step={0.1}
                 value={[currentRate]}
                 onValueChange={handleRateChange}
-                className={sliderClass}
+                variant="themed" // Apply themed variant
               />
             </div>
           )}
