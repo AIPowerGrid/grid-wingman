@@ -33,8 +33,8 @@ export const Settings = () => {
               Please connect to your models to start chatting
             </p>
             <Button
-              variant="outline"
-              className="border-[var(--active)] hover:bg-[var(--active)]/30"
+              variant="outline-themed" // Changed variant
+              // className="border-[var(--active)] hover:bg-[var(--active)]/30" // Removed className
               onClick={() => {
                 setAccordionValue("connect");
                 setShowWarning(false);

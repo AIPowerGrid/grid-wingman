@@ -105,13 +105,13 @@ const Pre = (props: CustomPreProps) => {
     </pre>
       {codeString && ( 
           (<Button
-            variant="ghost"
+            variant="copy-button" // Changed variant
             size="sm"
             aria-label={copied ? "Copied!" : "Copy code"}
             title={copied ? "Copied!" : "Copy code"}
             className={cn(
               "absolute right-2 top-2 h-8 w-8 p-0",
-              "bg-background text-foreground hover:bg-accent hover:text-accent-foreground",
+              // "bg-background text-foreground hover:bg-accent hover:text-accent-foreground", // Covered by copy-button
               "transition-opacity duration-200",
               (hovered || copied) ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
             )}
@@ -291,11 +291,11 @@ const ThinkingBlock = ({ content }: { content: string }) => {
       <Collapsible open={isOpen} onOpenChange={setIsOpen} className="w-full">
         <CollapsibleTrigger asChild>
           <Button
-            variant="outline"
+            variant="outline" // Keep variant
             size="sm"
             className={cn(
               "mb-1", 
-              "border-foreground text-foreground hover:bg-accent hover:text-accent-foreground"
+              "border-foreground text-foreground hover:text-accent-foreground" // hover:bg-accent is part of outline variant
             )}
           >
             {isOpen ? 'Hide Thoughts' : 'Show Thoughts'}
@@ -410,9 +410,9 @@ export const EditableMessage: FC<MessageProps> = ({
               <FiCheck className="h-4 w-4 mr-1" /> Save
             </Button>
             <Button
-              variant="outline"
+              variant="destructive-outline" // Changed variant
               size="sm"
-              className="text-destructive border-destructive hover:text-destructive-foreground hover:bg-destructive"
+              // className="text-destructive border-destructive hover:text-destructive-foreground hover:bg-destructive" // Covered
               onClick={onCancelEdit}
               title="Discard changes"
             >
@@ -425,7 +425,12 @@ export const EditableMessage: FC<MessageProps> = ({
           {turn.role === 'assistant' && turn.webDisplayContent && (
             <div className="message-prefix">
               <Markdown remarkPlugins={[[remarkGfm, { singleTilde: false }], remarkMath, remarkSupersub]} components={markdownComponents}>
-                {`**From the Internet**\n${turn.webDisplayContent}\n\n---\n\n`}
+                {`**From the Internet**
+${turn.webDisplayContent}
+
+---
+
+`}
               </Markdown>
             </div>
           )}
