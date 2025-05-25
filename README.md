@@ -17,7 +17,7 @@ Built on [sidellama](https://github.com/gyopak/sidellama).
 
 *   **Note** You can save context in the note and inject it into LLM as you want, it's convenient for you to compare or to embed context. Memory coming soon!
 *   **Instant Summaries:** Get the gist of any webpage in seconds.
-*   **Intelligent Interactions:** Ask questions and get answers directly from page content.
+*   **Intelligent Interactions:** Ask questions and get answers directly from ~page~ different content (e.g. url in chat, the page you are reading, the PDF in your browser, the content in your notes, or contents from SERP.).
 *   **Smart Web Search:** Context-aware searches using Google, DuckDuckGo, and Wikipedia.
 *   **Flexible AI Power:** Use local models (Ollama, LM Studio) or cloud services (OpenAI, Gemini).
 *   **Customizable Personas:** Choose from 7 pre-built AI personalities (researcher, strategist, etc.).
