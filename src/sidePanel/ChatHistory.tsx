@@ -251,7 +251,7 @@ export const ChatHistory = ({ loadChat, onDeleteAll, className }: ChatHistoryPro
                       {new Date(message.last_updated).getHours().toString().padStart(2, '0')}:
                       {new Date(message.last_updated).getMinutes().toString().padStart(2, '0')}
                     </span>
-                    <button className={`text-foreground text-base font-normal overflow-hidden px-4 py-2 text-left text-ellipsis whitespace-nowrap flex-grow hover:underline hover:underline-offset-4 hover:decoration-2 ${message.id === removeId ? 'line-through decoration-2' : ''} font-['Space_Mono',_monospace]`} onClick={() => loadChat(message)}>
+                    <button className={`text-foreground text-base font-normal overflow-hidden px-4 py-2 text-left text-ellipsis whitespace-nowrap flex-grow hover:underline hover:underline-offset-4 hover:decoration-1 ${message.id === removeId ? 'line-through decoration-2' : ''} font-['Space_Mono',_monospace]`} onClick={() => loadChat(message)}>
                       {message.title || 'Untitled Chat'}
                     </button>
                     <motion.div className={`shrink-0 transition-opacity duration-150 ${hoverId === message.id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`} whileHover={{ rotate: '15deg' }} onMouseEnter={() => setRemoveId(message.id)} onMouseLeave={() => setRemoveId(null)}>

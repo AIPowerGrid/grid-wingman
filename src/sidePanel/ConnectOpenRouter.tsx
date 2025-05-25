@@ -108,7 +108,7 @@ export const ConnectOpenRouter = () => {
           onClick={onConnect}
           className={cn(
             buttonHeightClass, "text-sm font-medium whitespace-nowrap",
-            "bg-[rgba(255,250,240,0.4)] dark:bg-[rgba(255,255,255,0.1)]  text-[var(--text)] hover:bg-[var(--active)]/90 rounded-md shadow-sm",
+            "bg-[rgba(255,250,240,0.4)] dark:bg-[rgba(255,255,255,0.1)]  text-[var(--text)] dark:hover:bg-[var(--active)]/90 hover:bg-[var(--active)]/90 rounded-md shadow-sm",
             "focus-visible:ring-1 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--bg)]"
           )}
           disabled={connectButtonDisabled}
