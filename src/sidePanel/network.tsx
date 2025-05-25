@@ -785,3 +785,31 @@ export async function fetchDataAsStream(
         finishStream(error instanceof Error ? error.message : String(error), true);
       }
     }
+
+/**
+ * Scrape the main content from a given URL using the same headers as SERP scraping.
+ */
+export async function scrapeUrlContent(url: string): Promise<string> {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 12000);
+  try {
+    const response = await fetch(url, {
+      signal: controller.signal,
+      method: 'GET',
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
+        'Accept-Language': 'en-US,en;q=0.9',
+      }
+    });
+    clearTimeout(timeoutId);
+    if (!response.ok) throw new Error(`Failed to fetch ${url} - Status: ${response.status}`);
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('text/html')) throw new Error(`Skipping non-HTML content (${contentType}) from ${url}`);
+    const html = await response.text();
+    return extractMainContent(html);
+  } catch (error: any) {
+    clearTimeout(timeoutId);
+    return `[Error scraping URL: ${url} - ${error.message}]`;
+  }
+}

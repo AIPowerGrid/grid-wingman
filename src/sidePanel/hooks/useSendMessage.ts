@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction, useRef } from 'react';
 import { MessageTurn } from '../ChatHistory';
-import { fetchDataAsStream, webSearch, processQueryWithAI } from '../network';
+import { fetchDataAsStream, webSearch, processQueryWithAI, scrapeUrlContent } from '../network';
 import storage from 'src/background/storageUtil';
 import type { Config, Model } from 'src/types/config';
 import { normalizeApiEndpoint } from 'src/background/util';
@@ -121,12 +121,31 @@ const useSendMessage = (
       setChatStatus('searching');
     } else if (currentChatMode === 'page') {
       setChatStatus('reading');
-    } else { // 'chat' or default
+    } else {
       setChatStatus('thinking');
     }
 
     completionGuard.current = callId;
-    
+
+    // --- URL Detection and Scraping ---
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    const urls = message.match(urlRegex);
+    let scrapedContent = '';
+    if (urls && urls.length > 0) {
+      setChatStatus('searching');
+      try {
+        const scrapedResults = await Promise.all(
+          urls.map(url => scrapeUrlContent(url))
+        );
+        scrapedContent = scrapedResults
+          .map((content, idx) => `Content from [${urls[idx]}]:\n${content}`)
+          .join('\n\n');
+      } catch (e) {
+        scrapedContent = '[Error scraping one or more URLs]';
+      }
+      setChatStatus('thinking');
+    }
+
     const updateAssistantTurn = (update: string, isFinished: boolean, isError?: boolean) => {
       if (completionGuard.current !== callId && !isFinished && !(isError === true) ) {
         console.log(`[${callId}] updateAssistantTurn: Guard mismatch (current: ${completionGuard.current}), skipping non-final update.`);
@@ -336,14 +355,15 @@ const useSendMessage = (
 
     const systemPromptParts = [];
     if (persona) systemPromptParts.push(persona);
-    if (userContextStatement) systemPromptParts.push(userContextStatement); // Add user context here
+    if (userContextStatement) systemPromptParts.push(userContextStatement);
     if (noteContextString) systemPromptParts.push(noteContextString);
     if (pageContextString) systemPromptParts.push(pageContextString);
     if (webContextString) systemPromptParts.push(webContextString);
-    
-    const systemContent = systemPromptParts.join('\n\n').trim(); // Join parts with double newlines for clarity
+    if (scrapedContent) systemPromptParts.push(`Use the following scraped content from URLs in the user's message:\n${scrapedContent}`);
 
-    console.log(`[${callId}] useSendMessage: System prompt constructed. Persona: ${!!persona}, UserCtx: ${!!userContextStatement}, NoteCtx: ${!!noteContextString}, PageCtx: ${!!pageContextString}, WebCtx: ${!!webContextString}`);
+    const systemContent = systemPromptParts.join('\n\n').trim();
+
+    console.log(`[${callId}] useSendMessage: System prompt constructed. Persona: ${!!persona}, UserCtx: ${!!userContextStatement}, NoteCtx: ${!!noteContextString}, PageCtx: ${!!pageContextString}, WebCtx: ${!!webContextString}, LinkCtx: ${!!scrapedContent}`)
 
     const assistantTurnPlaceholder: MessageTurn = {
       role: 'assistant',
