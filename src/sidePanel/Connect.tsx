@@ -13,7 +13,6 @@ import { ConnectOpenAI } from './ConnectOpenAI';
 import { ConnectOpenRouter } from './ConnectOpenRouter';
 import { ConnectCustom } from './ConnectCustom';
 import { SettingTitle } from './SettingsTitle';
-import { useConfig } from './ConfigContext';
 import { cn } from "@/src/background/util";
 
 type ConnectionProps = {
@@ -53,21 +52,18 @@ const ConnectionSection: FC<ConnectionProps> = ({
 );
 
 export const Connect: FC = () => {
-  // const { config } = useConfig(); // config is not used
-
-  // Removed local style variables, direct classes will be used.
 
   return (
     <AccordionItem
       value="connect"
       className={cn(
-        "bg-[var(--input-background)]", // Standard background
-        "border-[var(--text)]/10",    // Standard border
-        "rounded-xl",                 // Standard rounding
-        "shadow-md",                  // Standard shadow
-        "transition-all duration-150 ease-in-out", // Common transition
-        "hover:border-[var(--active)] hover:brightness-105", // Common hover
-        "overflow-hidden" // Specific to this instance
+        "bg-[var(--input-background)]",
+        "border-[var(--text)]/10",
+        "rounded-xl",
+        "shadow-md",
+        "transition-all duration-150 ease-in-out", 
+        "hover:border-[var(--active)] hover:brightness-105",
+        "overflow-hidden"
       )}
     >
       <AccordionTrigger

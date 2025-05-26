@@ -1,5 +1,4 @@
 import { useEffect, useState, ChangeEvent, Dispatch, SetStateAction } from 'react';
-// ResizeTextarea import will be removed
 import {
   AccordionItem,
   AccordionContent,
@@ -28,9 +27,7 @@ import React from 'react';
 import { useConfig } from './ConfigContext';
 import { SettingTitle } from './SettingsTitle';
 import { cn } from "@/src/background/util";
-import { Textarea, TextareaProps } from "@/components/ui/textarea"; // Import Textarea and its props
-
-// Local AutoResizeTextarea component definition is removed.
+import { Textarea } from "@/components/ui/textarea";
 
 const SaveButtons = ({
   hasChange,
@@ -48,25 +45,22 @@ const SaveButtons = ({
   return (
     <div className="flex mt-4 space-x-2 justify-end w-full">
       <Button
-        variant="active-bordered" // Use new variant
+        variant="active-bordered"
         size="sm"
-        // className is no longer needed as variant covers it
         onClick={onSave}
       >
         Save
       </Button>
       <Button
-        variant="active-bordered" // Use new variant
+        variant="active-bordered"
         size="sm"
-        // className is no longer needed as variant covers it
         onClick={onSaveAs}
       >
         Save As...
       </Button>
       <Button
-        variant="outline-subtle" // Use new variant
+        variant="outline-subtle"
         size="sm"
-        // className is no longer needed as variant covers it
         onClick={onCancel}
       >
         Cancel
@@ -126,13 +120,10 @@ const PersonaModal = ({
         </div>
         <DialogFooter className="sm:justify-end">
           <Button type="button" variant="outline-subtle" size="sm" // Use new variant
-            // className might not be needed, or only for specifics like focus if different
             onClick={onModalClose}
           > Cancel </Button>
           <Button type="button" variant="active-bordered" size="sm" // Use new variant
             className={cn(
-              // Base button provides disabled:opacity-50. If 60 is strictly needed, add it.
-              // For now, relying on base disabled style. The border will be new here.
             )}
             disabled={!name.trim()} onClick={handleCreate}
           > Create </Button>
@@ -181,11 +172,9 @@ const DeleteModal = ({
         </DialogHeader>
         <DialogFooter className="sm:justify-end pt-4">
            <Button type="button" variant="outline-subtle" size="sm" // Use new variant
-            // className might not be needed
             onClick={onModalClose}
           > Cancel </Button>
           <Button type="button" variant="destructive" size="sm"
-            // No change to destructive button's className needed
             onClick={handleDelete}
           > Delete </Button>
         </DialogFooter>
@@ -209,15 +198,8 @@ const PersonaSelect = ({
       <SelectTrigger
         variant="settings" // Use the new "settings" variant
         className={cn(
-          // Most styles are covered by the variant. Add any specific overrides if necessary.
-          // "text-[var(--text)]", // Covered by variant
-          "flex w-full", // Keep w-full if not part of base variant styles for trigger
-          // "border-[var(--text)]/10", // Covered by variant
-          // "focus:border-[var(--active)] focus:ring-1 focus:ring-[var(--active)]", // Covered by variant
-          // "hover:border-[var(--active)] hover:brightness-98", // Covered by variant
-          // "bg-[rgba(255,250,240,0.4)] dark:bg-[rgba(255,255,255,0.1)]", // Covered by variant (as --input-background)
+          "flex w-full",
           "data-[placeholder]:text-muted-foreground" // Keep if specific, though variant might cover similar placeholder needs
-          // "h-8" // Covered by variant
         )}
       >
         <SelectValue placeholder="Select persona" />
@@ -225,16 +207,12 @@ const PersonaSelect = ({
       <SelectContent
         variant="settingsPanel" // Using existing variant for content that matches style
         className={cn(
-          // "bg-[var(--bg)] text-[var(--text)] border-[var(--text)]/10", // Covered by settingsPanel variant
-          // "rounded-md shadow-lg" // Covered by settingsPanel variant
         )}
       >
         {Object.keys(personas).map((p) => (
           <SelectItem
             key={p} value={p}
-            focusVariant="activeTheme" // Use the new focus variant
-            // className={cn("hover:brightness-95 focus:bg-[var(--active)] focus:text-[var(--active-foreground)]", "text-[var(--text)]")}
-            // The className above is now handled by focusVariant="activeTheme"
+            focusVariant="activeTheme"
           > {p} </SelectItem>
         ))}
       </SelectContent>
@@ -250,15 +228,11 @@ const PersonaTextareaWrapper = ({
   isEditing: boolean;
   setIsEditing: Dispatch<SetStateAction<boolean>>;
 }) => {
-  // Props for the Textarea component from ui/textarea
   const onFocusProp = {
     onFocus: (e: React.FocusEvent<HTMLTextAreaElement>) => {
       if (!isEditing) setIsEditing(true);
-      // Call original onFocus if it exists in props (though not directly passed here, good practice for wrapper)
     },
   };
-  // if onTextAreaFocus was a direct prop to AutoResizeTextarea, it would be:
-  // if (props.onTextAreaFocus) props.onTextAreaFocus();
 
   return (
     <Textarea
@@ -274,20 +248,14 @@ const PersonaTextareaWrapper = ({
       {...onFocusProp} // Spread the onFocus handling
       placeholder="Define the persona's characteristics and instructions here..."
       className={cn(
-        // Base styles for bordered appearance, custom rounding, and sizing
         "w-full min-h-[80px] border border-[var(--text)]/10 px-3 py-2 text-sm ring-offset-[var(--bg)] placeholder:text-[var(--muted-foreground)] rounded-[12px]",
         "text-[var(--text)]", // Text color
         "no-scrollbar", // Scrollbar preference
-        // Custom focus style (overrides default focus from ui/textarea)
         "focus-visible:outline-none focus-visible:ring-0 focus-visible:box-shadow-[inset_0_0_0_1px_rgba(255,255,255,0.1),_0_0_8px_rgba(168,123,255,0.3)]",
-        // Conditional styling for editable vs read-only state
         !isEditing
           ? "opacity-75 cursor-default" // Styles for read-only
           : "hover:border-[var(--active)] focus:border-[var(--active)]", // Styles for editable
-        // Note: components/ui/textarea already includes "disabled:cursor-not-allowed disabled:opacity-50"
-        // The `readOnly` prop combined with these conditional classes should achieve the desired effect.
       )}
-      // Removed isEffectivelyReadOnly prop as it's mapped to readOnly and conditional classNames
     />
   );
 };

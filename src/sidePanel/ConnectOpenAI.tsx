@@ -13,8 +13,6 @@ export const ConnectOpenAI = () => {
   const [visibleApiKey, setVisibleApiKey] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  // buttonHeightClass will be removed, size="sm" will be used instead
-
   const onConnect = () => {
     if (!apiKey) {
       toast.error("API key is required for OpenAI.");
@@ -108,9 +106,9 @@ export const ConnectOpenAI = () => {
       {isConnected && (
         <Button
           variant="ghost"
-          size="sm" // Ensure size is sm
+          size="sm"
           aria-label="Connected to OpenAI"
-          className={cn("w-8 rounded-md text-[var(--success)]")} // buttonHeightClass removed
+          className={cn("w-8 rounded-md text-[var(--success)]")}
           onClick={onConnect}
           disabled={isLoading}
         >

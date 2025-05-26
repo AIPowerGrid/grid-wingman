@@ -34,7 +34,6 @@ export const Settings = () => {
             </p>
             <Button
               variant="outline-themed" // Changed variant
-              // className="border-[var(--active)] hover:bg-[var(--active)]/30" // Removed className
               onClick={() => {
                 setAccordionValue("connect");
                 setShowWarning(false);

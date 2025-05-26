@@ -11,8 +11,6 @@ export const ConnectOllama = () => {
   const [url, setUrl] = useState(config?.ollamaUrl || 'http://localhost:11434');
   const [isLoading, setIsLoading] = useState(false);
 
-  // buttonHeightClass will be removed, size="sm" will be used instead
-
   const onConnect = () => {
     setIsLoading(true);
     toast.dismiss();
@@ -88,11 +86,10 @@ export const ConnectOllama = () => {
       {isConnected && (
         <Button
           variant="ghost"
-          size="sm" // Ensure size is sm
+          size="sm"
           aria-label="Connected to Ollama"
           className={cn(
-            // buttonHeightClass removed
-            "w-8", // This seems to be for icon button sizing, keeping it
+            "w-8",
             "rounded-md",
             "text-[var(--success)]"
           )}

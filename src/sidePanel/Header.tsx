@@ -186,7 +186,6 @@ const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
             variant="outline-subtle" // Use new variant
             size="sm" // Standardize size
             onClick={() => onOpenChange(false)}
-            // className might not be needed if variant covers all
           >
             Cancel
           </Button>
@@ -194,8 +193,6 @@ const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
             variant="active-bordered" // Use new variant
             size="sm" // Standardize size
             onClick={handleSave}
-            // className might not be needed if variant covers all.
-            // The border will be new here.
           >
             Save Changes
           </Button>
@@ -283,9 +280,9 @@ export const Header: React.FC<HeaderProps> = ({
               Cancel
             </Button>
             <Button
-              variant="destructive" // Changed
+              variant="destructive"
               size="sm"
-              className={cn( // Changed
+              className={cn(
                 "focus:ring-1 focus:ring-red-400 focus:ring-offset-1 focus:ring-offset-[var(--bg)]"
               )}
               onClick={async () => {
@@ -340,7 +337,7 @@ export const Header: React.FC<HeaderProps> = ({
                   aria-label={leftButtonLabel}
                   variant="ghost"
                   size={showBackButton ? "sm" : undefined}
-                  className={cn( // Changed
+                  className={cn(
                     "text-[var(--text)] rounded-md p-0 h-8 w-8 flex items-center justify-center"
                   )}
                   onClick={handleLeftButtonClick}
@@ -436,7 +433,7 @@ export const Header: React.FC<HeaderProps> = ({
                           aria-label="Share Options"
                           variant="ghost"
                           size="sm"
-                          className="text-[var(--text)] rounded-md" // Changed
+                          className="text-[var(--text)] rounded-md"
                         >
                           <PiShareFat size="18px" />
                         </Button>
@@ -526,7 +523,7 @@ export const Header: React.FC<HeaderProps> = ({
                     aria-label="Delete All History"
                     variant="ghost"
                     size="sm"
-                    className="text-[var(--text)] rounded-md" // Changed
+                    className="text-[var(--text)] rounded-md"
                     onClick={handleDeleteAllWithConfirmation}
                   >
                     <FiTrash2 size="18px" />

@@ -15,8 +15,6 @@ type ModelParamKey = 'temperature' | 'maxTokens' | 'topP' | 'presencepenalty';
 export const ModelSettingsPanel = () => {
   const { config, updateConfig } = useConfig();
 
-  // sliderClass is removed, variant="themed" will be used instead.
-
   const handleChange = (key: ModelParamKey) => (val: number | number[]) => {
     const valueToSet = Array.isArray(val) ? val[0] : val;
     updateConfig({ [key]: valueToSet });

@@ -3,9 +3,7 @@ import type { ComponentPropsWithoutRef, ReactElement, FC } from 'react';
 import { Children, HTMLAttributes, ReactNode, useState } from 'react';
 import Markdown from 'react-markdown';
 import { FiCopy, FiCheck, FiX } from 'react-icons/fi';
-// AutosizeTextarea will be replaced by Textarea from components/ui/textarea
-// import AutosizeTextarea from 'react-textarea-autosize'; 
-import { Textarea } from "@/components/ui/textarea"; // Import the new Textarea
+import { Textarea } from "@/components/ui/textarea";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/src/background/util";
@@ -292,24 +290,17 @@ export const EditableMessage: FC<MessageProps> = ({
     >
       {isEditing ? (
         <div className="flex flex-col space-y-2 items-stretch w-full p-1">
-          <Textarea // Use the new Textarea component
-            autosize // Enable autosize mode
+          <Textarea
+            autosize 
             value={editText}
             onChange={(e) => onSetEditText(e.target.value)}
             placeholder="Edit your message..."
             className={cn(
-              // Base appearance for a bordered input
               "w-full rounded-md border bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground",
-              // Theme border color
               "border-input",
-              // Text color
               "text-foreground",
-              // Custom hover and focus behavior (overrides default focus from ui/textarea if specific enough)
               "hover:border-primary focus-visible:border-primary focus-visible:ring-0",
-              // Ensure existing min-height is kept
               "min-h-[60px]"
-              // Note: "flex" and "outline-none" are provided by the base autosize variant in ui/textarea.
-              // "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2" is replaced by the custom focus.
             )}
             minRows={3}
             autoFocus

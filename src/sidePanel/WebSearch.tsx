@@ -15,8 +15,6 @@ import { useConfig } from './ConfigContext';
 import type { Config } from '../types/config';
 import { SettingTitle } from './SettingsTitle';
 
-// sliderClass is removed, variant="themed" will be used instead.
-
 interface WebSearchModeSelectorProps {
   webMode: Config['webMode'];
   updateConfig: (newConfig: Partial<Config>) => void;
@@ -34,7 +32,6 @@ const WebSearchModeSelector = ({ webMode, updateConfig }: WebSearchModeSelectorP
           value={mode}
           id={`webMode-${mode}`}
           variant="themed" // Use the new themed variant
-          // className is no longer needed as the variant covers the styles
         />
         <Label
           htmlFor={`webMode-${mode}`}
@@ -128,7 +125,6 @@ const WikipediaSettingsPanel = ({ config, updateConfig }: WikipediaSettingsPanel
           checked={rerankEnabled}
           onCheckedChange={(checked) => updateConfig({ wikiRerank: !!checked })}
           variant="themed" // Use the new themed variant
-          // className is no longer needed as the variant covers the styles
         />
         <Label
           htmlFor="wikiRerank"
@@ -187,7 +183,6 @@ const GoogleCustomSearchSettingsPanel = ({ config, updateConfig }: GoogleCustomS
     updateConfig({ googleCx: newCx });
   };
 
-  // CurrentInputComponent definition is removed. Standard Input will be used.
 
   const linkClass = "text-[var(--active)] hover:underline text-xs";
 
@@ -203,8 +198,6 @@ const GoogleCustomSearchSettingsPanel = ({ config, updateConfig }: GoogleCustomS
           value={apiKey}
           onChange={handleApiKeyChange}
           placeholder="Enter Google API Key"
-          // className prop can be used here if specific overrides are essential
-          // For now, relying on default Input styling.
         />
         <p className="text-[var(--text)]/70 text-xs pt-1">
           Your Google Cloud API Key for Custom Search.
@@ -228,7 +221,6 @@ const GoogleCustomSearchSettingsPanel = ({ config, updateConfig }: GoogleCustomS
           value={cx}
           onChange={handleCxChange}
           placeholder="Enter Search Engine ID (CX)"
-          // className prop can be used here if specific overrides are essential
         />
         <p className="text-[var(--text)]/70 text-xs pt-1">
           Your Programmable Search Engine ID.

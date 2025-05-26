@@ -13,8 +13,6 @@ export const ConnectGroq = () => {
   const [visibleApiKey, setVisibleApiKey] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  // buttonHeightClass will be removed, size="sm" will be used instead
-
   const onConnect = () => {
     if (!apiKey) {
       toast.error("API key is required for Groq.");
@@ -115,7 +113,7 @@ export const ConnectGroq = () => {
           variant="ghost"
           size="sm" // Ensure size is sm
           aria-label="Connected to Groq"
-          className={cn("w-8 rounded-md text-[var(--success)]")} // buttonHeightClass removed
+          className={cn("w-8 rounded-md text-[var(--success)]")}
           onClick={onConnect}
           disabled={isLoading}
         >

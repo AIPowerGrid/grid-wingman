@@ -25,14 +25,6 @@ export const TtsSettings = () => {
   const [loadingVoices, setLoadingVoices] = useState(true);
   const [errorLoading, setErrorLoading] = useState<string | null>(null);
 
-  // Removed local style variables for AccordionItem, direct classes will be used.
-  // const subtleBorderClass = 'border-[var(--text)]/10';
-  // const controlBg = "bg-[rgba(255,250,240,0.4)] dark:bg-[rgba(255,255,255,0.1)]";  
-  // const itemShadow = 'shadow-md';
-  // const itemRounded = 'rounded-xl';
-
-  // sliderClass is removed, variant="themed" will be used instead.
-
   useEffect(() => {
     setLoadingVoices(true);
     setErrorLoading(null);
@@ -121,7 +113,6 @@ export const TtsSettings = () => {
                 <SelectTrigger
                   variant="settings" // Use the new "settings" variant
                   className={cn(
-                    // Most styles are covered by the variant.
                     "w-full", // Keep w-full as it's specific to this layout
                     "data-[placeholder]:text-muted-foreground" // Keep if specific
                   )}
@@ -130,14 +121,12 @@ export const TtsSettings = () => {
                 </SelectTrigger>
                 <SelectContent
                   variant="settingsPanel" // Use existing variant for content styling
-                  // className is likely not needed if settingsPanel variant is sufficient
                 >
                   {voices.map((voice) => (
                     <SelectItem
                       key={voice.name}
                       value={voice.name}
                       focusVariant="activeTheme" // Use the new focus variant
-                      // className for SelectItem might not be needed if focusVariant covers all
                     >
                       {voice.name} ({voice.lang})
                     </SelectItem>

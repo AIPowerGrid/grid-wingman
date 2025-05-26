@@ -1,4 +1,4 @@
-import type { TextareaHTMLAttributes, RefObject, FC } from 'react';
+import type { FC } from 'react';
 import { AddToChat } from './AddToChat';
 import type { SpeechRecognition as SpeechRecognitionInstance, SpeechRecognitionEvent as SpeechRecognitionEventInstance, SpeechRecognitionErrorEvent as SpeechRecognitionErrorEventInstance } from '../types/speech';
 import { useEffect, useRef, useState, useCallback, Dispatch, SetStateAction } from 'react';
@@ -15,7 +15,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Textarea } from "@/components/ui/textarea"; // Import the new Textarea
+import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/src/background/util";
 import { NotePopover } from './NotePopover';
 
@@ -23,14 +23,14 @@ interface InputProps {
     isLoading: boolean;
     message: string;
     setMessage: Dispatch<SetStateAction<string>>; 
-    onSend: () => void; // This is () => cognitoOnSend(cognitoMessageFromCognitoState)
+    onSend: () => void;
 }
 
 export const Input: FC<InputProps> = ({ isLoading, message, setMessage, onSend }) => {
   const { config } = useConfig();
   const ref = useRef<HTMLTextAreaElement>(null);
   const [isListening, setIsListening] = useState(false);
-  const [isFocused, setIsFocused] = useState(false); // <-- Add this
+  const [isFocused, setIsFocused] = useState(false);
 
   const setMessageRef = useRef<Dispatch<SetStateAction<string>>>(setMessage);
   useEffect(() => {
@@ -158,7 +158,7 @@ export const Input: FC<InputProps> = ({ isLoading, message, setMessage, onSend }
     )}>
       <AddToChat /> 
       <Textarea
-        autosize // Enable autosize mode
+        autosize
         ref={ref}
         minRows={1}
         maxRows={8}
@@ -169,7 +169,6 @@ export const Input: FC<InputProps> = ({ isLoading, message, setMessage, onSend }
         autoFocus
         onChange={event => setMessage(event.target.value)}
         onKeyDown={handleTextareaKeyDown}
-        // Apply minimal styling, ensuring it overrides defaults from ui/textarea when autosize is true
         className="flex-grow !bg-transparent px-0 py-1 border-none shadow-none outline-none focus-visible:ring-0"
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}

@@ -406,8 +406,8 @@ const Cognito = () => {
     setSettingsMode(false);
 
     const loadedConfigUpdate: Partial<Config> = {
-      // chatMode: chat.chatMode || undefined, // Do not restore chatMode from history
-      // webMode: chat.webMode || config?.webMode, // Do not restore webMode from history
+      // chatMode: chat.chatMode || undefined, 
+      // webMode: chat.webMode || config?.webMode, 
     };
 
     if (chat.useNoteActive && chat.noteContentUsed !== undefined) {
