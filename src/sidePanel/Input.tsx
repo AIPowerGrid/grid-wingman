@@ -153,7 +153,7 @@ export const Input: FC<InputProps> = ({ isLoading, message, setMessage, onSend }
 
   return (
     <div className={cn(
-      "flex w-full border border-[var(--active)]/50 items-center gap-0 p-0 bg-[var(--card,var(--bg-secondary))] rounded-lg shadow-md",
+      "flex w-full border border-[var(--active)]/50 items-center mb-1 gap-0 p-0 bg-[var(--card,var(--bg-secondary))] rounded-lg shadow-md",
       isFocused && "input-breathing"
     )}>
       <AddToChat /> 
@@ -169,7 +169,7 @@ export const Input: FC<InputProps> = ({ isLoading, message, setMessage, onSend }
         autoFocus
         onChange={event => setMessage(event.target.value)}
         onKeyDown={handleTextareaKeyDown}
-        className="flex-grow !bg-transparent px-0 py-1 border-none shadow-none outline-none focus-visible:ring-0"
+        className="flex-grow !bg-transparent p-1 border-none shadow-none outline-none focus-visible:ring-0"
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
       />

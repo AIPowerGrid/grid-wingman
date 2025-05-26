@@ -230,15 +230,15 @@ const useSendMessage = (
         );
         if (optimizedQuery && optimizedQuery.trim() && optimizedQuery !== message) {
           queryForProcessing = optimizedQuery;
-          processedQueryDisplay = `**SUB:** [*${queryForProcessing}*]\n\n`;
+          processedQueryDisplay = `**Optimized query:** "*${queryForProcessing}*"\n\n`;
           console.log(`[${callId}] useSendMessage: Query optimized to: "${queryForProcessing}"`);
         } else {
-          processedQueryDisplay = `**ORG:** (${queryForProcessing})\n\n`;
+          processedQueryDisplay = `**Original query:** "${queryForProcessing}"\n\n`;
           console.log(`[${callId}] useSendMessage: Using original query: "${queryForProcessing}"`);
         }
       } catch (optError) {
         console.error(`[${callId}] Query optimization failed:`, optError);
-        processedQueryDisplay = `**ORG:** (${queryForProcessing}) [Optimization Failed]\n\n`;
+        processedQueryDisplay = `**Fallback query:** "${queryForProcessing}"\n\n`;
       }
     } else {
       queryForProcessing = message;

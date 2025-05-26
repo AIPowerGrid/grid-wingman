@@ -256,7 +256,11 @@ export const Header: React.FC<HeaderProps> = ({
     }
   };
 
-  const leftButtonLabel = showBackButton ? 'Back to Chat' : 'Open Settings';
+  const leftButtonLabel = showBackButton 
+    ? 'Back to Chat' 
+    : config?.userName 
+      ? `Hi ${config.userName}, settings?`
+      : 'Settings';
 
   const handleDeleteAllWithConfirmation = () => {
     toast.custom(
