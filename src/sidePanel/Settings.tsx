@@ -32,8 +32,7 @@ export const Settings = () => {
           <div className="flex flex-col items-center gap-3">
             <p className="text-center font-medium">
               <strong>First Time GUIDE</strong><br />
-              Connect to API provider, then click on the avatar in the top left corner of the chat UI to select a model and set persona, you will be set then!
-            </p>
+            Connect to API. Free to explore the options in this page. Exit. Then tap top-left avatar in chatting UI to pick your model to chat with.</p>
             <Button
               variant="outline"
               className="justify-center h-7 text-sm"
