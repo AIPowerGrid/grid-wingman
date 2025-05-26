@@ -15,7 +15,7 @@ function Input({ className, type, ...props }: React.ComponentProps<"input">) {
         "text-[var(--text)] px-2.5",
         "focus:border-[var(--active)] dark:focus:border-0 focus:ring-1 focus:ring-[var(--active)] focus:ring-offset-0",
         "hover:border-[var(--active)] dark:hover:border-0",
-        "bg-[rgba(255,250,240,0.4)] dark:bg-[rgba(255,255,255,0.1)]",
+        "bg-[var(--input-background)]",
         "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
         "shadow-[var(--input-base-shadow)]",
         className,

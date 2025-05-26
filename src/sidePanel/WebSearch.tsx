@@ -15,15 +15,7 @@ import { useConfig } from './ConfigContext';
 import type { Config } from '../types/config';
 import { SettingTitle } from './SettingsTitle';
 
-const sliderClass = cn(
-  "w-full",
-  "[&>span:first-child]:bg-[var(--text)]/10",
-  "[&>span:first-child>span:first-child]:bg-[var(--active)]",
-  "[&_button]:bg-[var(--active)]",
-  "[&_button]:border-[var(--text)]/50",
-  "[&_button]:ring-offset-[var(--bg)]",
-  "[&_button:focus-visible]:ring-[var(--active)]"
-);
+// sliderClass is removed, variant="themed" will be used instead.
 
 interface WebSearchModeSelectorProps {
   webMode: Config['webMode'];
@@ -41,11 +33,8 @@ const WebSearchModeSelector = ({ webMode, updateConfig }: WebSearchModeSelectorP
         <RadioGroupItem
           value={mode}
           id={`webMode-${mode}`}
-          className={cn(
-            "border-[var(--text)] text-[var(--active)]",
-            "focus:ring-1 focus:ring-[var(--active)] focus:ring-offset-0",
-            "data-[state=checked]:border-[var(--active)]"
-          )}
+          variant="themed" // Use the new themed variant
+          // className is no longer needed as the variant covers the styles
         />
         <Label
           htmlFor={`webMode-${mode}`}
@@ -78,7 +67,7 @@ const SerpSettingsPanel = ({ config, updateConfig }: SerpSettingsPanelProps) => 
           max={10}
           min={1}
           step={1}
-          className={sliderClass}
+          variant="themed" // Apply themed variant
           onValueChange={value => updateConfig({ serpMaxLinksToVisit: value[0] })}
         />
         <p className="text-[var(--text)]/70 text-xs pt-1">
@@ -96,7 +85,7 @@ const SerpSettingsPanel = ({ config, updateConfig }: SerpSettingsPanelProps) => 
           max={128} 
           min={1}   
           step={1}
-          className={sliderClass}
+          variant="themed" // Apply themed variant
           onValueChange={value => updateConfig({ webLimit: value[0] })}
         />
          <p className="text-[var(--text)]/70 text-xs pt-1">
@@ -128,7 +117,7 @@ const WikipediaSettingsPanel = ({ config, updateConfig }: WikipediaSettingsPanel
           max={30}
           min={1}
           step={1}
-          className={sliderClass}
+          variant="themed" // Apply themed variant
           onValueChange={value => updateConfig({ wikiNumBlocks: value[0] })}
         />
       </div>
@@ -138,10 +127,8 @@ const WikipediaSettingsPanel = ({ config, updateConfig }: WikipediaSettingsPanel
           id="wikiRerank"
           checked={rerankEnabled}
           onCheckedChange={(checked) => updateConfig({ wikiRerank: !!checked })}
-          className={cn(
-            "border-[var(--text)] data-[state=checked]:bg-[var(--active)] data-[state=checked]:text-[var(--text)]",
-            "focus-visible:ring-1 focus-visible:ring-[var(--active)] focus-visible:ring-offset-0"
-          )}
+          variant="themed" // Use the new themed variant
+          // className is no longer needed as the variant covers the styles
         />
         <Label
           htmlFor="wikiRerank"
@@ -161,7 +148,7 @@ const WikipediaSettingsPanel = ({ config, updateConfig }: WikipediaSettingsPanel
             max={50}
             min={numBlocks} 
             step={1}
-            className={sliderClass}
+            variant="themed" // Apply themed variant
             onValueChange={value => updateConfig({ wikiNumBlocksToRerank: value[0] })}
             disabled={!rerankEnabled}
           />
@@ -200,17 +187,7 @@ const GoogleCustomSearchSettingsPanel = ({ config, updateConfig }: GoogleCustomS
     updateConfig({ googleCx: newCx });
   };
 
-  const CurrentInputComponent = Input || ( (props: React.InputHTMLAttributes<HTMLInputElement>) => (
-    <input
-      {...props}
-      className={cn(
-        "flex h-10 w-full rounded-md border border-[var(--text)]/30 bg-transparent px-3 py-2 text-sm",
-        "ring-offset-[var(--bg)] placeholder:text-[var(--text)]/50",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--active)] focus-visible:ring-offset-2",
-        props.className
-      )}
-    />
-  ));
+  // CurrentInputComponent definition is removed. Standard Input will be used.
 
   const linkClass = "text-[var(--active)] hover:underline text-xs";
 
@@ -220,12 +197,14 @@ const GoogleCustomSearchSettingsPanel = ({ config, updateConfig }: GoogleCustomS
         <Label htmlFor="googleApiKey" className="text-[var(--text)] text-base font-medium pb-1 block">
           Google API Key
         </Label>
-        <CurrentInputComponent
+        <Input // Use standard Input component
           id="googleApiKey"
           type={config.visibleApiKeys ? "text" : "password"}
           value={apiKey}
           onChange={handleApiKeyChange}
           placeholder="Enter Google API Key"
+          // className prop can be used here if specific overrides are essential
+          // For now, relying on default Input styling.
         />
         <p className="text-[var(--text)]/70 text-xs pt-1">
           Your Google Cloud API Key for Custom Search.
@@ -243,12 +222,13 @@ const GoogleCustomSearchSettingsPanel = ({ config, updateConfig }: GoogleCustomS
         <Label htmlFor="googleCx" className="text-[var(--text)] text-base font-medium pb-1 block">
           Search Engine ID (CX)
         </Label>
-        <CurrentInputComponent
+        <Input // Use standard Input component
           id="googleCx"
           type="text"
           value={cx}
           onChange={handleCxChange}
           placeholder="Enter Search Engine ID (CX)"
+          // className prop can be used here if specific overrides are essential
         />
         <p className="text-[var(--text)]/70 text-xs pt-1">
           Your Programmable Search Engine ID.
@@ -348,9 +328,10 @@ export const WebSearch = () => {
     <AccordionItem
       value="web-search"
       className={cn(
-        "overflow-hidden",
-        "transition-all duration-150 ease-in-out",
-        "hover:border-[var(--active)] hover:brightness-105"
+        "bg-[var(--input-background)] border-[var(--text)]/10 rounded-xl shadow-md", // Standard container styles
+        "overflow-hidden", // Specific to this instance
+        "transition-all duration-150 ease-in-out", // Common transition
+        "hover:border-[var(--active)] hover:brightness-105" // Common hover
       )}
     >
       <AccordionTrigger

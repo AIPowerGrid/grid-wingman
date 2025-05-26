@@ -12,7 +12,7 @@ const buttonVariants = cva(
         default:
           "bg-primary text-primary-foreground shadow-xs hover:bg-primary/90",
         destructive:
-          "bg-destructive text-white shadow-xs hover:bg-destructive/90 not-focus-visible",
+          "bg-destructive text-destructive-foreground shadow-xs hover:bg-destructive/90 not-focus-visible",
         outline:
           "border bg-background shadow-xs hover:bg-accent",
         secondary:
@@ -31,6 +31,12 @@ const buttonVariants = cva(
           "border border-destructive bg-transparent text-destructive shadow-xs hover:bg-destructive/10 hover:text-destructive-foreground focus-visible:bg-destructive/10 focus-visible:text-destructive-foreground focus-visible:ring-1 focus-visible:ring-destructive",
         "copy-button":
           "bg-background text-foreground shadow-none hover:bg-accent hover:text-accent-foreground focus-visible:bg-accent focus-visible:text-accent-foreground",
+        connect:
+          "bg-[var(--input-background)] text-[var(--text)] hover:bg-[var(--active)]/90 shadow-sm focus-visible:ring-1 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--bg)]",
+        "active-bordered":
+          "bg-[var(--active)] text-[var(--text)] border border-[var(--text)] hover:brightness-110 focus-visible:ring-1 focus-visible:ring-[var(--active)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--bg)] shadow-sm",
+        "outline-subtle":
+          "border border-[var(--text)]/50 bg-transparent text-[var(--text)] hover:bg-[var(--text)]/10 hover:border-[var(--text)]/70 hover:text-[var(--text)] focus-visible:ring-1 focus-visible:ring-[var(--active)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--bg)] shadow-sm",
       },
       size: {
         default: "h-9 px-2 py-2 has-[>svg]:px-2 [&_svg:not([class*='size-'])]:size-5", // Default icons are size-5 (1.25rem)

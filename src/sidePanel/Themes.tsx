@@ -441,8 +441,9 @@ export const Themes = () => {
     <AccordionItem
       value="themes"
       className={cn(
-        "transition-all duration-150 ease-in-out",
-        "hover:border-[var(--active)] hover:brightness-105"
+        "bg-[var(--input-background)] border-[var(--text)]/10 rounded-xl shadow-md", // Standard container styles
+        "transition-all duration-150 ease-in-out", // Common transition
+        "hover:border-[var(--active)] hover:brightness-105" // Common hover
       )}
     >
       <AccordionTrigger

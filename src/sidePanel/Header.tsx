@@ -183,15 +183,19 @@ const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
         </div>
         <DialogFooter className="px-6 py-4 border-t border-[var(--text)]/10">
           <Button
-            variant="outline"
+            variant="outline-subtle" // Use new variant
+            size="sm" // Standardize size
             onClick={() => onOpenChange(false)}
-            className="text-[var(--text)] border-[var(--text)]/50 hover:bg-[var(--text)]/10"
+            // className might not be needed if variant covers all
           >
             Cancel
           </Button>
           <Button
+            variant="active-bordered" // Use new variant
+            size="sm" // Standardize size
             onClick={handleSave}
-            className="bg-[var(--active)] text-[var(--text)] hover:brightness-110"
+            // className might not be needed if variant covers all.
+            // The border will be new here.
           >
             Save Changes
           </Button>
