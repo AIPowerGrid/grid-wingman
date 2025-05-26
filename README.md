@@ -60,7 +60,7 @@ This setup allows Cognito to understand the context of your browsing and provide
 *   Install from the [Chrome Web Store](https://chromewebstore.google.com/detail/pphjdjdoclkedgiaahmiahladgcpohca?utm_source=item-share-cb).
 
 #### Option 2: From Release (Manual Install)
-1.  Download the latest `Cognito-v3.6.0.zip` (or the current version from `package.json`) file from the [Releases page](https://github.com/3-ark/Cognito/releases).
+1.  Download the latest file from the [Releases page](https://github.com/3-ark/Cognito/releases).
 2.  Extract the downloaded ZIP file to a permanent folder on your computer.
 3.  Open Chrome and navigate to `chrome://extensions`.
 4.  Enable **Developer mode** using the toggle in the top-right corner.
