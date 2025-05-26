@@ -1,107 +1,138 @@
-![title.png](docs/title.png)
-# Cognito: Your Browser's AI Brain. Free, Fast, and Always On
+# Cognito: Your AI Sidekick for Chrome 🚀
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![GitHub version](https://img.shields.io/github/v/release/3-ark/Cognito)](https://github.com/3-ark/Cognito/releases/latest)
+<!-- Optional: Add more badges like build status, stars, etc. -->
 
-Get instant summaries, intelligent searches, and AI interactions directly in your Chrome browser. Tired of information overload? Cognito cuts through the noise. Get instant summaries of any webpage, ask questions about what you're reading, and conduct smarter searches—all without leaving your browser. No subscriptions, no complex setups. Cognito is free and runs right in your Chrome browser.
+**Cognito supercharges your Chrome browser with AI, acting as your intelligent sidekick to interpret your needs, guide your browsing, query information, and interact naturally with web content.**
 
-Run powerful AI models directly on your computer with Ollama, LM Studio, and more – or connect to cloud services like OpenAI and Gemini. *You choose the power.*
-
-Built on [sidellama](https://github.com/gyopak/sidellama).
-
-## Screenshot
-
+<!-- Optional: Add a slightly larger, more engaging screenshot or GIF here if available. docs/screenshot.png is good. -->
 ![](docs/screenshot.png)
 
-## Key Features
+## ✨ Core Features
 
-*   **Note** You can save context in the note and inject it into LLM as you want, it's convenient for you to compare or to embed context. Memory coming soon!
-*   **Instant Summaries:** Get the gist of any webpage in seconds.
-*   **Intelligent Interactions:** Ask questions and get answers directly from ~page~ different content (e.g. url in chat, the page you are reading, the PDF in your browser, the content in your notes, or contents from SERP.).
-*   **Smart Web Search:** Context-aware searches using Google, DuckDuckGo, and Wikipedia.
-*   **Flexible AI Power:** Use local models (Ollama, LM Studio) or cloud services (OpenAI, Gemini).
-*   **Customizable Personas:** Choose from 7 pre-built AI personalities (researcher, strategist, etc.).
-*   **Advanced Problem Solving:** Unique 'Computation Levels' for simple queries to complex tasks.
-*   **Reads Aloud:** Hear responses with built-in text-to-speech.
+*   **Seamless AI Integration:** Connect to a wide array of powerful AI models:
+    *   **Local Models:** Ollama, LM Studio
+    *   **Cloud Services:** OpenAI (ChatGPT), Gemini, Groq, OpenRouter
+    *   **Custom Connections:** Configure custom model endpoints.
+*   **Intelligent Content Interaction:**
+    *   **Instant Summaries:** Get the gist of any webpage in seconds.
+    *   **Contextual Q&A:** Ask questions about the current page, PDFs, or selected text.
+    *   **Smart Web Search:** Conduct context-aware searches using Google, DuckDuckGo, and Wikipedia, with the ability to fetch and analyze content from search results.
+*   **Personalized Experience:**
+    *   **Customizable Personas:** Choose from 7 pre-built AI personalities (Researcher, Strategist, etc.) or create your own.
+    *   **Computation Levels:** Adjust AI's problem-solving approach from quick answers (Low) to multi-step task decomposition (Medium, High) for complex queries. *(Beta: Note token usage - High Compute can use 100-150x more tokens than Low Compute.)*
+    *   **Themes & Appearance:** Customize the look and feel.
+*   **Productivity Boosters:**
+    *   **Note Taking:** Save context, chat snippets, and important information directly within the side panel.
+    *   **Text-to-Speech (TTS):** Hear AI responses read aloud (supports browser TTS and integration with external services like Piper).
+    *   **Chat History:** Keep track of your interactions.
+*   **Developer-Friendly:** Built with a modern tech stack, open-source, and ready for contributions.
 
-## Roadmap
+## 🛠️ How It Works
 
-*   Bug fixes and improvements.
-*   Evaluate and integrate pull requests.
----
+Cognito is a Chrome extension built with a modular architecture:
 
-*   Replace 'deep research' with local/basic API services (even free tier)
-*   "Memory" for the chat history with RAG and ~search~[20250512].
-*   "Short Memory"(state) for web search and page parsing in the same task. Comparison mode.
-*   Edit text content directly from sidepanel. Basically, I want to extend this to the "AI agent".
-*   Add to note function (webpage, chat)
-*   Better local TTS/STT by API. [add https://github.com/rhulha/StreamingKokoroJS to my extension, thanks for your code in advance.]
-*   Image, voice api support.
-## Installation
+*   **Side Panel (React & Redux):** The main user interface where you interact with the AI, manage settings, and view results. Built with React for a dynamic experience and Redux (via `webext-redux`) for robust state management.
+*   **Background Script:** The engine of the extension. It handles communication with AI services, manages long-running tasks, injects content scripts, and coordinates actions across the extension.
+*   **Content Scripts:** Injected into web pages to securely access and relay page content (text, HTML) to the Side Panel and Background Script for processing by the AI.
 
-### Download the Latest Release
+This setup allows Cognito to understand the context of your browsing and provide relevant AI assistance without leaving your current tab.
 
-1.  Download the latest release from [here].
-2.  Enable Chrome Extensions > Developer mode.
-3.  Load the content of the extracted zip with the "Load unpacked" button.
+## 💻 Technology Stack
 
-### Install from Source
+*   **React:** For building the interactive Side Panel UI.
+*   **TypeScript:** For robust and maintainable code.
+*   **Redux & `webext-redux`:** For state management across the extension components.
+*   **Tailwind CSS:** For styling the user interface.
+*   **Webpack:** For bundling the extension.
+*   Various UI libraries (Radix UI components like `@radix-ui/react-accordion`, `lucide-react` for icons) for a polished look and feel.
 
-1.  Clone the repository: `git clone https://github.com/3-ark/Cognito.git`
-2.  Run `npm i && npm start` to generate your bundle, located in `dist/chrome`.
-3.  Enable Chrome Extensions > Developer mode.
-4.  Load the content of the `dist/chrome` folder with the "Load unpacked" button.
+## 🚀 Getting Started
 
-or a updated version before installation:
-1. run `npm install -g npm-check-updates`
-2. then `ncu -u` or `npx ncu -u`
-3. load package
+### Prerequisites
 
-## Furter tweaks
-**TTS** Currently, there is only basic TTS from the browser, so if you want some natural voices, you should use Edge or you have integrated TTS API from elsewhere. https://github.com/ken107/piper-browser-extension Here is an excellent Chrome extension that can add a local TTS service directly to Chrome, so you can find the downloaded models in the select dropdown in settings. And I found some https://github.com/remsky/Kokoro-FastAPI https://github.com/Lex-au/Orpheus-FastAPI, maybe we can integrate with them too. I have put a .tsx like that in the files anyway. I will look into this further. I hope someone can add this if possible, because so far it's good enough for me. But still, it's better to have some more choices without breaking anything.
+*   Google Chrome
 
-**Computation Levels** Need deeper insights? Cognito's unique 'Computation Levels' let you adjust the AI's thinking power. From quick answers to complex problem-solving, tailor the AI to your task.
+### Installation
 
-*   **Low:** Direct query to the LLM for a quick response. Ideal for simple questions and standard chat.
-*   **Medium:** Single-level task decomposition for moderately complex queries, breaking down the task into subtasks and synthesizing the results.
-*   **High:** Two-level task decomposition (stages → steps) for highly complex, multi-component tasks. This mode allows for in-depth planning and problem-solving.
+#### Option 1: From Chrome Web Store (Recommended for most users)
+*   Install from the [Chrome Web Store](https://chromewebstore.google.com/detail/pphjdjdoclkedgiaahmiahladgcpohca?utm_source=item-share-cb).
 
-**Important Considerations (Beta Phase):**
+#### Option 2: From Release (Manual Install)
+1.  Download the latest `Cognito-v3.6.0.zip` (or the current version from `package.json`) file from the [Releases page](https://github.com/3-ark/Cognito/releases).
+2.  Extract the downloaded ZIP file to a permanent folder on your computer.
+3.  Open Chrome and navigate to `chrome://extensions`.
+4.  Enable **Developer mode** using the toggle in the top-right corner.
+5.  Click the **Load unpacked** button.
+6.  Select the folder where you extracted the ZIP file.
 
-*   **Experimental Feature:** The Computation Levels feature is currently in **beta**. We encourage experimentation and feedback!
-*   **Token Usage:** Higher Compute Levels significantly increase token consumption. **High Compute can use 100-150x more tokens than Low Compute for the same query.** That means time and cost, too.
-*   **Potential Instability:** As a beta feature, unexpected behavior may occur. Please report any issues you encounter.
+#### Option 3: From Source (For Developers)
+1.  Clone the repository:
+    ```bash
+    git clone https://github.com/3-ark/Cognito.git
+    cd Cognito
+    ```
+2.  Install dependencies:
+    ```bash
+    npm install
+    ```
+3.  Build the extension:
+    ```bash
+    npm start
+    ```
+    This will generate the bundled extension in the `dist/chrome` folder.
+4.  Open Chrome and navigate to `chrome://extensions`.
+5.  Enable **Developer mode**.
+6.  Click **Load unpacked** and select the `dist/chrome` folder.
 
-By carefully selecting the appropriate Computation Level, you can unlock the full potential of Cognito while managing your resources effectively. We believe this feature will provide a significant boost in the quality of AI-driven problem-solving.
-   
-## Available Personas
+## 📖 Usage Examples
 
-Cognito offers the following personas to tailor the AI's behavior to your specific needs:
+*   **Summarize a News Article:** Open a lengthy article, open the Cognito side panel, and click "Summarize Page" or type "Summarize this page."
+*   **Ask About Page Content:** While viewing a complex technical document, select a confusing paragraph and ask Cognito, "Explain this selected text in simpler terms."
+*   **Perform Deep Research:** Use a Persona like "Ein (Academic Researcher)" and a "Medium" or "High" Computation Level to ask, "What are the latest advancements in renewable energy storage and their potential impacts?" Cognito can perform web searches and synthesize information.
+*   **Connect to Local LLM:** If you have Ollama running with a model like Llama3, go to Cognito's settings, select Ollama, enter your model details (e.g., `http://localhost:11434` and model name `llama3`), and start chatting with your local AI.
+*   **Save Notes:** During a chat, if the AI provides a useful snippet or you want to remember a key piece of information, click the "Add to Note" button (or a similar function) to save it for later reference within Cognito's notes feature.
 
-*   **Ein:** Academic researcher
-*   **Warren:** Business analyst
-*   **Jet:** Friendly assistant
-*   **Agatha:** Creative thinker
-*   **Jan:** Strategist
-*   **Sherlock:** Detective
-*   **Spike:** All-around assistant
+## ⚙️ Configuration
 
-See the [documentation](DOCs.md) for a complete overview of each persona's capabilities.
+*   **Connecting to AI Models:** Access the settings panel to configure connections to various supported LLMs (OpenAI, Gemini, Ollama, Groq, OpenRouter, Custom). You'll typically need API keys for cloud services or endpoint URLs for local models.
+*   **Choosing Personas:** Select from available personas (Ein: Academic researcher, Warren: Business analyst, Jet: Friendly assistant, Agatha: Creative thinker, Jan: Strategist, Sherlock: Detective, Spike: All-around assistant) to tailor the AI's tone and expertise, or create your own.
+*   **Adjusting Computation Levels:** Experiment with Low (direct query for simple questions), Medium (single-level task decomposition for moderately complex queries), and High (two-level task decomposition for highly complex tasks) computation levels. Be mindful of increased token usage (High Compute can use 100-150x more tokens) and processing time with higher levels. This feature is in beta.
+*   **TTS Settings:** Configure text-to-speech options, including browser-based TTS or integration with external services like Piper (via compatible extensions).
+*   **Theme Customization:** Personalize the appearance of the side panel.
 
-## Documentation
+## 🗺️ Roadmap
 
-For detailed usage instructions, persona guides, and troubleshooting, please refer to the [documentation page](DOCs.md).
-It's outdated, so I deleted it. New Doc needs some time to complete.
+*   Ongoing bug fixes and performance improvements.
+*   Evaluation and integration of community pull requests.
+*   **Enhanced Agent Capabilities:**
+    *   "Memory" for chat history with RAG (Retrieval Augmented Generation) and semantic search.
+    *   "Short-term Memory" (state management) for multi-step tasks within the same context (e.g., web search followed by page parsing and comparison).
+    *   Direct text editing/interaction on web pages via the side panel – extending Cognito towards an "AI agent" experience.
+*   Improved local TTS/STT integration (e.g., exploring options like StreamingKokoroJS).
+*   Potential support for image and voice API interactions for multimodal capabilities.
 
-## Thanks
+*(This section will be regularly updated based on project progress)*
 
-https://github.com/stanford-oval/WikiChat
-[sidellama](https://github.com/gyopak/sidellama).
-https://github.com/AlexBefest/highCompute.py
-https://github.com/rhulha/StreamingKokoroJS
-https://github.com/ken107/piper-browser-extension
+## 🤝 Contributing
 
-## License
+Contributions are welcome! If you'd like to help improve Cognito, please:
 
-MIT License - see the [LICENSE](LICENSE) file for details.
+1.  Fork the repository.
+2.  Create a new branch for your feature or bug fix: `git checkout -b feature/your-feature-name` or `bugfix/issue-number`.
+3.  Make your changes.
+4.  Ensure your code lints (e.g., `npm run lint` if a lint script is configured) and builds correctly (`npm start`).
+5.  Submit a pull request with a clear description of your changes.
 
+*(Consider adding details on coding style, development setup, or linking to a dedicated CONTRIBUTING.md file if one is created in the future.)*
+
+## 🙏 Acknowledgments
+
+*   Cognito was originally built upon and inspired by [sidellama](https://github.com/gyopak/sidellama).
+*   Inspiration and ideas from projects like Stanford's [WikiChat](https://github.com/stanford-oval/WikiChat), [highCompute.py](https://github.com/AlexBefest/highCompute.py) by AlexBefest, [StreamingKokoroJS](https://github.com/rhulha/StreamingKokoroJS), and the [piper-browser-extension](https://github.com/ken107/piper-browser-extension).
+*   Thanks to all the developers of the open-source libraries and tools that make Cognito possible.
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
