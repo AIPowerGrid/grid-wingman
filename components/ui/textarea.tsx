@@ -3,10 +3,16 @@ import AutosizeTextarea from "react-textarea-autosize"
 
 import { cn } from "@/src/background/util"
 
-export interface TextareaProps extends React.ComponentProps<"textarea"> {
+type Style = {
+  height?: number;
+  [key: string]: any;
+}
+
+export interface TextareaProps extends Omit<React.ComponentProps<"textarea">, 'style'> {
   autosize?: boolean
   minRows?: number
   maxRows?: number
+  style?: Style
 }
 
 function Textarea({
@@ -14,6 +20,7 @@ function Textarea({
   autosize = false,
   minRows,
   maxRows,
+  style,
   ...props
 }: TextareaProps) {
   if (autosize) {
@@ -22,6 +29,7 @@ function Textarea({
         data-slot="textarea-autosize"
         minRows={minRows}
         maxRows={maxRows}
+        style={style}
         className={cn(
           "flex w-full bg-transparent placeholder:text-muted-foreground",
           "focus-visible:border-ring focus-visible:ring-ring/50",

@@ -192,11 +192,12 @@ const GoogleCustomSearchSettingsPanel = ({ config, updateConfig }: GoogleCustomS
         <Label htmlFor="googleApiKey" className="text-[var(--text)] text-base font-medium pb-1 block">
           Google API Key
         </Label>
-        <Input // Use standard Input component
+        <Input
           id="googleApiKey"
           type={config.visibleApiKeys ? "text" : "password"}
           value={apiKey}
           onChange={handleApiKeyChange}
+          className="h-6"
           placeholder="Enter Google API Key"
         />
         <p className="text-[var(--text)]/70 text-xs pt-1">
@@ -215,10 +216,11 @@ const GoogleCustomSearchSettingsPanel = ({ config, updateConfig }: GoogleCustomS
         <Label htmlFor="googleCx" className="text-[var(--text)] text-base font-medium pb-1 block">
           Search Engine ID (CX)
         </Label>
-        <Input // Use standard Input component
+        <Input
           id="googleCx"
           type="text"
           value={cx}
+          className="h-6"
           onChange={handleCxChange}
           placeholder="Enter Search Engine ID (CX)"
         />
