@@ -234,7 +234,7 @@ const WebSearchIconButton = ({ children, onClick, isActive, title }: { children:
           "border rounded-lg text-[var(--text)]",
           "cursor-pointer flex items-center justify-center",
           "p-2 place-items-center relative",
-          "w-10 h-10 flex-shrink-0",
+          "w-8 h-8 flex-shrink-0",
           "transition-colors duration-200 ease-in-out",
           isActive 
             ? "bg-[var(--active)] text-[var(--text)] border-[var(--active)] hover:brightness-95" 
@@ -657,9 +657,9 @@ const Cognito = () => {
             {config?.chatMode === "page" && (
                    (<div
                       className={cn(
-                        "fixed bottom-14 left-0 right-0",
+                        "fixed bottom-14 left-1/2 -translate-x-1/2", // Changed positioning
                         "flex flex-row justify-center",
-                        "w-full h-12 z-[2]",
+                        "w-fit h-8 z-[2]",
                         "transition-all duration-200 ease-in-out",
                         isPageActionsHovering ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2.5",
                         "bg-transparent px-0 py-0"
@@ -715,9 +715,9 @@ const Cognito = () => {
             {config?.chatMode === "web" && (
               <div
                 className={cn(
-                  "fixed bottom-14 left-0 right-0",
+                  "fixed bottom-14 left-1/2 -translate-x-1/2", // Changed positioning
                   "flex flex-row justify-center",
-                  "w-full h-12 z-[2]",
+                  "w-fit h-10 z-[2]",
                   "transition-all duration-200 ease-in-out",
                   isWebSearchHovering ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2.5",
                   "bg-transparent px-0 py-0"
@@ -726,7 +726,7 @@ const Cognito = () => {
                 onMouseEnter={() => setIsWebSearchHovering(true)}
                 onMouseLeave={() => setIsWebSearchHovering(false)}
               >
-                <div className="flex items-center space-x-3 max-w-full overflow-x-auto px-4 py-1">
+                <div className="flex items-center space-x-4 max-w-full overflow-x-auto px-4 py-1">
                   {WEB_SEARCH_MODES.map((mode) => (
                     <WebSearchIconButton
                       key={mode.id}
