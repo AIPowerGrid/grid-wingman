@@ -8,8 +8,6 @@ import { cn } from "@/src/background/util";
 import { useConfig } from './ConfigContext';
 import { SettingTitle } from './SettingsTitle';
 
-// sliderClass is removed, variant="themed" will be used instead.
-
 interface ContextLimitSliderProps {
   size: number;
   updateConfig: ReturnType<typeof useConfig>['updateConfig'];

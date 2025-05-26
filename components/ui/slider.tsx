@@ -11,7 +11,6 @@ const sliderVariants = cva(
     variants: {
       variant: {
         default: [
-          // Default Track, Range, Thumb styles
           "[&>span[data-slot=slider-track]]:bg-secondary",
           "[&>span[data-slot=slider-track]>span[data-slot=slider-range]]:bg-primary",
           "[&>button[data-slot=slider-thumb]]:bg-background",
@@ -72,14 +71,14 @@ function Slider({
       <SliderPrimitive.Track
         data-slot="slider-track"
         className={cn(
-          "relative h-1.5 w-full grow overflow-hidden rounded-full", // Removed bg-secondary, CVA handles it
+          "relative h-1.5 w-full grow overflow-hidden rounded-full",
           "data-[orientation=vertical]:h-full data-[orientation=vertical]:w-1.5"
         )}
       >
         <SliderPrimitive.Range
           data-slot="slider-range"
           className={cn(
-            "absolute h-full", // Removed bg-primary, CVA handles it
+            "absolute h-full",
             "data-[orientation=vertical]:w-full"
           )}
         />
@@ -88,10 +87,8 @@ function Slider({
         <SliderPrimitive.Thumb
           data-slot="slider-thumb"
           key={index}
-          // Base thumb styles. Variant-specific styles (bg, border, ring) are applied by CVA on Root.
           className={cn(
-            "block h-4 w-4 rounded-full border shadow-sm transition-colors focus-visible:ring-1 disabled:pointer-events-none disabled:opacity-50"
-            // Removed: bg-background, border-primary, ring-offset-background, focus-visible:ring-ring (now handled by CVA)
+            "block h-4 w-4 bg-white rounded-full border border-primary/50 shadow-sm transition-colors focus-visible:ring-1 disabled:pointer-events-none disabled:opacity-50"
           )}
         />
       ))}

@@ -1,8 +1,8 @@
 import * as React from "react"
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group"
 import { CircleIcon } from "lucide-react"
-
 import { cn } from "src/background/util"
+import { cva, type VariantProps } from "class-variance-authority"
 
 function RadioGroup({
   className,
@@ -17,26 +17,18 @@ function RadioGroup({
   )
 }
 
-function RadioGroupItem({
-  className,
-import { cva, type VariantProps } from "class-variance-authority" // Import CVA
-
-// Define CVA variants for RadioGroupItem
 const radioGroupItemVariants = cva(
-  // Base styles
   "aspect-square size-4 shrink-0 rounded-full border shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
   {
     variants: {
       variant: {
         default: [
           "border-input dark:bg-input/30 text-primary focus-visible:border-ring focus-visible:ring-ring/50",
-          // Default indicator style is handled by the CircleIcon className directly for fill
         ],
         themed: [
           "border-[var(--text)] text-[var(--active)]", // Base border and text (for icon)
           "focus-visible:ring-1 focus-visible:ring-[var(--active)] focus-visible:ring-offset-0 focus-visible:border-[var(--active)]", // Themed focus
           "data-[state=checked]:border-[var(--active)]", // Themed checked border
-          // Themed indicator style will be handled by modifying CircleIcon's fill if needed or ensuring text color is inherited
         ],
       },
     },
@@ -46,7 +38,6 @@ const radioGroupItemVariants = cva(
   }
 )
 
-// Define props for RadioGroupItem including variants
 export interface RadioGroupItemProps
   extends React.ComponentProps<typeof RadioGroupPrimitive.Item>,
     VariantProps<typeof radioGroupItemVariants> {}

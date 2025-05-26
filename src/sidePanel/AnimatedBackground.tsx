@@ -16,7 +16,6 @@ const AnimatedBackground: React.FC = () => {
       container.appendChild(canvas);
 
       const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;      if (!ctx) return;
-      // From here, ctx is CanvasRenderingContext2D
 
       const fontSize = 16;
       const columnWidth = fontSize * 1.2;
