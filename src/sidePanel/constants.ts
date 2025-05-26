@@ -20,7 +20,7 @@ export const personaImages: {
   Warren: 'assets/images/warren.png',
   Jet: 'assets/images/jet.png',
   Jan: 'assets/images/jan.png',
-  Sherlock: 'assets/images/Cognito.png',
+  Sherlock: 'assets/images/sherlock.png',
   Ein: 'assets/images/ein.png',
   Faye: 'assets/images/faye.png',
   default: 'assets/images/custom.png'

@@ -67,17 +67,22 @@ const WelcomeModal: React.FC<WelcomeModalProps> = ({ isOpen, onClose, setSetting
     <DialogContent
       variant="themedPanel"
       className={cn( 
-          "max-w-[240px] max-h-[140px]",
           "[&>button]:hidden"
       )}
+      style={{ 
+        width: '220px', 
+        height: '110px',
+        borderRadius: '30px',
+        boxShadow: '15px 15px 30px rgb(25, 25, 25), 0px 0px 30px rgb(60, 60, 60)'
+      }}
       onInteractOutside={(e) => e.preventDefault()}
     >
-      <DialogHeader className="text-center font-['Bruno_Ace_SC'] p-2">
+      <DialogHeader className="text-center font-['Bruno_Ace_SC'] p-2 header-title-glow">
         <DialogTitle className="text-base pt-2">Welcome</DialogTitle>
       </DialogHeader>
       <DialogDescription asChild>
         <div className="p-4 text-center">
-          <p className="text-[var(--text)] text-xl font-['Bruno_Ace_SC'] mb-2 -mt-7">
+          <p className="text-[var(--text)] header-title-glow font-['Bruno_Ace_SC'] mb-2 -mt-7">
             The game is afoot!<br />
           </p>
           <div className="flex justify-center">
@@ -94,7 +99,7 @@ const WelcomeModal: React.FC<WelcomeModalProps> = ({ isOpen, onClose, setSetting
         </div>
       </DialogDescription>
     </DialogContent>
-  </Dialog>
+  </Dialog> 
 );
 
 const Badge = ({ children }: { children: React.ReactNode }) => (

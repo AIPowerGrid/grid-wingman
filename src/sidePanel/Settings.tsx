@@ -25,21 +25,24 @@ export const Settings = () => {
       {showWarning && (
         <div className={cn(
           "mb-4 p-4 rounded-xl",
-          "bg-[var(--active)]/20 border border-[var(--active)]",
-          "text-[var(--text)]"
+          "cognito-title-blade-glow",
+          "text-[var(--text)]",
+          "text-base"
         )}>
           <div className="flex flex-col items-center gap-3">
             <p className="text-center font-medium">
-              Please connect to your models to start chatting
+              <strong>First Time GUIDE</strong><br />
+              Connect to API provider, then click on the avatar in the top left corner of the chat UI to select a model and set persona, you will be set then!
             </p>
             <Button
-              variant="outline-themed" // Changed variant
+              variant="outline"
+              className="justify-center h-7 text-sm"
               onClick={() => {
                 setAccordionValue("connect");
                 setShowWarning(false);
               }}
             >
-              Connect Models
+            Start
             </Button>
           </div>
         </div>

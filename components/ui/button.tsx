@@ -31,7 +31,7 @@ const buttonVariants = cva(
           "border border-destructive bg-transparent text-destructive shadow-xs hover:bg-destructive/10 hover:text-destructive-foreground focus-visible:bg-destructive/10 focus-visible:text-destructive-foreground focus-visible:ring-1 focus-visible:ring-destructive",
         "copy-button":
           "bg-background text-foreground shadow-none hover:bg-accent hover:text-accent-foreground focus-visible:bg-accent focus-visible:text-accent-foreground",
-        connect:
+        "connect":
           "bg-[var(--input-background)] text-[var(--text)] hover:bg-[var(--active)]/90 shadow-sm focus-visible:ring-1 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--bg)]",
         "active-bordered":
           "bg-[var(--active)] text-[var(--text)] border border-[var(--text)] hover:brightness-110 focus-visible:ring-1 focus-visible:ring-[var(--active)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--bg)] shadow-sm",
