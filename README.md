@@ -1,8 +1,8 @@
+![](docs/banner.png)
 # Cognito: Your AI Sidekick for Chrome 🚀
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![GitHub version](https://img.shields.io/github/v/release/3-ark/Cognito)](https://github.com/3-ark/Cognito/releases/latest)
-<!-- Optional: Add more badges like build status, stars, etc. -->
 
 **Cognito supercharges your Chrome browser with AI, acting as your intelligent sidekick to interpret your needs, guide your browsing, query information, and interact naturally with web content.**
 
