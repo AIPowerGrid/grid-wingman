@@ -1,8 +1,6 @@
-![](docs/banner.png)
+
 # Wingman: Your AI Sidekick for Chrome
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![GitHub version](https://img.shields.io/github/v/release/AIPowerGrid/grid-wingman)](https://github.com/AIPowerGrid/grid-wingman/releases/latest)
 
 **Wingman** enhances your Chrome browsing experience by providing an intelligent AI assistant that interprets your needs, guides your browsing, answers queries, and interacts naturally with web content.
 
