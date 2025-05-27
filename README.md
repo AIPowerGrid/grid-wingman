@@ -7,7 +7,8 @@
 **Cognito supercharges your Chrome browser with AI, acting as your intelligent sidekick to interpret your needs, guide your browsing, query information, and interact naturally with web content.**
 
 <!-- Optional: Add a slightly larger, more engaging screenshot or GIF here if available. docs/screenshot.png is good. -->
-![](docs/screenshot.png)
+![](docs/web.gif) ![](docs/local.gif) 
+
 
 ## ✨ Core Features
 
