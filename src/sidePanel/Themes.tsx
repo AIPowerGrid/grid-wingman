@@ -486,7 +486,7 @@ export const Themes = () => {
 
           <div>
             <p className="text-foreground text-base font-medium pb-3 text-left">Font Size: {currentFontSize}px</p>
-            <Slider value={[currentFontSize]} max={20} min={7} step={1} className="w-full" onValueChange={(value) => { updateConfig({ fontSize: value[0] }); }} />
+            <Slider value={[currentFontSize]} variant="themed" max={20} min={7} step={1} className="w-full" onValueChange={(value) => { updateConfig({ fontSize: value[0] }); }} />
           </div>
 
           <div className="pt-4 mt-4 border-t border-[var(--text)]/20">
