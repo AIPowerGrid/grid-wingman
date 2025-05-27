@@ -73,7 +73,7 @@ export const Connect: FC = () => {
           "hover:brightness-95",
         )}
       >
-        <SettingTitle icon="♾️" text="Connect" />
+        <SettingTitle icon="♾️" text="API Access" />
       </AccordionTrigger>
       <AccordionContent className="p-0 text-[var(--text)]">
         <ConnectionSection Component={ConnectOllama} title="Ollama" />
