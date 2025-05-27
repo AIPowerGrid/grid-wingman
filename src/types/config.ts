@@ -43,6 +43,7 @@ export interface Config {
   persona: string;
   generateTitle?: boolean;
   backgroundImage?: boolean;
+  animatedBackground?: boolean;
   webMode?: 'Duckduckgo' | 'Brave' | 'Google' | 'Wikipedia' | 'GoogleCustomSearch' | string; // Added GoogleCustomSearch
   webLimit?: number;
   serpMaxLinksToVisit?: number;

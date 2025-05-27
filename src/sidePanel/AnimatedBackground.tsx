@@ -6,6 +6,11 @@ const AnimatedBackground: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // If animations are disabled, don't render anything
+    if (!config?.animatedBackground) {
+      return;
+    }
+
     const container = containerRef.current;
     if (!container) return;
 
@@ -162,7 +167,12 @@ const AnimatedBackground: React.FC = () => {
         balls.forEach((ball) => container.removeChild(ball));
       };
     }
-  }, [config?.theme]);
+  }, [config?.theme, config?.animatedBackground]);
+
+  // Don't render anything if animations are disabled
+  if (!config?.animatedBackground) {
+    return null;
+  }
 
   return (
     <div

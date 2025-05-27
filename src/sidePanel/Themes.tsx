@@ -140,30 +140,23 @@ export const themes: Theme[] = [
 ];
 
 function isColorDark(color: string): boolean {
-  // Handle empty/invalid input
   if (!color) return false;
 
-  // Remove opacity if present
   const hex = color.replace(/[^0-9a-f]/gi, '');
   
-  // Handle 3, 4, 6 or 8 digit hex
   let r, g, b;
   if (hex.length <= 4) {
-    // 3 or 4 digits (RGB or RGBA)
     r = parseInt(hex[0] + hex[0], 16);
     g = parseInt(hex[1] + hex[1], 16);
     b = parseInt(hex[2] + hex[2], 16);
   } else {
-    // 6 or 8 digits (RRGGBB or RRGGBBAA)
     r = parseInt(hex.substring(0, 2), 16);
     g = parseInt(hex.substring(2, 4), 16);
     b = parseInt(hex.substring(4, 6), 16);
   }
 
-  // Check if parsing was successful
   if (isNaN(r) || isNaN(g) || isNaN(b)) return false;
 
-  // Calculate perceived brightness using YIQ formula
   const brightness = (r * 299 + g * 587 + b * 114) / 1000;
   return brightness < 128;
 }
@@ -177,7 +170,6 @@ export const setTheme = (c: Theme, paperTextureEnabled: boolean = true) => {
     return;
   }
 
-  // Improved dark theme detection
   const isDarkBg = c.bg && isColorDark(c.bg);
   const isDarkTheme = c.name === 'dark' || (c.name === 'custom' && isDarkBg);
   root.dataset.theme = isDarkTheme ? 'dark' : 'light';
@@ -196,7 +188,6 @@ export const setTheme = (c: Theme, paperTextureEnabled: boolean = true) => {
     return `rgba(${r}, ${g}, ${b}, ${a})`;
   };
 
-  // When getting colors, convert 8-digit hex to rgba
   const bg = convertHexToRGBA(c.bg || '#ffffff');
   const text = convertHexToRGBA(c.text || '#000000');
   const active = convertHexToRGBA(c.active || '#007bff');
@@ -267,10 +258,8 @@ const PaletteColorPicker = ({
   onColorChangeComplete: (key: keyof Omit<Theme, 'name'>, color: IColor) => void;
   themeKey: keyof Omit<Theme, 'name'>;
 }) => {
-  // Always normalize to #RRGGBBAA
   const normalizedHex = normalizeColor(initialColor);
 
-  // Use the color-palette hook directly
   const [color, setColor] = useColor(normalizedHex);
 
   const handleChange = (newColor: IColor) => {
@@ -278,7 +267,6 @@ const PaletteColorPicker = ({
   };
 
   const handleComplete = (finalColor: IColor) => {
-    // Always output #RRGGBBAA (never longer)
     let hex = finalColor.hex.slice(0, 7);
     if (finalColor.rgb.a !== undefined && finalColor.rgb.a < 1) {
       const alphaHex = Math.round(finalColor.rgb.a * 255)
@@ -290,7 +278,6 @@ const PaletteColorPicker = ({
     }
     hex = hex.slice(0, 9);
 
-    // Don't mutate finalColor, create a new object
     onColorChangeComplete(themeKey, { ...finalColor, hex });
   };
 
@@ -441,9 +428,9 @@ export const Themes = () => {
     <AccordionItem
       value="themes"
       className={cn(
-        "bg-[var(--input-background)] border-[var(--text)]/10 rounded-xl shadow-md", // Standard container styles
-        "transition-all duration-150 ease-in-out", // Common transition
-        "hover:border-[var(--active)] hover:brightness-105" // Common hover
+        "bg-[var(--input-background)] border-[var(--text)]/10 rounded-xl shadow-md",
+        "transition-all duration-150 ease-in-out",
+        "hover:border-[var(--active)] hover:brightness-105"
       )}
     >
       <AccordionTrigger
@@ -472,6 +459,14 @@ export const Themes = () => {
                 id="backgroundImage-switch"
                 checked={config?.backgroundImage ?? false}
                 onCheckedChange={(checked) => updateConfig({ backgroundImage: checked })}
+              />
+            </div>
+            <div className="flex items-center justify-between pr-3">
+              <Label htmlFor="animatedBackground-switch" className="text-base font-medium text-foreground cursor-pointer">Animated background</Label>
+              <Switch
+                id="animatedBackground-switch"
+                checked={config?.animatedBackground ?? true}
+                onCheckedChange={(checked) => updateConfig({ animatedBackground: checked })}
               />
             </div>
             <div className="flex items-center justify-between pr-3">
@@ -541,36 +536,28 @@ export const Themes = () => {
   );
 };
 
-// Update the color validation function
 function isValidColor(color: string): boolean {
   if (!color) return false;
   
-  // Remove any non-hex characters
   const hex = color.replace(/[^0-9a-f]/gi, '');
   
-  // Check if the remaining hex digits are valid length
   return [6, 8].includes(hex.length);
 }
 
-// Update the normalize function
 function normalizeColor(color: string): string {
   if (!color) return '#000000ff';
 
-  // Remove non-hex characters
   let hex = color.replace(/[^0-9a-f]/gi, '');
 
-  // Only keep the first 8 digits (RRGGBBAA)
   hex = hex.slice(0, 8);
 
-  // Pad to 6 or 8 digits
   if (hex.length < 6) {
     hex = hex.padEnd(6, '0');
   }
   if (hex.length === 6) {
-    hex += 'ff'; // opaque
+    hex += 'ff';
   }
 
-  // Only allow 8 digits (RRGGBBAA)
   hex = hex.slice(0, 8);
 
   return `#${hex}`;
